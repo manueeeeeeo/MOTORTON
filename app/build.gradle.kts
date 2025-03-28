@@ -43,7 +43,12 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    implementation(libs.activity)
+    implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation ("com.google.firebase:firebase-auth:22.1.1")
+    implementation ("com.google.android.gms:play-services-auth:20.6.0")
+    implementation ("androidx.activity:activity-ktx:1.7.0")
 }
