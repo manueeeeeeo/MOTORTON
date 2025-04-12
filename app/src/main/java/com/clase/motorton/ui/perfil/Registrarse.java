@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -19,7 +20,12 @@ import androidx.core.view.WindowInsetsCompat;
 import com.clase.motorton.R;
 import com.clase.motorton.controllers.ControladorEmail;
 import com.clase.motorton.controllers.ControladorPassword;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class Registrarse extends AppCompatActivity {
@@ -136,7 +142,7 @@ public class Registrarse extends AppCompatActivity {
             }
         });
 
-        // Acción que sucederá al tocar el botónde de volver
+        // Acción que sucederá al tocar el botón de de volver
         btnVolver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -150,5 +156,168 @@ public class Registrarse extends AppCompatActivity {
                 finish();
             }
         });
+
+        // Acción que sucederá al tocar el botón de borrar campos
+        btnBorrar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Llamamos al método de borrar campos
+                borrarCampos();
+            }
+        });
+
+        // Acción que sucederá al tocar el botón de registrarse
+        btnRegis.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                correo = (String) editCorreo.getText().toString(); // Obtenemos en una variable el correo
+                clave = (String) editClave.getText().toString(); // Obtenemos en una variable la clave
+                clave2 = (String) editConfirmarClave.getText().toString(); // Obtenemos en una variable la confirmación de la clave
+                if(correo.isEmpty()){ // En caso de que el correo esté vacío
+                    // Lanzamos un Toast indicandolo
+                    showToast("El campo del correo está vacio!!");
+                }else{ // En caso de que esté relleno
+                    if(clave.isEmpty()){ // En caso de que la clave esté vacía
+                        // Lanzamos in Toast indicandolo
+                        showToast("El campo de la clave está vacio!!");
+                    }else{ // En caso de que esté rellena
+                        if(clave2.isEmpty()){ // En caso de que la confirmación de clave esté vacía
+                            // Lanzamos un Toast indicandolo
+                            showToast("El campo de confirmar la clave está vacio!!");
+                        }else{ // En caso de que esté rellena
+                            // Procedemos a comprobar que la clave y la confirmación sean la misma
+                            if(clave.equals(clave2)){ // En caso de que sean la misma
+                                // Comprobamos con el controlador que sea un correo valido
+                                if(controEmail.esCorreoValido(correo)){ // En caso de ser valido
+                                    // Comprobamos con el controlador que la clave sea valida
+                                    if(controPass.validarPassword(clave).equals("OK")){ // En caso de ser valida
+                                        // Comprobamos con el controlador que la confirmación sea valida
+                                        if(controPass.validarPassword(clave2).equals("OK")){ // En caso de ser valida
+                                            // Llamamos al método para registrarnos con el correo y la clave
+                                            registrarseConClaveYEmail(correo, clave);
+                                        }else{ // En caso de que la confirmación no sea valida
+                                            // Lanzamos un Toast indicandolo
+                                            showToast("Error: " + controPass.validarPassword(clave2));
+                                        }
+                                    }else{ // En caso de que la clave no sea valida
+                                        // Lanzamos un Toast indicandolo
+                                        showToast("Error: " + controPass.validarPassword(clave));
+                                    }
+                                }else{ // En caso de que el correo no sea valido
+                                    // Lanzamos un Toast indicandolo
+                                    showToast("El correo no tiene el formato adecuado!!");
+                                }
+                            }else{ // En caso de que sean diferentes
+                                // Lanzamos un Toast indicandolo
+                                showToast("La clave y la confirmación tienen que ser la misma");
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * @param email
+     * @param clave
+     * Método para registrar al usuario con un email y una clave
+     * en nuestra aplicación, además también, comprobamos si el usuario ya existe
+     * en la base de datos de la misma para realizar un procedeimiento u otro
+     * */
+    public void registrarseConClaveYEmail(String email, String clave){
+        auth.createUserWithEmailAndPassword(email, clave)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Obtenemos el usuario de firebase autenticado
+                            FirebaseUser user = auth.getCurrentUser();
+                            // Comprobamos que no sea nulo
+                            if (user != null) {
+                                // Obtenemos en una variable el uid del usuario
+                                String uid = user.getUid();
+                                // Verificamos si el usuario ya existe en Firestore
+                                db.collection("perfiles").document(uid).get()
+                                        // Una vez completado
+                                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                // Procedemos a comprobar si la tarea ha sido hecha correctamente o no
+                                                if (task.isSuccessful()) { // En caso afirmativo
+                                                    // Obtenemos un documento que hace referencia a lo obtenido de la tarea de busqueda
+                                                    DocumentSnapshot document = task.getResult();
+                                                    // Comprobamos si existe el documento
+                                                    if (document.exists()) { // En caso de si existir
+                                                        // Si el documento existe, redirigimos al usuario al inicio de sesión
+                                                        showToast("El usuario ya está registrado.");
+                                                        volverAlLogin();
+                                                    } else { // En caso de no existir
+                                                        // Lanzamos un Toast para que el usuario sepa que está pasando algo
+                                                        showToast("Redirigiendo para completar perfil...");
+                                                        // Creamos un nuevo intent indicando de donde partimos y a donde vamos
+                                                        Intent intent = new Intent(Registrarse.this, CreacionPerfil.class);
+                                                        intent.putExtra("uid", uid); // Pasamos el UID del usuario
+                                                        intent.putExtra("email", email); // Pasamos el correo del usuario
+                                                        // Iniciamos la nueva actividad
+                                                        startActivity(intent);
+                                                        // Establecemos una animación para que sea más suave la transición
+                                                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                                                        finish(); // Cerramos la actividad actual
+                                                    }
+                                                } else { // En caso de que haya ocurrido un error al verificar el usaurio
+                                                    // Lanzamos un Toast con el error de verificación
+                                                    showToast("Error al verificar usuario: " + task.getException().getMessage());
+                                                }
+                                            }
+                                        });
+                            }
+                        }
+                    }
+                });
+    }
+
+    /**
+     * Método para borrar y reiniciar los campos
+     * del formulario de registro
+     * */
+    public void borrarCampos(){
+        editCorreo.setText("");
+        editClave.setText("");
+        editConfirmarClave.setText("");
+    }
+
+    /**
+     * Método para volver a la pantalla
+     * de inicio de sesión tras el registro del
+     * usuario
+     * */
+    public void volverAlLogin(){
+        // Genero un nuevo Intent indicando de donde inicio y a donde voy
+        Intent in = new Intent(Registrarse.this, InicioSesion.class);
+        // Inicializo la nueva actividad
+        startActivity(in);
+        // Establecemos una transición suave
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        // Finalizamos la actividad actual
+        finish();
+    }
+
+    /**
+     * @param mensaje
+     * Método para ir matando los Toast y mostrar todos en el mismo para evitar
+     * colas de Toasts y que se ralentice el dispositivo*/
+    public void showToast(String mensaje){
+        if (this != null){
+            // Comprobamos si existe algun toast cargado en el toast de la variable global
+            if (mensajeToast != null) { // En caso de que si que exista
+                mensajeToast.cancel(); // Le cancelamos, es decir le "matamos"
+            }
+
+            // Creamos un nuevo Toast con el mensaje que nos dan de argumento en el método
+            mensajeToast = Toast.makeText(this, mensaje, Toast.LENGTH_SHORT);
+            // Mostramos dicho Toast
+            mensajeToast.show();
+        }
     }
 }
