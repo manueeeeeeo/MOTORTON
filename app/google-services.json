@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "157393031901",
+    "project_id": "tfgmanu-17a36",
+    "storage_bucket": "tfgmanu-17a36.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:157393031901:android:e1104eb13908c191f88134",
+        "android_client_info": {
+          "package_name": "com.clase.motorton"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "157393031901-v2gfvsjrjcr68b6n96ig41h33hntnnrm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHtDTXUsqD8ItIP5JiBC-X06Q0lH6gcbg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "157393031901-v2gfvsjrjcr68b6n96ig41h33hntnnrm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
