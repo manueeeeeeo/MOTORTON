@@ -92,6 +92,7 @@ public class CreacionPerfil extends AppCompatActivity {
     // Variable para manejar el código de solicitud de permisos
     private static final int PERMISSION_REQUEST_CODE = 100;
 
+    // Lanzador de actividad para obtener el resultado de la foto hecha con la camara
     private final ActivityResultLauncher<Intent> cameraResult =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK) {
@@ -103,6 +104,7 @@ public class CreacionPerfil extends AppCompatActivity {
                 }
             });
 
+    // Lanzador de actividad para obtener el resultado de la foto escogida de galeria
     private final ActivityResultLauncher<Intent> galleryResult =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK) {
@@ -212,5 +214,40 @@ public class CreacionPerfil extends AppCompatActivity {
                     }
                 })
                 .show();
+    }
+
+    /**
+     * @param mensaje
+     * Método para ir matando los Toast y mostrar todos en el mismo para evitar
+     * colas de Toasts y que se ralentice el dispositivo*/
+    public void showToast(String mensaje){
+        if (this != null){
+            // Comprobamos si existe algun toast cargado en el toast de la variable global
+            if (mensajeToast != null) { // En caso de que si que exista
+                mensajeToast.cancel(); // Le cancelamos, es decir le "matamos"
+            }
+
+            // Creamos un nuevo Toast con el mensaje que nos dan de argumento en el método
+            mensajeToast = Toast.makeText(this, mensaje, Toast.LENGTH_SHORT);
+            // Mostramos dicho Toast
+            mensajeToast.show();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            double latitud = data.getDoubleExtra("latitud", 0.0);
+            double longitud = data.getDoubleExtra("longitud", 0.0);
+            String direccion = data.getStringExtra("direccion");
+
+            ubicacionSeleccionada = new HashMap<>();
+            ubicacionSeleccionada.put("latitud", CifradoDeDatos.cifrar(String.valueOf(latitud)));
+            ubicacionSeleccionada.put("longitud", CifradoDeDatos.cifrar(String.valueOf(longitud)));
+            ubicacionSeleccionada.put("direccion", CifradoDeDatos.cifrar(direccion));
+
+            btnElegirUbicacion.setText(direccion);
+        }
     }
 }
