@@ -5,9 +5,11 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -23,10 +25,14 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.clase.motorton.R;
 import com.clase.motorton.cifrado.CifradoDeDatos;
+import com.clase.motorton.modelos.Perfil;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -214,6 +220,79 @@ public class CreacionPerfil extends AppCompatActivity {
                     }
                 })
                 .show();
+    }
+
+    public void insertarPerfil() {
+        db = FirebaseFirestore.getInstance();
+        FirebaseUser user = auth.getCurrentUser();
+
+        if (user == null) {
+            Toast.makeText(this, "No se pudo obtener la información del usuario. Inicia sesión nuevamente.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String uid = user.getUid();
+        String email = user.getEmail();
+
+        String campoUsername = editUsername.getText().toString();
+        String nombreCifrado = CifradoDeDatos.cifrar(editNombre.getText().toString());
+        String descripcionCifrada = CifradoDeDatos.cifrar(editDescrip.getText().toString());
+        String fechaNaciCifrada = CifradoDeDatos.cifrar(editFechaNacimiento.getText().toString());
+        String cpCifrado = CifradoDeDatos.cifrar(editCP.getText().toString());
+        String anosPermisoCifrado = CifradoDeDatos.cifrar(editAnoCon.getText().toString());
+        String emailCifrado = CifradoDeDatos.cifrar(email);
+
+        BitmapDrawable drawable = (BitmapDrawable) imagenPerfil.getDrawable();
+        Bitmap fotoBitmap = drawable != null ? drawable.getBitmap() : null;
+
+        String fotoPerfilBase64 = null;
+        if (fotoBitmap != null) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            fotoBitmap.compress(Bitmap.CompressFormat.JPEG, 85, baos);
+
+            byte[] fotoBytes = baos.toByteArray();
+            fotoPerfilBase64 = Base64.encodeToString(fotoBytes, Base64.DEFAULT);
+        }
+
+        Perfil perfil = new Perfil(
+                uid,
+                campoUsername,
+                nombreCifrado,
+                null,
+                edad,
+                fechaNaciCifrada,
+                cp.isEmpty() ? 0 : Integer.parseInt(cp),
+                new ArrayList<>(),
+                fotoBitmap,
+                emailCifrado
+        );
+
+        Map<String, Object> perfilMap = new HashMap<>();
+        perfilMap.put("uid", perfil.getUid());
+        perfilMap.put("username", perfil.getUsername());
+        perfilMap.put("nombre_completo", perfil.getNombre_completo());
+        perfilMap.put("ubicacion", ubicacionSeleccionada);
+        perfilMap.put("edad", perfil.getEdad());
+        perfilMap.put("fechaNaci", perfil.getFechaNaci());
+        perfilMap.put("cp", perfil.getCp());
+        perfilMap.put("email", perfil.getEmail());
+        perfilMap.put("aniosConduciendo", anosPermisoCifrado);
+        perfilMap.put("listaVehiculos", perfil.getListaVehiculos());
+        perfilMap.put("fotoPerfil", fotoPerfilBase64);
+
+        db.collection("perfiles").document(uid).set(perfilMap)
+                .addOnSuccessListener(aVoid -> {
+                    showToast("Perfil creado exitosamente");
+                    Intent i = new Intent(CreacionPerfil.this, AdministrarVehiculos.class);
+                    i.putExtra("uid", uid);
+                    startActivity(i);
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    showToast("Error al crear perfil: " + e.getMessage());
+                });
     }
 
     /**
