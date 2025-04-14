@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -19,6 +20,8 @@ import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -26,6 +29,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.clase.motorton.R;
 import com.clase.motorton.cifrado.CifradoDeDatos;
 import com.clase.motorton.modelos.Perfil;
+import com.clase.motorton.ui.mapas.ElegirUbicacion;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -101,10 +105,13 @@ public class CreacionPerfil extends AppCompatActivity {
     // Lanzador de actividad para obtener el resultado de la foto hecha con la camara
     private final ActivityResultLauncher<Intent> cameraResult =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-                if (result.getResultCode() == RESULT_OK) {
+                if (result.getResultCode() == RESULT_OK) { // En caso de que el resultado sea OK
+                    // Obtengo en una variable el resultado data obtenido con el Intent
                     Intent data = result.getData();
-                    if (data != null) {
+                    // Comprobamos que la data no sea nula
+                    if (data != null) { // En caso de no ser nulo
                         Bitmap photo = (Bitmap) data.getExtras().get("data");
+                        // Establezco la imagen uri en el componente de ImageView
                         imagenPerfil.setImageBitmap(photo);
                     }
                 }
@@ -113,10 +120,14 @@ public class CreacionPerfil extends AppCompatActivity {
     // Lanzador de actividad para obtener el resultado de la foto escogida de galeria
     private final ActivityResultLauncher<Intent> galleryResult =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-                if (result.getResultCode() == RESULT_OK) {
+                if (result.getResultCode() == RESULT_OK) { // En caso de que el resultado sea OK
+                    // Obtengo en una variable el resultado data obtenido con el Intent
                     Intent data = result.getData();
-                    if (data != null) {
+                    // Comprobamos que la data no sea nula
+                    if (data != null) { // En caso de no ser nulo
+                        // Obtengo en una variable de tipo Uri la data
                         Uri imageUri = data.getData();
+                        // Establezco la imagen uri en el componente de ImageView
                         imagenPerfil.setImageURI(imageUri);
                     }
                 }
@@ -178,6 +189,54 @@ public class CreacionPerfil extends AppCompatActivity {
 
             datePickerDialog.show();
         });
+
+        // Evento que sucede cuando pulsamos sobre el imageview de la imagen de perfil
+        imagenPerfil.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (ContextCompat.checkSelfPermission(CreacionPerfil.this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+                        ContextCompat.checkSelfPermission(CreacionPerfil.this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+                    ActivityCompat.requestPermissions(CreacionPerfil.this,
+                            new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.READ_EXTERNAL_STORAGE},
+                            PERMISSION_REQUEST_CODE);
+                } else { // En caso de tener los permisos concedidos
+                    // Llamamos al método para mostrar el dialogo de elegir de donde sacar la foto
+                    showImagePickerDialog();
+                }
+            }
+        });
+
+        // Evento que sucede cuando pulsamos el botón de elegir ubicación
+        btnElegirUbicacion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(CreacionPerfil.this, ElegirUbicacion.class);
+                startActivityForResult(intent, 1);
+            }
+        });
+
+        // Evento que sucede cuando pulsamos el botón de borrar los campos
+        btnBorrarCampos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                resetarCampos();
+            }
+        });
+
+        // Evento que sucede cuando pulsamos el botón de crear perfil
+        btnCrear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                username = editUsername.getText().toString();
+                nombre = editNombre.getText().toString();
+                anosPermiso = editAnoCon.getText().toString();
+                descripcion = editDescrip.getText().toString();
+                cp = editCP.getText().toString();
+                fechaNaci = editFechaNacimiento.getText().toString();
+                insertarPerfil();
+            }
+        });
     }
 
     /**
@@ -205,6 +264,12 @@ public class CreacionPerfil extends AppCompatActivity {
         }
     }
 
+    /**
+     * Método en el que mostramos al usuario un
+     * dialogo para que él, eliga de donde quiere sacar
+     * la imagen para su perfil, o desde camara o desde
+     * galeria
+     */
     private void showImagePickerDialog() {
         CharSequence[] options = {"Tomar Foto", "Elegir de Galería"};
 
@@ -222,6 +287,8 @@ public class CreacionPerfil extends AppCompatActivity {
                 .show();
     }
 
+    /**
+     * Método en el que */
     public void insertarPerfil() {
         db = FirebaseFirestore.getInstance();
         FirebaseUser user = auth.getCurrentUser();
@@ -280,6 +347,7 @@ public class CreacionPerfil extends AppCompatActivity {
         perfilMap.put("aniosConduciendo", anosPermisoCifrado);
         perfilMap.put("listaVehiculos", perfil.getListaVehiculos());
         perfilMap.put("fotoPerfil", fotoPerfilBase64);
+        perfilMap.put("descripcion", editDescrip);
 
         db.collection("perfiles").document(uid).set(perfilMap)
                 .addOnSuccessListener(aVoid -> {
@@ -313,6 +381,15 @@ public class CreacionPerfil extends AppCompatActivity {
         }
     }
 
+    /**
+     * @param data
+     * @param requestCode
+     * @param resultCode
+     * Método en el que tratamos y obtenemos todos
+     * los parametros de la ubicación del usuario.
+     * Obtenemos la latitud, longitud y dirección
+     * de la ubicación elegida por el usuario
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
