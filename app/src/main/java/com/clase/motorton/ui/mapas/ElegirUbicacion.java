@@ -1,5 +1,7 @@
 package com.clase.motorton.ui.mapas;
 
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -14,9 +16,17 @@ import com.clase.motorton.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class ElegirUbicacion extends AppCompatActivity {
     private MapView mapView = null;
@@ -57,8 +67,74 @@ public class ElegirUbicacion extends AppCompatActivity {
         });
     }
 
+    /**
+     * @param nombreLugar
+     * Método para */
     private void buscarUbicacion(String nombreLugar){
+        new Thread(() -> {
+            try {
+                String urlStr = "https://nominatim.openstreetmap.org/search?q=" +
+                        nombreLugar.replace(" ", "+") + "&format=json&limit=1";
+                URL url = new URL(urlStr);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestProperty("User-Agent", "MotortonApp/1.0");
+                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String linea;
+                while ((linea = reader.readLine()) != null) {
+                    response.append(linea);
+                }
+                reader.close();
 
+                JSONArray resultados = new JSONArray(response.toString());
+                if (resultados.length() > 0) {
+                    JSONObject lugar = resultados.getJSONObject(0);
+                    double lat = lugar.getDouble("lat");
+                    double lon = lugar.getDouble("lon");
+                    String direccion = lugar.getString("display_name");
+
+                    runOnUiThread(() -> mostrarResultado(lat, lon, direccion));
+                } else {
+                    runOnUiThread(() -> Toast.makeText(this, "No se encontró el lugar", Toast.LENGTH_SHORT).show());
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() -> Toast.makeText(this, "Error al buscar", Toast.LENGTH_SHORT).show());
+            }
+        }).start();
+    }
+
+    /**
+     * @param direccion
+     * @param lat
+     * @param lon
+     * Método para */
+    private void mostrarResultado(double lat, double lon, String direccion) {
+        GeoPoint punto = new GeoPoint(lat, lon);
+        mapView.getController().animateTo(punto);
+        mapView.getController().setZoom(15.0);
+
+        mapView.getOverlays().clear();
+        Marker marcador = new Marker(mapView);
+        marcador.setPosition(punto);
+        marcador.setTitle(direccion);
+        mapView.getOverlays().add(marcador);
+        mapView.invalidate();
+
+        new AlertDialog.Builder(this)
+                .setTitle("¿Usar esta ubicación?")
+                .setMessage(direccion)
+                .setPositiveButton("Sí", (dialog, which) -> {
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("latitud", lat);
+                    resultIntent.putExtra("longitud", lon);
+                    resultIntent.putExtra("direccion", direccion);
+                    setResult(RESULT_OK, resultIntent);
+                    finish();
+                })
+                .setNegativeButton("No", null)
+                .show();
     }
 
     /**
