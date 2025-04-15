@@ -444,7 +444,7 @@ public class AdministrarVehiculos extends AppCompatActivity {
 
         // Procedemos a comprobar si el usuario ya tiene todos los vehículos o no
         db.collection("vehiculos")
-                .whereEqualTo("usuarioId", uid)  // Filtramos por usuario
+                .whereEqualTo("uidDueno", uid)  // Filtramos por usuario
                 .get()
                 .addOnCompleteListener(task -> { // En caso de que todo vaya bien
                     // Procedemos a comprobar si la tarea se completo con existo
