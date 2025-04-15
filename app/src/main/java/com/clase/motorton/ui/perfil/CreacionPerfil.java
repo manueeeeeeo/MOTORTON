@@ -35,9 +35,11 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.ByteArrayOutputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -172,21 +174,29 @@ public class CreacionPerfil extends AppCompatActivity {
         // Establecemos el formato a establecer
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
+        // Evento que sucede cuando tocamos el ediText de la fecha de nacimeinto
         editFechaNacimiento.setOnClickListener(v -> {
+            // Creamos un nuevo calendario con la instancia actual para que marque el día de hoy
             Calendar calendar = Calendar.getInstance();
+            // Guardamos en una variable al año
             int year = calendar.get(Calendar.YEAR);
+            // Guardamos en una variable el mes
             int month = calendar.get(Calendar.MONTH);
+            // Guardamos en una variable el día
             int day = calendar.get(Calendar.DAY_OF_MONTH);
 
+            // Creo un nuevo dialogo de selección de fecha
             DatePickerDialog datePickerDialog = new DatePickerDialog(
                     CreacionPerfil.this,
                     (view, selectedYear, selectedMonth, selectedDay) -> {
+                        // Le damos formato a la fecha para que quede bien
                         String selectedDate = String.format("%04d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDay);
-                        editFechaNacimiento.setText(selectedDate);
+                        editFechaNacimiento.setText(selectedDate); // Introducimos la fecha seleccionada en el ediText
                     },
-                    year, month, day
+                    year, month, day // Establecemos que queremos el año, mes y día
             );
 
+            // Mostramos el dialogo de elección de la fecha
             datePickerDialog.show();
         });
 
@@ -211,7 +221,9 @@ public class CreacionPerfil extends AppCompatActivity {
         btnElegirUbicacion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Creamos un nuevo intent para ir a la actividad en donde elegimos nuestra ubicación
                 Intent intent = new Intent(CreacionPerfil.this, ElegirUbicacion.class);
+                // Obtenemos lo que nos devuelva la actividad de elegir nuestra ubicación
                 startActivityForResult(intent, 1);
             }
         });
@@ -220,6 +232,7 @@ public class CreacionPerfil extends AppCompatActivity {
         btnBorrarCampos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Llamamos al método para resetear los campos
                 resetarCampos();
             }
         });
@@ -228,12 +241,18 @@ public class CreacionPerfil extends AppCompatActivity {
         btnCrear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Obtengo en las variable todos los valores de los editText
                 username = editUsername.getText().toString();
                 nombre = editNombre.getText().toString();
                 anosPermiso = editAnoCon.getText().toString();
                 descripcion = editDescrip.getText().toString();
                 cp = editCP.getText().toString();
                 fechaNaci = editFechaNacimiento.getText().toString();
+
+                // Guardamos en una variable la edad calculada con el método pasandole la fecha de nacimiento del usuario
+                edad = calcularEdad(fechaNaci);
+
+                // Llamamos al método para insertar el perfil
                 insertarPerfil();
             }
         });
@@ -251,6 +270,45 @@ public class CreacionPerfil extends AppCompatActivity {
         editNombre.setText("");
     }
 
+    /**
+     * @return
+     * @param fechaNacimiento
+     * Método en el que le pasamos un string con la fecha de nacimiento
+     * y obtenemos la edad que tiene el usuario basandonos en la
+     * fecha actual
+     */
+    private int calcularEdad(String fechaNacimiento) {
+        // Utilizamos un try catch para poder captar y tratar todas las posibles excepciones
+        try {
+            // Creo un objeto date y le doy formato a la fecha de nacimiento que paso por argumentos
+            Date fecha = dateFormat.parse(fechaNacimiento);
+            // Creo un objeto calendario para obtener la fecha
+            Calendar fechaNac = Calendar.getInstance();
+            // Establezco en el calendario creado la fecha de nacimiento del usuario
+            fechaNac.setTime(fecha);
+
+            // Creo otro calendar para obtener la fecha actual y así obtener la edad
+            Calendar hoy = Calendar.getInstance();
+
+            // Obtenemos en una variable la resta del año actual y el año de nuestro nacimiento
+            int edad = hoy.get(Calendar.YEAR) - fechaNac.get(Calendar.YEAR);
+
+            // En caso de que el día de hoy sea menor que el día de la fecha de nacimiento
+            if (hoy.get(Calendar.DAY_OF_YEAR) < fechaNac.get(Calendar.DAY_OF_YEAR)) {
+                // Restamos uno a la edad
+                edad--;
+            }
+
+            // Retornamos la variable entera de edad
+            return edad;
+        } catch (ParseException e) { // En caso de que surja alguna excepción
+            // Pintaremos por consola la excepción
+            e.printStackTrace();
+            // Retornaremos 0
+            return 0;
+        }
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -259,7 +317,7 @@ public class CreacionPerfil extends AppCompatActivity {
                     grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                 showImagePickerDialog();
             } else {
-                Toast.makeText(this, "Permisos necesarios no otorgados", Toast.LENGTH_SHORT).show();
+                showToast("Permisos necesarios no otorgados");
             }
         }
     }
@@ -271,94 +329,140 @@ public class CreacionPerfil extends AppCompatActivity {
      * galeria
      */
     private void showImagePickerDialog() {
+        // Variable en donde cargamos todas las opciones a la hora de subir la foto
         CharSequence[] options = {"Tomar Foto", "Elegir de Galería"};
 
+        // Creo un nuevo dialogo de alerta
         new AlertDialog.Builder(CreacionPerfil.this)
-                .setTitle("Elegir Imagen")
+                .setTitle("Elegir Imagen") // Establecemos el título
                 .setItems(options, (dialog, which) -> {
-                    if (which == 0) {
+                    // Utilizamos un if para comprobar la opción que eligio el usuario
+                    if (which == 0) { // En caso de ser la opción 0 (Foto de la Camara)
+                        // Creamos un intent para abrir la camara dentro de nuestra app
                         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        // Al lanzar obtenemos el resultado de la camara
                         cameraResult.launch(takePictureIntent);
-                    } else if (which == 1) {
+                    } else if (which == 1) { // En caso de ser la opción 1 (Foto de la Galeria)
+                        // Creamos un intent para abrir la galeria y elegir una foto de la misma
                         Intent pickPhotoIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        // Al lanzar obtenemos el resultado de la galeri
                         galleryResult.launch(pickPhotoIntent);
                     }
                 })
-                .show();
+                .show(); // Mostramos el dialogo
     }
 
     /**
      * Método en el que */
     public void insertarPerfil() {
+        // Obtenemos la instancia e la base de datos de firestore
         db = FirebaseFirestore.getInstance();
+        // Obtenemos el usuario que está autenticado en ese momento
         FirebaseUser user = auth.getCurrentUser();
 
-        if (user == null) {
-            Toast.makeText(this, "No se pudo obtener la información del usuario. Inicia sesión nuevamente.", Toast.LENGTH_SHORT).show();
+        // Procedemos a comprobar si el usuario no es nulo
+        if (user == null) { // En caso de ser nulo
+            // Indicamos al usuario que ha de iniciar sesión de nuevo
+            showToast("No se pudo obtener la información del usuario. Inicia sesión nuevamente.");
+            // Retornamos para no proseguir con el método
             return;
         }
 
+        // Obtenemos en una variable el uid del usuario
         String uid = user.getUid();
+        // Obtenemos en una variable el email del usuario
         String email = user.getEmail();
-
+        // Obtenemos en una variable el username del usuario
         String campoUsername = editUsername.getText().toString();
+
+        // Obtenemos en una variable el nombre completo del usuario cifrado
         String nombreCifrado = CifradoDeDatos.cifrar(editNombre.getText().toString());
-        String descripcionCifrada = CifradoDeDatos.cifrar(editDescrip.getText().toString());
+        // Obtenemos en una variable la fecha de nacimeinto del usuario cifrada
         String fechaNaciCifrada = CifradoDeDatos.cifrar(editFechaNacimiento.getText().toString());
-        String cpCifrado = CifradoDeDatos.cifrar(editCP.getText().toString());
-        String anosPermisoCifrado = CifradoDeDatos.cifrar(editAnoCon.getText().toString());
+        // Obtenemos en una variable el email cifrado del usuario
         String emailCifrado = CifradoDeDatos.cifrar(email);
 
+        // Obtenemos en una variable el recurso que se ha puesto en la imageview de la imagen de perfil
         BitmapDrawable drawable = (BitmapDrawable) imagenPerfil.getDrawable();
+        // Obtenemos en una variable el bitmao de la imagen elegida
         Bitmap fotoBitmap = drawable != null ? drawable.getBitmap() : null;
 
+        // Creo una variable de tipo texto donde almacenar la foto en base64
         String fotoPerfilBase64 = null;
-        if (fotoBitmap != null) {
+        // Procedemos a comprobar si el bitmap es nulo
+        if (fotoBitmap != null) { // En caso de no ser nulo
+            // Creamos un array de bytes para comprimir la imagen
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
+            // Procedemos a comprimmir la imagen a un 85% y además, le establecemos como un JPEG
             fotoBitmap.compress(Bitmap.CompressFormat.JPEG, 85, baos);
 
+            // Creamos una cadena de bytes en donde almacenamos la imagen
             byte[] fotoBytes = baos.toByteArray();
+            // Y guardamos en la variable antes creado la codificación en base64
             fotoPerfilBase64 = Base64.encodeToString(fotoBytes, Base64.DEFAULT);
         }
 
+        // Creamos un objeto del modelo de perfil de usuario para tener todos los valores rellenos y a mano
         Perfil perfil = new Perfil(
-                uid,
-                campoUsername,
-                nombreCifrado,
-                null,
-                edad,
-                fechaNaciCifrada,
-                cp.isEmpty() ? 0 : Integer.parseInt(cp),
-                new ArrayList<>(),
-                fotoBitmap,
-                emailCifrado
+          uid,
+          campoUsername,
+          emailCifrado,
+          nombreCifrado,
+          ubicacionSeleccionada,
+          edad,
+          fechaNaciCifrada,
+          cp.isEmpty() ? 0 : Integer.parseInt(cp),
+          new ArrayList<>(),
+          fotoBitmap,
+          descripcion,
+          anosPermiso.isEmpty() ? 0 : Integer.parseInt(anosPermiso)
         );
 
+        // Creamos un nuevo Map para darle los nombres y los valores a los documentos dentro de la colección
         Map<String, Object> perfilMap = new HashMap<>();
+        // Guardamos el uid del usuario
         perfilMap.put("uid", perfil.getUid());
+        // Guardamos el username del usuario
         perfilMap.put("username", perfil.getUsername());
+        // Guardamos el nombre completo del usuario cifrado
         perfilMap.put("nombre_completo", perfil.getNombre_completo());
-        perfilMap.put("ubicacion", ubicacionSeleccionada);
+        // Guardamos la ubicación del usuario cifrada
+        perfilMap.put("ubicacion", perfil.getUbicacion());
+        // Guardamos la edad del usuario
         perfilMap.put("edad", perfil.getEdad());
+        // Guardamos la fecha de nacimiento del usuario
         perfilMap.put("fechaNaci", perfil.getFechaNaci());
+        // Guardamos el código postal del usuario
         perfilMap.put("cp", perfil.getCp());
+        // Guardamos el correo del usuario cifrado
         perfilMap.put("email", perfil.getEmail());
-        perfilMap.put("aniosConduciendo", anosPermisoCifrado);
+        // Guardamos los años que lleva conduciendo el usuario
+        perfilMap.put("aniosConduciendo", perfil.getAniosConduciendo());
+        // Guardamos la lista de vehículos vacía del usuairo
         perfilMap.put("listaVehiculos", perfil.getListaVehiculos());
+        // Guardamos la foto de perfil en base 64
         perfilMap.put("fotoPerfil", fotoPerfilBase64);
-        perfilMap.put("descripcion", editDescrip);
+        // Guardamos la descripción del usuario
+        perfilMap.put("descripcion", perfil.getDescripcion());
 
+        // Procedemos a insertar en la colección perfiles de la base de datos el Map creado
         db.collection("perfiles").document(uid).set(perfilMap)
-                .addOnSuccessListener(aVoid -> {
+                .addOnSuccessListener(aVoid -> { // En caso de que todo vaya bien
+                    // Lanzamos un Toast indicando al usuario que se creo correctamente el perfil
                     showToast("Perfil creado exitosamente");
+                    // Creamos un nuevo intent para pasar a la pantalla de administrar los vehículos
                     Intent i = new Intent(CreacionPerfil.this, AdministrarVehiculos.class);
+                    // Pasamos como dato el uid del usuario
                     i.putExtra("uid", uid);
+                    // Iniciamos la nueva actividad
                     startActivity(i);
+                    // Establecemos una animación a la hora de movernos de actividad
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                    finish();
+                    finish(); // Finalizamos la actividad actual
                 })
-                .addOnFailureListener(e -> {
+                .addOnFailureListener(e -> { // En caso de que algo falle
+                    // Lanzamos un Toast indicando que ha sucedido un error al crear el perfil
                     showToast("Error al crear perfil: " + e.getMessage());
                 });
     }
@@ -366,7 +470,8 @@ public class CreacionPerfil extends AppCompatActivity {
     /**
      * @param mensaje
      * Método para ir matando los Toast y mostrar todos en el mismo para evitar
-     * colas de Toasts y que se ralentice el dispositivo*/
+     * colas de Toasts y que se ralentice el dispositivo
+     */
     public void showToast(String mensaje){
         if (this != null){
             // Comprobamos si existe algun toast cargado en el toast de la variable global
@@ -394,15 +499,23 @@ public class CreacionPerfil extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == RESULT_OK) {
+            // Obtenemos la latitud y si no existe la ponemos como 0.0
             double latitud = data.getDoubleExtra("latitud", 0.0);
+            // Obtenemos la longitud y si no existe la ponemos como 0.0
             double longitud = data.getDoubleExtra("longitud", 0.0);
+            // Obtenemos la dirección
             String direccion = data.getStringExtra("direccion");
 
+            // Inicializamos la ubicación seleccionada como un nuevo HashMap
             ubicacionSeleccionada = new HashMap<>();
+            // Guardamos la latitud cifrada
             ubicacionSeleccionada.put("latitud", CifradoDeDatos.cifrar(String.valueOf(latitud)));
+            // Guardamos la longtiud cifrada
             ubicacionSeleccionada.put("longitud", CifradoDeDatos.cifrar(String.valueOf(longitud)));
+            // Guardamos la dirección cifrada
             ubicacionSeleccionada.put("direccion", CifradoDeDatos.cifrar(direccion));
 
+            // Establecemos al botón el texto de la dirección obtenida
             btnElegirUbicacion.setText(direccion);
         }
     }
