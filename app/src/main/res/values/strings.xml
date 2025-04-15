@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">MOTORTON</string>
     <string name="title_home">Inicio</string>
-    <string name="title_dashboard">Busqueda</string>
-    <string name="title_notifications">Crear</string>
+    <string name="title_busqueda">Busqueda</string>
+    <string name="title_crear">Crear</string>
     <string name="title_map">Mapa</string>
     <string name="title_perfil">Perfil</string>
     <string name="client_id">157393031901-v2gfvsjrjcr68b6n96ig41h33hntnnrm.apps.googleusercontent.com</string>

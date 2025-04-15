@@ -9,12 +9,12 @@
     <item
         android:id="@+id/navigation_dashboard"
         android:icon="@drawable/icono_buscar"
-        android:title="@string/title_dashboard" />
+        android:title="@string/title_busqueda" />
 
     <item
         android:id="@+id/navigation_createEvent"
         android:icon="@drawable/icono_agregar"
-        android:title="@string/title_notifications"/>
+        android:title="@string/title_crear"/>
 
     <item
         android:id="@+id/navigation_mapa"
