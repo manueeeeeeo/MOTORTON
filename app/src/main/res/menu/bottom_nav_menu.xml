@@ -12,12 +12,12 @@
         android:title="@string/title_dashboard" />
 
     <item
-        android:id="@+id/navigation_notifications"
+        android:id="@+id/navigation_createEvent"
         android:icon="@drawable/icono_agregar"
         android:title="@string/title_notifications"/>
 
     <item
-        android:id="@+id/navigation_notifications"
+        android:id="@+id/navigation_mapa"
         android:icon="@drawable/icono_mapa"
         android:title="@string/title_map" />
 

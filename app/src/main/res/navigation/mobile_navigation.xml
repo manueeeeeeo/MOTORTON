@@ -22,4 +22,16 @@
         android:name="com.clase.motorton.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
+
+    <fragment
+        android:id="@+id/navigation_createEvent"
+        android:name="com.clase.motorton.ui.eventos.CreateEventFragment"
+        android:label="@string/title_notifications"
+        tools:layout="@layout/fragment_notifications" />
+
+    <fragment
+        android:id="@+id/navigation_mapa"
+        android:name="com.clase.motorton.ui.mapas.MapaFragment"
+        android:label="@string/title_notifications"
+        tools:layout="@layout/fragment_notifications" />
 </navigation>
