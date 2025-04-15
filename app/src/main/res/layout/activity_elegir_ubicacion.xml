@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FAFAFA"
+    android:background="@drawable/gradient_background"
     tools:context=".ui.mapas.ElegirUbicacion">
 
     <com.google.android.material.textfield.TextInputLayout
@@ -17,6 +17,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="72dp"
         android:hint="Buscar ubicación"
+        android:textColorHint="#9F9F9F"
         app:boxCornerRadiusTopStart="12dp"
         app:boxCornerRadiusTopEnd="12dp"
         app:boxCornerRadiusBottomStart="12dp"
@@ -28,8 +29,8 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/inputBusqueda"
-            android:textColor="#000000"
-            android:textColorHint="#3D3D3D"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#9F9F9F"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text" />
