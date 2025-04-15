@@ -28,6 +28,8 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/inputBusqueda"
+            android:textColor="#000000"
+            android:textColorHint="#3D3D3D"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text" />
@@ -41,7 +43,7 @@
         android:layout_marginEnd="16dp"
         android:contentDescription="Buscar"
         android:src="@android:drawable/ic_menu_search"
-        app:backgroundTint="@color/purple_500"
+        app:backgroundTint="#000000"
         app:tint="@android:color/white"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
