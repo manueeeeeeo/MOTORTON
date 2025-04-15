@@ -174,6 +174,17 @@ public class CreacionPerfil extends AppCompatActivity {
         // Establecemos el formato a establecer
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
+        // Inicializamos el cifrado de datos
+        cifrar = new CifradoDeDatos();
+        // Utilizamos un try catch para poder captar y tratar todas las excepciones
+        try {
+            // Generamos una clave en caso de que no existe
+            CifradoDeDatos.generarClaveSiNoExiste();
+        } catch (Exception e) { // En caso de que surja alguna excepción
+            // Imprimiremos la misma por la consola
+            e.printStackTrace();
+        }
+
         // Evento que sucede cuando tocamos el ediText de la fecha de nacimeinto
         editFechaNacimiento.setOnClickListener(v -> {
             // Creamos un nuevo calendario con la instancia actual para que marque el día de hoy
@@ -249,11 +260,18 @@ public class CreacionPerfil extends AppCompatActivity {
                 cp = editCP.getText().toString();
                 fechaNaci = editFechaNacimiento.getText().toString();
 
-                // Guardamos en una variable la edad calculada con el método pasandole la fecha de nacimiento del usuario
-                edad = calcularEdad(fechaNaci);
+                // Procedemos a comprobar si están todos los campos rellenos
+                if(username.isEmpty() || nombre.isEmpty() || anosPermiso.isEmpty() || descripcion.isEmpty()
+                || cp.isEmpty() || fechaNaci.isEmpty()){ // En caso de faltar alguno
+                    // Lanzamos un Toast indicando que tiene que completar todos los campos
+                    showToast("Usted ha de completar todos los campos, por favor!!");
+                }else{ // En caso de estar todos rellenos
+                    // Guardamos en una variable la edad calculada con el método pasandole la fecha de nacimiento del usuario
+                    edad = calcularEdad(fechaNaci);
 
-                // Llamamos al método para insertar el perfil
-                insertarPerfil();
+                    // Llamamos al método para insertar el perfil
+                    insertarPerfil();
+                }
             }
         });
     }
@@ -353,7 +371,11 @@ public class CreacionPerfil extends AppCompatActivity {
     }
 
     /**
-     * Método en el que */
+     * Método en el que obtenemos todos los valores de posibilidades
+     * del usuario, su foto de perfil, cifrados datos, convertimos la imagen
+     * a base64, comprobamos que el username elegido no esté ya en uso,
+     * y una vez hecho todo eso y comprobado, insertamos el perfil en la bd
+     */
     public void insertarPerfil() {
         // Obtenemos la instancia e la base de datos de firestore
         db = FirebaseFirestore.getInstance();
@@ -446,25 +468,44 @@ public class CreacionPerfil extends AppCompatActivity {
         // Guardamos la descripción del usuario
         perfilMap.put("descripcion", perfil.getDescripcion());
 
-        // Procedemos a insertar en la colección perfiles de la base de datos el Map creado
-        db.collection("perfiles").document(uid).set(perfilMap)
-                .addOnSuccessListener(aVoid -> { // En caso de que todo vaya bien
-                    // Lanzamos un Toast indicando al usuario que se creo correctamente el perfil
-                    showToast("Perfil creado exitosamente");
-                    // Creamos un nuevo intent para pasar a la pantalla de administrar los vehículos
-                    Intent i = new Intent(CreacionPerfil.this, AdministrarVehiculos.class);
-                    // Pasamos como dato el uid del usuario
-                    i.putExtra("uid", uid);
-                    // Iniciamos la nueva actividad
-                    startActivity(i);
-                    // Establecemos una animación a la hora de movernos de actividad
-                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                    finish(); // Finalizamos la actividad actual
+        // Obtenemos en una variable el username a querer ingresar
+        String usernameNuevo = perfilMap.get("username").toString();
+
+        // Procedemos a comprobar si ya existe un perfil con ese username
+        db.collection("perfiles")
+                .whereEqualTo("username", usernameNuevo)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> { // En caso de que todo vaya bien
+                    if (queryDocumentSnapshots.isEmpty()) { // En caso de que la consulta esté vacía
+                        // No existe ningún usuario con ese username, entonces podemos crear el perfil
+                        db.collection("perfiles").document(uid).set(perfilMap)
+                                .addOnSuccessListener(aVoid -> { // En caso de que todo vaya bien
+                                    // Lanzamos un Toast indicando que se creo el perfil correctamente
+                                    showToast("Perfil creado exitosamente");
+                                    // Creamos un nuevo intent indicando a la nueva pantalla que vamos a saltar
+                                    Intent i = new Intent(CreacionPerfil.this, AdministrarVehiculos.class);
+                                    // Pasamos como parametro un uid
+                                    i.putExtra("uid", uid);
+                                    // Iniciamos la nueva actividad
+                                    startActivity(i);
+                                    // Establecemos una animcación para que se vea más visual
+                                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                                    finish(); // Cerramos la actividad actual
+                                })
+                                .addOnFailureListener(e -> { // En caso de que algo falle
+                                    // Lanzamos un Toast indicando al usuario que ocurrio un error al crear el perfil
+                                    showToast("Error al crear perfil: " + e.getMessage());
+                                });
+                    } else { // En caso de que si que exista
+                        // Lanzaremos un Toast indicando al usuario que ese username ya está en uso
+                        showToast("El nombre de usuario ya está en uso. Por favor elige otro.");
+                    }
                 })
-                .addOnFailureListener(e -> { // En caso de que algo falle
-                    // Lanzamos un Toast indicando que ha sucedido un error al crear el perfil
-                    showToast("Error al crear perfil: " + e.getMessage());
+                .addOnFailureListener(e -> { // En caso de que surja algún error
+                    // Lanzaremos un toast indicando que ocurrido un error al verificar el username
+                    showToast("Error al verificar username: " + e.getMessage());
                 });
+
     }
 
     /**
