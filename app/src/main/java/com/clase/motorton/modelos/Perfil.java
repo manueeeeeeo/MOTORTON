@@ -3,25 +3,30 @@ package com.clase.motorton.modelos;
 import android.graphics.Bitmap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Perfil {
     private String uid;
     private String username;
     private String email;
     private String nombre_completo;
-    private String ubicacion;
+    private Map<String, Object> ubicacion;
     private int edad;
     private String fechaNaci;
     private int cp;
     private ArrayList<Vehiculo> listaVehiculos;
     private Bitmap fotoPerfil;
+    private String descripcion;
+    private int aniosConduciendo;
 
     public Perfil() {
     }
 
-    public Perfil(String uid, String username, String nombre_completo, String ubicacion, int edad, String fechaNaci, int cp, ArrayList<Vehiculo> listaVehiculos, Bitmap fotoPerfil, String email) {
+    public Perfil(String uid, String username, String email, String nombre_completo, Map<String, Object> ubicacion, int edad, String fechaNaci, int cp, ArrayList<Vehiculo> listaVehiculos, Bitmap fotoPerfil, String descripcion, int aniosConduciendo) {
         this.uid = uid;
         this.username = username;
+        this.email = email;
         this.nombre_completo = nombre_completo;
         this.ubicacion = ubicacion;
         this.edad = edad;
@@ -29,20 +34,8 @@ public class Perfil {
         this.cp = cp;
         this.listaVehiculos = listaVehiculos;
         this.fotoPerfil = fotoPerfil;
-        this.email = email;
-    }
-
-    public Perfil(String uid, String username, String nombre_completo, String ubicacion, int edad, String fechaNaci, int cp, Bitmap fotoPerfil, String email) {
-        this.uid = uid;
-        this.username = username;
-        this.nombre_completo = nombre_completo;
-        this.ubicacion = ubicacion;
-        this.edad = edad;
-        this.fechaNaci = fechaNaci;
-        this.cp = cp;
-        this.listaVehiculos = new ArrayList<>();
-        this.fotoPerfil = fotoPerfil;
-        this.email = email;
+        this.descripcion = descripcion;
+        this.aniosConduciendo = aniosConduciendo;
     }
 
     public String getEmail() {
@@ -77,12 +70,28 @@ public class Perfil {
         this.nombre_completo = nombre_completo;
     }
 
-    public String getUbicacion() {
+    public Map<String, Object> getUbicacion() {
         return ubicacion;
     }
 
-    public void setUbicacion(String ubicacion) {
+    public void setUbicacion(Map<String, Object> ubicacion) {
         this.ubicacion = ubicacion;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public int getAniosConduciendo() {
+        return aniosConduciendo;
+    }
+
+    public void setAniosConduciendo(int aniosConduciendo) {
+        this.aniosConduciendo = aniosConduciendo;
     }
 
     public int getEdad() {
