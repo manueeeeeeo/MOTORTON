@@ -13,13 +13,25 @@
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.clase.motorton.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
+        android:name="com.clase.motorton.ui.search.SearchFragment"
+        android:label="@string/title_busqueda"
         tools:layout="@layout/fragment_dashboard" />
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.clase.motorton.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
+        android:name="com.clase.motorton.ui.perfil.MyPerfilFragment"
+        android:label="@string/title_perfil"
         tools:layout="@layout/fragment_notifications" />
+
+    <fragment
+        android:id="@+id/navigation_createEvent"
+        android:name="com.clase.motorton.ui.eventos.CreateEventFragment"
+        android:label="@string/title_crear"
+        tools:layout="@layout/fragment_create_event" />
+
+    <fragment
+        android:id="@+id/navigation_mapa"
+        android:name="com.clase.motorton.ui.mapas.MapaFragment"
+        android:label="@string/title_map"
+        tools:layout="@layout/fragment_mapa" />
 </navigation>

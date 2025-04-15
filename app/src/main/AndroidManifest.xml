@@ -2,8 +2,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
@@ -16,17 +26,25 @@
         android:theme="@style/Theme.MOTORTON"
         tools:targetApi="31">
         <activity
-            android:name=".ui.perfil.Registrarse"
+            android:name=".ui.mapas.ElegirUbicacion"
             android:exported="false"
             android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.perfil.AdministrarVehiculos"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.perfil.Registrarse"
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.perfil.CreacionPerfil"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.perfil.InicioSesion"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.carga.PantallaCarga"
             android:exported="true"
@@ -41,6 +59,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
     </application>
+
 </manifest>
