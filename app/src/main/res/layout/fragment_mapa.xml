@@ -5,10 +5,11 @@
     android:layout_height="match_parent"
     tools:context=".ui.mapas.MapaFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ImageView
+        android:id="@+id/mapaEspana"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:scaleType="fitCenter"
+        android:src="@drawable/mapaespana"/>
 
 </FrameLayout>
