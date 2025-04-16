@@ -20,6 +20,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
@@ -49,6 +50,10 @@ public class ElegirUbicacion extends AppCompatActivity {
         mapView = findViewById(R.id.mapView);
         editBuscar = findViewById(R.id.inputBusqueda);
         botonBuscar = findViewById(R.id.btnBuscar);
+
+        BoundingBox spainBounds = new BoundingBox(43.79, 4.33, 27.63, -9.30);
+        mapView.setScrollableAreaLimitDouble(spainBounds);
+
 
         mapView.setTileSource(TileSourceFactory.MAPNIK);
         // Habilitamos los multicontroles de toques
@@ -90,8 +95,11 @@ public class ElegirUbicacion extends AppCompatActivity {
             // Procedemos a utilizar un try catch para poder captar y tratar todas las posibles excepciones
             try {
                 // Generamos una url que será la que utilicemos para hacer la consulta en OSM
+                //String urlStr = "https://nominatim.openstreetmap.org/search?q=" +
+                        //nombreLugar.replace(" ", "+") + "&format=json&limit=1";
                 String urlStr = "https://nominatim.openstreetmap.org/search?q=" +
-                        nombreLugar.replace(" ", "+") + "&format=json&limit=1";
+                        nombreLugar.replace(" ", "+") + "&format=json&limit=1&countrycodes=es";
+
                 // Creamos una url indicandole que use el string anterior
                 URL url = new URL(urlStr);
                 // Creamos una conexión con una url http indicandole que abriremos la conexión
