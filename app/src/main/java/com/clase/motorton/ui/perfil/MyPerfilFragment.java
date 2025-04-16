@@ -1,7 +1,10 @@
 package com.clase.motorton.ui.perfil;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +25,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.clase.motorton.modelos.Vehiculo;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import javax.crypto.SecretKey;
 
@@ -76,7 +81,10 @@ public class MyPerfilFragment extends Fragment {
         btnAjustes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent = new Intent(requireContext(), Ajustes.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                requireActivity().finish();
             }
         });
 
@@ -113,6 +121,96 @@ public class MyPerfilFragment extends Fragment {
         }
 
         DocumentReference docRef = db.collection("perfiles").document(uid);
+
+        docRef.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                String username = documentSnapshot.getString("username");
+                Long edadLong = documentSnapshot.getLong("edad");
+                String edad = edadLong != null ? edadLong.toString() : "N/A";
+                String fotoPerfilBase64 = documentSnapshot.getString("fotoPerfil");
+                String email = documentSnapshot.getString("email");
+                String nombreCompleto = documentSnapshot.getString("nombre_completo");
+
+                Map<String, Object> ubicacionMap = (Map<String, Object>) documentSnapshot.get("ubicacion");
+                String direccion = "Ubicación no disponible";
+
+                if (ubicacionMap != null) {
+                    direccion = (String) ubicacionMap.get("direccion");
+                }
+
+                if (username != null && edad != null && direccion != null && email != null && nombreCompleto != null) {
+                    textViewUsername.setText(username);
+                    textViewEdad.setText("Edad: " + edad);
+                    textViewUbicacion.setText("Ubicación: " + CifradoDeDatos.descifrar(direccion));
+                    textViewNombreCompleto.setText("Nombre Completo: "+CifradoDeDatos.descifrar(nombreCompleto));
+
+                    if (fotoPerfilBase64 != null && !fotoPerfilBase64.isEmpty()) {
+                        Bitmap bitmap = convertirBase64AImagen(fotoPerfilBase64);
+                        if (bitmap != null) {
+                            imageViewPerfil.setImageBitmap(bitmap);
+                        } else {
+                            imageViewPerfil.setImageResource(R.drawable.icono);
+                        }
+                    } else {
+                        imageViewPerfil.setImageResource(R.drawable.icono);
+                    }
+
+                    cargarVehiculos(uid);
+                } else {
+                    showToast("Datos incompletos en el perfil");
+                }
+            } else {
+                showToast("Perfil no encontrado");
+            }
+            progressBar.setVisibility(View.GONE);
+        }).addOnFailureListener(e -> {
+            progressBar.setVisibility(View.GONE);
+            showToast("Error al cargar perfil: " + e.getMessage());
+        });
+    }
+
+    private Bitmap convertirBase64AImagen(String base64String) {
+        try {
+            base64String = base64String.replace("\n", "").replace("\r", "");
+
+            byte[] decodedString = Base64.decode(base64String, Base64.DEFAULT);
+
+            return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            showToast("Error al convertir imagen Base64");
+            return null;
+        }
+    }
+
+    private void cargarVehiculos(String uid) {
+        listaVehiculos.clear();
+
+        db.collection("vehiculos")
+                .whereEqualTo("uidDueno", uid)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        if (!task.getResult().isEmpty()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Vehiculo vehiculo = document.toObject(Vehiculo.class);
+                                listaVehiculos.add(vehiculo);
+                            }
+                        } else {
+                            showToast("No se encontraron vehículos para este usuario.");
+                        }
+
+                        if (vehiculosAdapter != null) {
+                            vehiculosAdapter.notifyDataSetChanged();
+                        } else {
+                            vehiculosAdapter = new VehiculosAdapter(listaVehiculos, getContext());
+                            recyclerViewVehiculos.setAdapter(vehiculosAdapter);
+                        }
+
+                    } else {
+                        showToast("Error al cargar vehículos: " + task.getException().getMessage());
+                    }
+                });
     }
 
     /**
