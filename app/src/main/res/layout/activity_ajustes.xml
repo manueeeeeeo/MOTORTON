@@ -31,30 +31,15 @@
             android:paddingBottom="24dp" />
 
         <Button
-            android:id="@+id/btnCambiarIdioma"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="🌐 Cambiar idioma"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/button_background"
-            android:padding="14dp"
-            android:layout_marginBottom="16dp" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#888888"
-            android:layout_marginBottom="16dp" />
-
-        <Button
             android:id="@+id/btnReportarProblema"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="🐞 Reportar problema"
             android:textColor="#FFFFFF"
-            android:background="@drawable/button_background"
+            android:backgroundTint="#3E8400"
             android:padding="14dp"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="16dp"
+            android:textSize="16dp"/>
 
         <View
             android:layout_width="match_parent"
@@ -68,9 +53,27 @@
             android:layout_height="wrap_content"
             android:text="📊 Ver estadísticas"
             android:textColor="#FFFFFF"
-            android:background="@drawable/button_background"
+            android:backgroundTint="#005EFF"
             android:padding="14dp"
+            android:layout_marginBottom="16dp"
+            android:textSize="16dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#888888"
             android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/btnCerrarSesion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🔒 Cerrar Sesión"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#005EFF"
+            android:padding="14dp"
+            android:layout_marginBottom="16dp"
+            android:textSize="16dp"/>
 
         <View
             android:layout_width="match_parent"
@@ -84,7 +87,8 @@
             android:layout_height="wrap_content"
             android:text="🗑 Eliminar cuenta"
             android:textColor="#FFFFFF"
-            android:background="@drawable/button_danger_background"
+            android:textSize="16dp"
+            android:backgroundTint="#FF0000"
             android:padding="14dp" />
     </LinearLayout>
 </ScrollView>
