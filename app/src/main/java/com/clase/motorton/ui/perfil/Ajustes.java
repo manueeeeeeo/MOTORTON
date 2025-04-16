@@ -16,6 +16,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.clase.motorton.R;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -52,6 +54,7 @@ public class Ajustes extends AppCompatActivity {
         // Obtengo todos los pelementos visuales de la interfaz
         btnBorrarCuenta = findViewById(R.id.btnEliminarCuenta);
         btnReportarProblema = findViewById(R.id.btnReportarProblema);
+        btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
 
         // Establezco la acción que realiza al tocar el botón de borrar cuenta
         btnBorrarCuenta.setOnClickListener(new View.OnClickListener() {
@@ -70,6 +73,22 @@ public class Ajustes extends AppCompatActivity {
                 redirigirAEmail();
             }
         });
+
+        btnCerrarSesion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cerrarSesion();
+            }
+        });
+    }
+
+    private void cerrarSesion(){
+        GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut();
+        mAuth.signOut();
+
+        Intent intent = new Intent(this, InicioSesion.class);
+        startActivity(intent);
+        finish();
     }
 
     /**
