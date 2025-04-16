@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
+    android:fillViewport="true"
+    tools:context=".ui.perfil.Ajustes">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="⚙ Ajustes"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:paddingBottom="16dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Versión 1.0.0"
+            android:textColor="#D0D0D0"
+            android:textSize="14sp"
+            android:paddingBottom="24dp" />
+
+        <Button
+            android:id="@+id/btnCambiarIdioma"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🌐 Cambiar idioma"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/button_background"
+            android:padding="14dp"
+            android:layout_marginBottom="16dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#888888"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/btnReportarProblema"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🐞 Reportar problema"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/button_background"
+            android:padding="14dp"
+            android:layout_marginBottom="16dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#888888"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/btnVerGraficas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📊 Ver estadísticas"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/button_background"
+            android:padding="14dp"
+            android:layout_marginBottom="16dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#888888"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/btnEliminarCuenta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🗑 Eliminar cuenta"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/button_danger_background"
+            android:padding="14dp" />
+    </LinearLayout>
+</ScrollView>
