@@ -39,6 +39,9 @@ public class MyPerfilFragment extends Fragment {
     private Button buttonEditarPerfil;
     private ImageView btnAgregarVeiculo = null;
     private ImageView btnAjustes = null;
+    private ImageView btnCoches = null;
+    private ImageView btnEventosCreados = null;
+    private ImageView btnEventosParticipas = null;
     private RecyclerView recyclerViewVehiculos;
     private VehiculosAdapter vehiculosAdapter;
     private ArrayList<Vehiculo> listaVehiculos = new ArrayList<>();
@@ -70,6 +73,9 @@ public class MyPerfilFragment extends Fragment {
         recyclerViewVehiculos = root.findViewById(R.id.recyclerViewVehiculos);
         btnAgregarVeiculo = root.findViewById(R.id.buttonAgregarVehiculo);
         btnAjustes = root.findViewById(R.id.buttonAjustes);
+        btnCoches = root.findViewById(R.id.buttonMisCoches);
+        btnEventosCreados = root.findViewById(R.id.buttonEventosCreados);
+        btnEventosParticipas = root.findViewById(R.id.buttonEventosActivos);
 
         cifrar = new CifradoDeDatos();
         try {
@@ -82,7 +88,6 @@ public class MyPerfilFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(requireContext(), Ajustes.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 requireActivity().finish();
             }
@@ -99,6 +104,27 @@ public class MyPerfilFragment extends Fragment {
         });
 
         buttonEditarPerfil.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        btnCoches.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        btnEventosParticipas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        btnEventosCreados.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
