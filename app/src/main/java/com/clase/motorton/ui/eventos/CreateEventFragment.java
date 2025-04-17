@@ -7,16 +7,20 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.clase.motorton.R;
+import com.clase.motorton.adaptadores.SpinnerAdaptarNormal;
 import com.clase.motorton.cifrado.CifradoDeDatos;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.views.MapView;
 
 import java.util.ArrayList;
@@ -25,76 +29,195 @@ import java.util.List;
 
 import javax.crypto.SecretKey;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link CreateEventFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class CreateEventFragment extends Fragment {
     private FirebaseAuth mAuth = null;
     private FirebaseFirestore db = null;
 
-    private EditText editTextNombreEvento = null, editTextDescripcion = null, editTextUbicacion = null, editTextProvincia = null;
+    private EditText editTextNombreEvento = null, editTextDescripcion = null, editTextUbicacion = null;
     private Spinner spinnerTipoEvento = null;
     private DatePicker datePickerFecha = null;
     private Button buttonCrearEvento = null;
+    private MapView mapView = null;
+    private Button btnIrRuta = null;
+    private Spinner spinnerProvincia = null;
+
     private double latInicio = 0.0;
     private double latFin = 0.0;
     private double lonInicio = 0.0;
     private double lonFin = 0.0;
-    private MapView mapView = null;
-    private Button btnIrRuta = null;
+    private String provincia = null;
 
     private List<String> tiposEvento = new ArrayList<>();
+    private List<String> provincias = new ArrayList<>();
 
     private CifradoDeDatos cifrar = null;
     private SecretKey claveSecreta = null;
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public CreateEventFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment CreateEventFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static CreateEventFragment newInstance(String param1, String param2) {
-        CreateEventFragment fragment = new CreateEventFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflar la vista
         View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
+
+        // Inicializar Firebase
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+
+        // Obtener referencias a los elementos de la interfaz
+        editTextNombreEvento = root.findViewById(R.id.editTextNombreEvento);
+        editTextDescripcion = root.findViewById(R.id.editTextDescripcion);
+        editTextUbicacion = root.findViewById(R.id.editTextUbicacion);
+        spinnerTipoEvento = root.findViewById(R.id.spinnerTipoEvento);
+        datePickerFecha = root.findViewById(R.id.datePickerFecha);
+        buttonCrearEvento = root.findViewById(R.id.buttonCrearEvento);
+        mapView = root.findViewById(R.id.map);
+        btnIrRuta = root.findViewById(R.id.buttonIrRuta);
+        spinnerProvincia = root.findViewById(R.id.spinnerProvincia);
+
+        mapView.setTileSource(TileSourceFactory.MAPNIK);  // Usar Mapnik para el fondo del mapa
+        mapView.setBuiltInZoomControls(true);  // Activar controles de zoom
+        mapView.setMultiTouchControls(true);
+
+        tiposEvento = new ArrayList<>();
+        tiposEvento.add("Quedada Motos");
+        tiposEvento.add("Quedada Coches");
+        tiposEvento.add("Ruta MultiVehículo");
+        tiposEvento.add("Ruta Moto");
+        tiposEvento.add("Ruta Coche");
+        tiposEvento.add("Ruta");
+        tiposEvento.add("Slalom");
+        tiposEvento.add("Rally");
+        tiposEvento.add("Otros");
+
+        provincias.add("Álava");
+        provincias.add("Albacete");
+        provincias.add("Alicante");
+        provincias.add("Almería");
+        provincias.add("Asturias");
+        provincias.add("Ávila");
+        provincias.add("Badajoz");
+        provincias.add("Barcelona");
+        provincias.add("Burgos");
+        provincias.add("Cáceres");
+        provincias.add("Cádiz");
+        provincias.add("Cantabria");
+        provincias.add("Castellón");
+        provincias.add("Ciudad Real");
+        provincias.add("Córdoba");
+        provincias.add("La Coruña");
+        provincias.add("Cuenca");
+        provincias.add("Gerona");
+        provincias.add("Granada");
+        provincias.add("Guadalajara");
+        provincias.add("Guipúzcoa");
+        provincias.add("Huelva");
+        provincias.add("Huesca");
+        provincias.add("Islas Baleares");
+        provincias.add("Jaén");
+        provincias.add("León");
+        provincias.add("Lérida");
+        provincias.add("Lugo");
+        provincias.add("Madrid");
+        provincias.add("Málaga");
+        provincias.add("Murcia");
+        provincias.add("Navarra");
+        provincias.add("Orense");
+        provincias.add("Palencia");
+        provincias.add("Las Palmas");
+        provincias.add("Pontevedra");
+        provincias.add("La Rioja");
+        provincias.add("Salamanca");
+        provincias.add("Santa Cruz de Tenerife");
+        provincias.add("Segovia");
+        provincias.add("Sevilla");
+        provincias.add("Soria");
+        provincias.add("Tarragona");
+        provincias.add("Teruel");
+        provincias.add("Toledo");
+        provincias.add("Valencia");
+        provincias.add("Valladolid");
+        provincias.add("Vizcaya");
+        provincias.add("Zamora");
+        provincias.add("Zaragoza");
+        provincias.add("Ceuta");
+        provincias.add("Melilla");
+
+
+
+        cifrar = new CifradoDeDatos();
+        try {
+            CifradoDeDatos.generarClaveSiNoExiste();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        SpinnerAdaptarNormal adapter = new SpinnerAdaptarNormal(getContext(), tiposEvento);
+        spinnerTipoEvento.setAdapter(adapter);
+
+        SpinnerAdaptarNormal adapter2 = new SpinnerAdaptarNormal(getContext(), provincias);
+        spinnerProvincia.setAdapter(adapter2);
+
+        buttonCrearEvento.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        spinnerTipoEvento.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                String selectedItem = parentView.getItemAtPosition(position).toString();
+
+                if ("Ruta Moto".equals(selectedItem) || "Ruta Coche".equals(selectedItem)) {
+                    mapView.setVisibility(View.VISIBLE);
+                    btnIrRuta.setVisibility(View.VISIBLE);
+                } else {
+                    mapView.setVisibility(View.GONE);
+                    btnIrRuta.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+            }
+        });
+
+        spinnerProvincia.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        btnIrRuta.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        getParentFragmentManager().setFragmentResultListener("rutaSeleccionada", this, (key, bundle) -> {
+            double startLat = bundle.getDouble("startLat", Double.NaN);
+            double startLon = bundle.getDouble("startLon", Double.NaN);
+            double endLat = bundle.getDouble("endLat", Double.NaN);
+            double endLon = bundle.getDouble("endLon", Double.NaN);
+
+            if (Double.isNaN(startLat) || Double.isNaN(startLon) || Double.isNaN(endLat) || Double.isNaN(endLon)) {
+                Toast.makeText(getContext(), "Error: coordenadas de la ruta no válidas", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            this.latInicio = startLat;
+            this.lonInicio = startLon;
+            this.latFin = endLat;
+            this.lonFin = endLon;
+        });
 
         return root;
     }
@@ -104,7 +227,6 @@ public class CreateEventFragment extends Fragment {
         editTextNombreEvento.setText("");
         editTextDescripcion.setText("");
         editTextUbicacion.setText("");
-        editTextProvincia.setText("");
         datePickerFecha.updateDate(Calendar.getInstance().get(Calendar.YEAR),
                 Calendar.getInstance().get(Calendar.MONTH),
                 Calendar.getInstance().get(Calendar.DAY_OF_MONTH));

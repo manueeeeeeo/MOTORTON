@@ -121,19 +121,13 @@
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="8dp" />
 
-                <EditText
-                    android:id="@+id/editTextProvincia"
+                <Spinner
+                    android:id="@+id/spinnerProvincia"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Ingrese la provincia"
-                    android:textColor="#000000"
-                    android:textSize="19dp"
-                    android:textColorHint="#727272"
-                    android:inputType="textCapWords"
                     android:layout_marginBottom="16dp"
-                    android:padding="12dp"
-                    android:maxLength="70"
-                    android:background="@drawable/rounded_editext" />
+                    android:backgroundTint="#FFFFFF"
+                    android:popupBackground="@color/white" />
 
                 <TextView
                     android:id="@+id/textViewTipoEvento"
