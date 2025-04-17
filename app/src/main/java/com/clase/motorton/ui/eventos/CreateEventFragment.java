@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -193,7 +194,12 @@ public class CreateEventFragment extends Fragment {
         btnIrRuta.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                try {
+                    Navigation.findNavController(view).navigate(R.id.navigation_map_ruta);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    showToast("Error al navegar");
+                }
             }
         });
 

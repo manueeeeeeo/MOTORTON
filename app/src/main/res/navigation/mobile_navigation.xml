@@ -34,4 +34,10 @@
         android:name="com.clase.motorton.ui.mapas.MapaFragment"
         android:label="@string/title_map"
         tools:layout="@layout/fragment_mapa" />
+
+    <fragment
+        android:id="@+id/navigation_map_ruta"
+        android:name="com.clase.motorton.ui.mapas.MapaEventFragment"
+        android:label="@string/title_map"
+        tools:layout="@layout/fragment_mapa_event" />
 </navigation>
