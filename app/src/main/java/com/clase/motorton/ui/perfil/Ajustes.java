@@ -1,9 +1,7 @@
 package com.clase.motorton.ui.perfil;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,13 +9,11 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.clase.motorton.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -31,13 +27,19 @@ import java.util.Locale;
 import java.util.Map;
 
 public class Ajustes extends AppCompatActivity {
+    // Variable para manejar el boton de reporter problema
     private Button btnReportarProblema = null;
+    // Variable para manejar el botón de borrar cuenta
     private Button btnBorrarCuenta = null;
+    // Variable para manejar el botón de cerrar sesión
     private Button btnCerrarSesion = null;
 
+    // Variable para manejar todos los Toast de está actividad
     private Toast mensajeToast = null;
 
+    // Variable para manejar el autenticador de Firebase en esta actividad
     private FirebaseAuth mAuth = null;
+    // Variable para manejar la base de datos en esta actividad
     private FirebaseFirestore db = null;
 
     @Override
@@ -74,6 +76,7 @@ public class Ajustes extends AppCompatActivity {
             }
         });
 
+        // Establezco la acción que realiza al tocar el botón de cerrar sesión
         btnCerrarSesion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -82,6 +85,12 @@ public class Ajustes extends AppCompatActivity {
         });
     }
 
+    /**
+     * Método en el que cuando le llamamos cerramos
+     * sesión de la cuenta en el dispositivo, es decir,
+     * cerramos tanto el autenticador como la cuenta de Google,
+     * para así evitar posibles errores
+     */
     private void cerrarSesion(){
         GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut();
         mAuth.signOut();
@@ -112,33 +121,38 @@ public class Ajustes extends AppCompatActivity {
         }
     }
 
-    /**
-     * Método en el que */
     private void mostrarDialogoConfirmacion() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Eliminar cuenta");
+        View view = getLayoutInflater().inflate(R.layout.bottom_sheet_eliminar_cuenta, null);
+        final BottomSheetDialog dialog = new BottomSheetDialog(this);
+        dialog.setContentView(view);
 
-        final EditText inputMotivo = new EditText(this);
-        inputMotivo.setHint("Escribe el motivo...");
-        builder.setView(inputMotivo);
+        EditText editTextMotivo = view.findViewById(R.id.editTextMotivo);
+        Button btnConfirmar = view.findViewById(R.id.btnConfirmarEliminar);
+        Button btnCancelar = view.findViewById(R.id.btnCancelarEliminar);
 
-        builder.setPositiveButton("Confirmar", (dialog, which) -> {
-            String motivo = inputMotivo.getText().toString().trim();
-            if (TextUtils.isEmpty(motivo)) {
-                Toast.makeText(this, "Debes escribir un motivo", Toast.LENGTH_SHORT).show();
-                return;
+        btnConfirmar.setOnClickListener(v -> {
+            String motivo = editTextMotivo.getText().toString().trim();
+            if(motivo.isEmpty()){
+                showToast("Ha de rellenar el motivo!!!");
+            }else{
+                eliminarCuenta(motivo);
+                dialog.dismiss();
             }
-            eliminarCuenta(motivo);
         });
+        btnCancelar.setOnClickListener(v -> dialog.dismiss());
 
-        builder.setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss());
-
-        builder.show();
+        dialog.show();
     }
+
 
     /**
      * @param motivo
-     * Método en el que */
+     * Método en el que le pasamos como motivo
+     * la eliminación de la cuenta del usuairo, obtenemos
+     * la fecha actual en un formato especifico y le ponemos
+     * un nombre al documento, subimos además la fecha
+     * el uid del usuario y el motivo
+     */
     private void eliminarCuenta(String motivo) {
         String uid = mAuth.getCurrentUser().getUid();
         String fechaHoraActual = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());

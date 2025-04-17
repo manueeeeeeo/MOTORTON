@@ -32,7 +32,7 @@
         android:id="@+id/btnConfirmarEliminar"
         android:text="Eliminar cuenta"
         android:textColor="@android:color/white"
-        android:backgroundTint="@android:color/holo_red_dark"
+        android:backgroundTint="#FF0000"
         android:layout_marginTop="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
@@ -40,7 +40,9 @@
     <Button
         android:id="@+id/btnCancelarEliminar"
         android:text="Cancelar"
+        android:backgroundTint="#002AFF"
         android:layout_marginTop="8dp"
+        android:textColor="#FFFFFF"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 </LinearLayout>
