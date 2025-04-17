@@ -7,60 +7,39 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.SearchView;
 
 import com.clase.motorton.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link MapaEventFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import org.osmdroid.config.Configuration;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Polyline;
 public class MapaEventFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public MapaEventFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment MapaEventFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static MapaEventFragment newInstance(String param1, String param2) {
-        MapaEventFragment fragment = new MapaEventFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    private MapView map = null;
+    private Marker startMarker = null;
+    private Marker endMarker = null;
+    private Polyline routeLine = null;
+    private Button btnConfirmarRuta = null;
+    private Button btnBorrarRuta = null;
+    private SearchView searchView = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_mapa_event, container, false);
+        View view = inflater.inflate(R.layout.fragment_mapa_event, container, false);
+        map = view.findViewById(R.id.map);
+        btnConfirmarRuta = view.findViewById(R.id.btnConfirmarRuta);
+        btnBorrarRuta = view.findViewById(R.id.btnBorrarRuta);
+        searchView = view.findViewById(R.id.searchView);
+
+        Configuration.getInstance().setUserAgentValue(requireContext().getPackageName());
+        map.setMultiTouchControls(true);
+        map.getController().setZoom(15.0);
+        map.getController().setCenter(new GeoPoint(40.4168, -3.7038));
+
+        return  view;
     }
 }
