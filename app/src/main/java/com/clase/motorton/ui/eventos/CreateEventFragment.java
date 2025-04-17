@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.clase.motorton.R;
 import com.clase.motorton.adaptadores.SpinnerAdaptarNormal;
 import com.clase.motorton.cifrado.CifradoDeDatos;
+import com.clase.motorton.modelos.Evento;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -25,6 +26,7 @@ import org.osmdroid.views.MapView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.crypto.SecretKey;
@@ -52,12 +54,13 @@ public class CreateEventFragment extends Fragment {
 
     private CifradoDeDatos cifrar = null;
     private SecretKey claveSecreta = null;
+    private Toast mensajeToast= null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflar la vista
-        View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
+        View root = inflater.inflate(R.layout.fragment_create_event, container, false);
 
         // Inicializar Firebase
         mAuth = FirebaseAuth.getInstance();
@@ -183,18 +186,6 @@ public class CreateEventFragment extends Fragment {
             }
         });
 
-        spinnerProvincia.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
         btnIrRuta.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -209,7 +200,7 @@ public class CreateEventFragment extends Fragment {
             double endLon = bundle.getDouble("endLon", Double.NaN);
 
             if (Double.isNaN(startLat) || Double.isNaN(startLon) || Double.isNaN(endLat) || Double.isNaN(endLon)) {
-                Toast.makeText(getContext(), "Error: coordenadas de la ruta no válidas", Toast.LENGTH_SHORT).show();
+                showToast("Error: coordenadas de la ruta no válidas");
                 return;
             }
 
@@ -222,6 +213,54 @@ public class CreateEventFragment extends Fragment {
         return root;
     }
 
+    private void crearEvento() {
+        String nombre = editTextNombreEvento.getText().toString().trim();
+        String descripcion = editTextDescripcion.getText().toString().trim();
+        String ubicacion = editTextUbicacion.getText().toString().trim();
+        String provincia = spinnerProvincia.getSelectedItem().toString();
+        String tipoEvento = spinnerTipoEvento.getSelectedItem().toString();
+
+        int dia = datePickerFecha.getDayOfMonth();
+        int mes = datePickerFecha.getMonth();
+        int anio = datePickerFecha.getYear();
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, anio);
+        calendar.set(Calendar.MONTH, mes);
+        calendar.set(Calendar.DAY_OF_MONTH, dia);
+
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        Date fechaEvento = calendar.getTime();
+
+        String uidOrganizador = mAuth.getCurrentUser().getUid();
+
+        Evento evento = new Evento();
+        evento.setNombre(nombre);
+        evento.setDescripcion(descripcion);
+        evento.setUbicacion(ubicacion);
+        evento.setProvincia(provincia);
+        evento.setTipoEvento(tipoEvento);
+        evento.setFecha(fechaEvento);
+        evento.setOrganizador(uidOrganizador);
+        String eventoId = uidOrganizador + "_" + System.currentTimeMillis();
+        evento.setId(eventoId);
+        evento.setActivo(true);
+        evento.setParticipantes(new ArrayList<>());
+
+        db.collection("eventos")
+                .add(evento)
+                .addOnSuccessListener(documentReference -> {
+                    showToast("Evento creado con éxito");
+                    limpiarFormulario();
+                })
+                .addOnFailureListener(e -> {
+                    showToast("Error al crear el evento");
+                });
+    }
+
     // Limpiar los campos después de crear el evento
     private void limpiarFormulario() {
         editTextNombreEvento.setText("");
@@ -230,5 +269,24 @@ public class CreateEventFragment extends Fragment {
         datePickerFecha.updateDate(Calendar.getInstance().get(Calendar.YEAR),
                 Calendar.getInstance().get(Calendar.MONTH),
                 Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+    }
+
+    /**
+     * @param mensaje
+     * Método para ir matando los Toast y mostrar todos en el mismo para evitar
+     * colas de Toasts y que se ralentice el dispositivo
+     */
+    public void showToast(String mensaje){
+        if (this != null){
+            // Comprobamos si existe algun toast cargado en el toast de la variable global
+            if (mensajeToast != null) { // En caso de que si que exista
+                mensajeToast.cancel(); // Le cancelamos, es decir le "matamos"
+            }
+
+            // Creamos un nuevo Toast con el mensaje que nos dan de argumento en el método
+            mensajeToast = Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT);
+            // Mostramos dicho Toast
+            mensajeToast.show();
+        }
     }
 }
