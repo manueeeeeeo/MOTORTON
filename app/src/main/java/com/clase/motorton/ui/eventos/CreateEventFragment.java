@@ -7,8 +7,23 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.Spinner;
 
 import com.clase.motorton.R;
+import com.clase.motorton.cifrado.CifradoDeDatos;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.osmdroid.views.MapView;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+import javax.crypto.SecretKey;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -16,6 +31,24 @@ import com.clase.motorton.R;
  * create an instance of this fragment.
  */
 public class CreateEventFragment extends Fragment {
+    private FirebaseAuth mAuth = null;
+    private FirebaseFirestore db = null;
+
+    private EditText editTextNombreEvento = null, editTextDescripcion = null, editTextUbicacion = null, editTextProvincia = null;
+    private Spinner spinnerTipoEvento = null;
+    private DatePicker datePickerFecha = null;
+    private Button buttonCrearEvento = null;
+    private double latInicio = 0.0;
+    private double latFin = 0.0;
+    private double lonInicio = 0.0;
+    private double lonFin = 0.0;
+    private MapView mapView = null;
+    private Button btnIrRuta = null;
+
+    private List<String> tiposEvento = new ArrayList<>();
+
+    private CifradoDeDatos cifrar = null;
+    private SecretKey claveSecreta = null;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -60,7 +93,20 @@ public class CreateEventFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_create_event, container, false);
+        // Inflar la vista
+        View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
+
+        return root;
+    }
+
+    // Limpiar los campos después de crear el evento
+    private void limpiarFormulario() {
+        editTextNombreEvento.setText("");
+        editTextDescripcion.setText("");
+        editTextUbicacion.setText("");
+        editTextProvincia.setText("");
+        datePickerFecha.updateDate(Calendar.getInstance().get(Calendar.YEAR),
+                Calendar.getInstance().get(Calendar.MONTH),
+                Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
     }
 }

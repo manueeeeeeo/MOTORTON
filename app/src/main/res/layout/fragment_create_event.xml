@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:osmdroid="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,201 +8,203 @@
     android:background="@drawable/gradient_background"
     tools:context=".ui.eventos.CreateEventFragment">
 
-    <android.widget.ScrollView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp"
-            android:layout_marginBottom="120dp">
+            android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/textView11"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Crear Evento"
-                android:textSize="35dp"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold"
-                android:layout_marginBottom="7dp"/>
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:layout_marginBottom="120dp">
 
-            <TextView
-                android:id="@+id/textViewTituloEvento"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Nombre del Evento"
-                android:textSize="18sp"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
+                <TextView
+                    android:id="@+id/textView11"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Crear Evento"
+                    android:textSize="35dp"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="7dp"/>
 
-            <EditText
-                android:id="@+id/editTextNombreEvento"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Ingrese el nombre del evento"
-                android:textColor="#000000"
-                android:textSize="19dp"
-                android:textColorHint="#727272"
-                android:inputType="textCapWords"
-                android:layout_marginBottom="16dp"
-                android:padding="12dp"
-                android:maxLength="40"
-                android:background="@drawable/rounded_editext" />
+                <TextView
+                    android:id="@+id/textViewTituloEvento"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Nombre del Evento"
+                    android:textSize="18sp"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
 
-            <TextView
-                android:id="@+id/textViewDescripcion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Descripción del Evento"
-                android:textSize="18sp"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp" />
+                <EditText
+                    android:id="@+id/editTextNombreEvento"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Ingrese el nombre del evento"
+                    android:textColor="#000000"
+                    android:textSize="19dp"
+                    android:textColorHint="#727272"
+                    android:inputType="textCapWords"
+                    android:layout_marginBottom="16dp"
+                    android:padding="12dp"
+                    android:maxLength="40"
+                    android:background="@drawable/rounded_editext" />
 
-            <EditText
-                android:id="@+id/editTextDescripcion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Descripción breve"
-                android:inputType="textMultiLine"
-                android:textColor="#000000"
-                android:textSize="19dp"
-                android:textColorHint="#727272"
-                android:lines="4"
-                android:maxLines="5"
-                android:minLines="3"
-                android:maxLength="120"
-                android:layout_marginBottom="16dp"
-                android:padding="12dp"
-                android:background="@drawable/rounded_editext" />
+                <TextView
+                    android:id="@+id/textViewDescripcion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Descripción del Evento"
+                    android:textSize="18sp"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp" />
 
-            <TextView
-                android:id="@+id/textViewUbicacion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Ubicación del Evento"
-                android:textSize="18sp"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp" />
+                <EditText
+                    android:id="@+id/editTextDescripcion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Descripción breve"
+                    android:inputType="textMultiLine"
+                    android:textColor="#000000"
+                    android:textSize="19dp"
+                    android:textColorHint="#727272"
+                    android:lines="4"
+                    android:maxLines="5"
+                    android:minLines="3"
+                    android:maxLength="120"
+                    android:layout_marginBottom="16dp"
+                    android:padding="12dp"
+                    android:background="@drawable/rounded_editext" />
 
-            <EditText
-                android:id="@+id/editTextUbicacion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Ingrese la ubicación"
-                android:textColor="#000000"
-                android:textSize="19dp"
-                android:textColorHint="#727272"
-                android:inputType="textCapWords"
-                android:layout_marginBottom="16dp"
-                android:padding="12dp"
-                android:maxLength="120"
-                android:background="@drawable/rounded_editext" />
+                <TextView
+                    android:id="@+id/textViewUbicacion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ubicación del Evento"
+                    android:textSize="18sp"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp" />
 
-            <TextView
-                android:id="@+id/textViewProvincia"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Provincia"
-                android:textSize="18sp"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp" />
+                <EditText
+                    android:id="@+id/editTextUbicacion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Ingrese la ubicación"
+                    android:textColor="#000000"
+                    android:textSize="19dp"
+                    android:textColorHint="#727272"
+                    android:inputType="textCapWords"
+                    android:layout_marginBottom="16dp"
+                    android:padding="12dp"
+                    android:maxLength="120"
+                    android:background="@drawable/rounded_editext" />
 
-            <EditText
-                android:id="@+id/editTextProvincia"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Ingrese la provincia"
-                android:textColor="#000000"
-                android:textSize="19dp"
-                android:textColorHint="#727272"
-                android:inputType="textCapWords"
-                android:layout_marginBottom="16dp"
-                android:padding="12dp"
-                android:maxLength="70"
-                android:background="@drawable/rounded_editext" />
+                <TextView
+                    android:id="@+id/textViewProvincia"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Provincia"
+                    android:textSize="18sp"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp" />
 
-            <TextView
-                android:id="@+id/textViewTipoEvento"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Tipo de Evento"
-                android:textSize="18sp"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp" />
+                <EditText
+                    android:id="@+id/editTextProvincia"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Ingrese la provincia"
+                    android:textColor="#000000"
+                    android:textSize="19dp"
+                    android:textColorHint="#727272"
+                    android:inputType="textCapWords"
+                    android:layout_marginBottom="16dp"
+                    android:padding="12dp"
+                    android:maxLength="70"
+                    android:background="@drawable/rounded_editext" />
 
-            <Spinner
-                android:id="@+id/spinnerTipoEvento"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:textColor="#FFFFFF"/>
+                <TextView
+                    android:id="@+id/textViewTipoEvento"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tipo de Evento"
+                    android:textSize="18sp"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp" />
 
-            <org.osmdroid.views.MapView
-                android:id="@+id/map"
-                android:visibility="gone"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                <Spinner
+                    android:id="@+id/spinnerTipoEvento"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:textColor="#FFFFFF"/>
 
-            <Button
-                android:id="@+id/buttonIrRuta"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Ir a Seleccionar Ruta"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#007BFF"
-                android:visibility="gone"
-                android:layout_marginTop="20dp"
-                android:padding="12dp"
-                android:textSize="18sp"
-                android:layout_marginBottom="60dp"/>
+                <org.osmdroid.views.MapView
+                    android:id="@+id/map"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
 
-            <TextView
-                android:id="@+id/textViewFechaEvento"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Fecha del Evento"
-                android:textSize="18sp"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp" />
+                <Button
+                    android:id="@+id/buttonIrRuta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ir a Seleccionar Ruta"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#007BFF"
+                    android:visibility="gone"
+                    android:layout_marginTop="20dp"
+                    android:padding="12dp"
+                    android:textSize="18sp"
+                    android:layout_marginBottom="60dp"/>
 
-            <android.widget.DatePicker
-                android:id="@+id/datePickerFecha"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:layout_gravity="center"
-                android:background="@android:color/white"
-                android:calendarTextColor="#000000"
-                android:textColor="#000000"/>
+                <TextView
+                    android:id="@+id/textViewFechaEvento"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Fecha del Evento"
+                    android:textSize="18sp"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp" />
 
-            <Button
-                android:id="@+id/buttonCrearEvento"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Crear Evento"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#007BFF"
-                android:layout_marginTop="20dp"
-                android:padding="12dp"
-                android:textSize="18sp"
-                android:layout_marginBottom="60dp"/>
+                <DatePicker
+                    android:id="@+id/datePickerFecha"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:layout_gravity="center"
+                    android:background="@android:color/white"
+                    android:calendarTextColor="#000000"
+                    android:textColor="#000000"/>
 
-        </LinearLayout>
-
-    </android.widget.ScrollView>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+                <Button
+                    android:id="@+id/buttonCrearEvento"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Crear Evento"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#007BFF"
+                    android:layout_marginTop="20dp"
+                    android:padding="12dp"
+                    android:textSize="18sp"
+                    android:layout_marginBottom="60dp"/>
+            </LinearLayout>
+        </ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
