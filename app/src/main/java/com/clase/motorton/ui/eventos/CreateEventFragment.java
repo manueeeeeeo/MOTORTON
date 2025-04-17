@@ -1,5 +1,6 @@
 package com.clase.motorton.ui.eventos;
 
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -22,7 +23,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Polyline;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -163,7 +167,7 @@ public class CreateEventFragment extends Fragment {
         buttonCrearEvento.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                crearEvento();
             }
         });
 
@@ -208,9 +212,47 @@ public class CreateEventFragment extends Fragment {
             this.lonInicio = startLon;
             this.latFin = endLat;
             this.lonFin = endLon;
+
+            dibujarRuta(latInicio, lonInicio, latFin, lonFin);
         });
 
         return root;
+    }
+
+    private void dibujarRuta(double latInicio, double lonInicio, double latFin, double lonFin) {
+        GeoPoint puntoInicio = new GeoPoint(latInicio, lonInicio);
+        GeoPoint puntoFin = new GeoPoint(latFin, lonFin);
+
+        List<GeoPoint> puntosRuta = new ArrayList<>();
+        puntosRuta.add(puntoInicio);
+        puntosRuta.add(puntoFin);
+
+        Polyline polyline = new Polyline();
+        polyline.setPoints(puntosRuta);
+        polyline.setColor(Color.BLUE);
+        polyline.setWidth(5);
+
+        mapView.getOverlays().add(polyline);
+
+        BoundingBox boundingBox = calculateBoundingBox(puntosRuta);
+
+        mapView.zoomToBoundingBox(boundingBox, true);
+    }
+
+    private BoundingBox calculateBoundingBox(List<GeoPoint> puntosRuta) {
+        double minLat = Double.MAX_VALUE;
+        double maxLat = -Double.MAX_VALUE;
+        double minLon = Double.MAX_VALUE;
+        double maxLon = -Double.MAX_VALUE;
+
+        for (GeoPoint point : puntosRuta) {
+            minLat = Math.min(minLat, point.getLatitude());
+            maxLat = Math.max(maxLat, point.getLatitude());
+            minLon = Math.min(minLon, point.getLongitude());
+            maxLon = Math.max(maxLon, point.getLongitude());
+        }
+
+        return new BoundingBox(maxLat, maxLon, minLat, minLon);
     }
 
     private void crearEvento() {
