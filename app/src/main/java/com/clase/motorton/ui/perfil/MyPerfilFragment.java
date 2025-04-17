@@ -89,7 +89,6 @@ public class MyPerfilFragment extends Fragment {
             public void onClick(View view) {
                 Intent intent = new Intent(requireContext(), Ajustes.class);
                 startActivity(intent);
-                requireActivity().finish();
             }
         });
 
