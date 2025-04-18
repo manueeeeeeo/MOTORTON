@@ -73,23 +73,36 @@ public class MapaEventFragment extends Fragment {
         MapEventsReceiver mReceive = new MapEventsReceiver() {
             @Override
             public boolean singleTapConfirmedHelper(GeoPoint p) {
+                // Comprobamos que la marca inicial sea nula
                 if (startMarker == null) {
+                    // Inicializamos el marcador
                     startMarker = new Marker(map);
+                    // Establecemos la posición en el marcador
                     startMarker.setPosition(p);
+                    // Establecemos el título
                     startMarker.setTitle("Punto de inicio");
+                    // Marcamos en el mapa el marcador
                     map.getOverlays().add(startMarker);
-                } else if (endMarker == null) {
+                } else if (endMarker == null) { // Comprobamos que la marca final sea nula
+                    // Inicializamos el marcador
                     endMarker = new Marker(map);
+                    // Establecemos la posición en el marcador
                     endMarker.setPosition(p);
+                    // Establecemos el título
                     endMarker.setTitle("Punto de fin");
+                    // Marcamos en el mapa el marcador
                     map.getOverlays().add(endMarker);
 
+                    // Llamamos al método para dibujar la línea de la ruta
                     dibujarLineaRuta();
                 }
+                // Invalidamos el mapa
                 map.invalidate();
+                // Retornamos true
                 return true;
             }
 
+            // Retornamos false
             @Override
             public boolean longPressHelper(GeoPoint p) {
                 return false;
@@ -99,51 +112,77 @@ public class MapaEventFragment extends Fragment {
         MapEventsOverlay eventsOverlay = new MapEventsOverlay(mReceive);
         map.getOverlays().add(eventsOverlay);
 
+        // Establecemos la acción que sucede al pulsar el botón de confirmar la ruta
         btnConfirmarRuta.setOnClickListener(v -> {
-            if (startMarker != null && endMarker != null) {
+            // Comprobamos que los marcadores sean o no nulos
+            if (startMarker != null && endMarker != null) { // En caso de que las marcas no sean nulas
+                // Creamos un nuevo bundle
                 Bundle bundle = new Bundle();
+                // Establecemos todos los datos de las coordenadas
                 bundle.putDouble("startLat", startMarker.getPosition().getLatitude());
+                // Establecemos todos los datos de las coordenadas
                 bundle.putDouble("startLon", startMarker.getPosition().getLongitude());
+                // Establecemos todos los datos de las coordenadas
                 bundle.putDouble("endLat", endMarker.getPosition().getLatitude());
+                // Establecemos todos los datos de las coordenadas
                 bundle.putDouble("endLon", endMarker.getPosition().getLongitude());
 
+                // Pasamos al nuevo fragmento el bundle establecido
                 getParentFragmentManager().setFragmentResult("rutaSeleccionada", bundle);
 
+                // Utilizamos la navegación para pasar a otro fragmento
                 Navigation.findNavController(view).navigate(R.id.navigation_createEvent, bundle);
-            } else {
+            } else { // En caso de que las marcas sean nulas
+                // Lanzamos un toast indicando al usuario que ha de tener inicio y final
                 showToast("Selecciona inicio y fin");
             }
         });
 
+        // Establecemos la acción que sucede al pulsar el botón de borrar la ruta
         btnBorrarRuta.setOnClickListener(v -> {
+            // Comprobamos que la marca inicial no sea nula
             if (startMarker != null) {
+                // Eliminarlo del mapa
                 map.getOverlays().remove(startMarker);
+                // Establecemos como nulo
                 startMarker = null;
             }
+            // Comprobamos que la marca de final no sea nula
             if (endMarker != null) {
+                // Eliminarlo del mapa
                 map.getOverlays().remove(endMarker);
+                // Establecemos como nulo
                 endMarker = null;
             }
+            // Comprobamos que la línea dibuja no sea nula
             if (routeLine != null) {
+                // Eliminarlo del mapa
                 map.getOverlays().remove(routeLine);
+                // Establecemos como nulo
                 routeLine = null;
             }
+            // Invalidamos el mapa
             map.invalidate();
         });
 
+        // Establezco la acción que sucede al escribir sobre el searchView
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                // Llamo al método para buscar la localización
                 buscarLocalizacion(query);
+                // Retornamos true
                 return true;
             }
 
+            // Retornamos false
             @Override
             public boolean onQueryTextChange(String newText) {
                 return false;
             }
         });
 
+        // Retornamos la vista
         return  view;
     }
 
