@@ -1,7 +1,6 @@
 package com.clase.motorton.adaptadores;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +11,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 import com.clase.motorton.R;
 import com.clase.motorton.modelos.Evento;
@@ -21,12 +18,16 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EventosAdapter extends RecyclerView.Adapter<EventosAdapter.ViewHolder> {
-    private List<Evento> eventoList;
-    private Context context;
-    private String currentUserId;
+    // Variable para manejar la lista de los eventos
+    private List<Evento> eventoList = new ArrayList<>();
+    // Variable para manejar el contexto de la aplicación
+    private Context context = null;
+    // Variable para manejar el uid del usuario
+    private String currentUserId = null;
 
     public EventosAdapter(Context context, List<Evento> eventos, String currentUserId) {
         this.context = context;

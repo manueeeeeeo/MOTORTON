@@ -80,6 +80,7 @@ public class Ajustes extends AppCompatActivity {
         btnCerrarSesion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Llamo al método para cerrar la sesión
                 cerrarSesion();
             }
         });
@@ -92,55 +93,95 @@ public class Ajustes extends AppCompatActivity {
      * para así evitar posibles errores
      */
     private void cerrarSesion(){
+        // Cierro la sesión en el usuario de Google por si acaso
         GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut();
+        // Cierro la sesión del usuario en la autentificación
         mAuth.signOut();
 
+        // Creo un nuevo intent en donde volvemos al inicio de sesión
         Intent intent = new Intent(this, InicioSesion.class);
+        // Inicio la nueva actividad
         startActivity(intent);
+        // Cierro la nueva actividad
         finish();
     }
 
     /**
-     * Método en el que */
+     * Método en el que establecemos el destinatario,
+     * asuto y cuerpo del email para reportar problemas
+     * mediante correo, posteriormente establecemos una nueva
+     * actividad para poder abrir el gmail, otulook o cualquier
+     * aplicación para enivar correos
+     */
     private void redirigirAEmail() {
+        // Establezco el correo del destinatario
         String destinatario = "manu.engenios@gmail.com";
+        // Establezco el asunto
         String asunto = "Problema con MotorTon";
+        // Establezco el cuerpo inicial del mensaje
         String cuerpo = "Estimado equipo de MotorTon,\n\nHe encontrado el siguiente problema:\n\n[Escribe aquí el detalle del problema]";
 
+        // Creo un nuevo intent en donde indico que iremos a una app para enviar
         Intent intent = new Intent(Intent.ACTION_SEND);
+        // Establecemos el tipo de intent para que detecte solo algunas apps
         intent.setType("message/rfc822");
 
+        // Establecemos en el intent el destinatario
         intent.putExtra(Intent.EXTRA_EMAIL, new String[]{destinatario});
+        // Establecemos en el intent el asunto
         intent.putExtra(Intent.EXTRA_SUBJECT, asunto);
+        // Establecemos en el intent el cuerpo
         intent.putExtra(Intent.EXTRA_TEXT, cuerpo);
 
-        if (intent.resolveActivity(this.getPackageManager()) != null) {
+        // Comprobamos que el usuario tenga clientes de correo posibles
+        if (intent.resolveActivity(this.getPackageManager()) != null) { // En caso de tener apps
+            // Inicio la nueva actividad
             startActivity(intent);
-        } else {
+        } else { // En caso de no tener aplicaciones posibles
+            // Lanzamos un toast en donde indicamos que no se puede abrir el cliente del correo
             showToast("No se pudo abrir el cliente de correo");
         }
     }
 
+    /**
+     * Método en el que mostramos el dialogo de confirmación
+     * personalizado para obtener el motivo por el que borrar la cuenta
+     * comprobamos que no esté vacío el campo y una vez que se este todo
+     * correcto llamamos al método para borrar la cuenta y borrar los
+     * vehículos asociados*/
     private void mostrarDialogoConfirmacion() {
+        // Inflamos la vista
         View view = getLayoutInflater().inflate(R.layout.bottom_sheet_eliminar_cuenta, null);
         final BottomSheetDialog dialog = new BottomSheetDialog(this);
         dialog.setContentView(view);
 
+        // Obtenemos el editText para el motivo
         EditText editTextMotivo = view.findViewById(R.id.editTextMotivo);
+        // Obtenemos el botón para confirmar
         Button btnConfirmar = view.findViewById(R.id.btnConfirmarEliminar);
+        // Obtenemos el botón para cancelar
         Button btnCancelar = view.findViewById(R.id.btnCancelarEliminar);
 
+        // Establecemos la acción al pulsar el botón de confirmar
         btnConfirmar.setOnClickListener(v -> {
+            // Guardamos en una variable el texto que contiene el editText
             String motivo = editTextMotivo.getText().toString().trim();
-            if(motivo.isEmpty()){
+            // Comprobamos que no sea nulo
+            if(motivo.isEmpty()){ // En caso de ser nulo
+                // Lanzamos un toast indicando que tiene que rellenar el motivo
                 showToast("Ha de rellenar el motivo!!!");
-            }else{
+            }else{ // En caso de no ser nulo
+                // Llamamos al método para eliminar la cuenta
                 eliminarCuenta(motivo);
+                // Ocultamos el dialogo
                 dialog.dismiss();
             }
         });
+
+        // En caso de tocar el botón de cancelar ocultamos el dialogo
         btnCancelar.setOnClickListener(v -> dialog.dismiss());
 
+        // Mostramos el dialogo
         dialog.show();
     }
 
@@ -154,16 +195,25 @@ public class Ajustes extends AppCompatActivity {
      * el uid del usuario y el motivo
      */
     private void eliminarCuenta(String motivo) {
+        // Obtenemos el uid del usuario autenticado
         String uid = mAuth.getCurrentUser().getUid();
+        // Obtenemos en una variable la fecha actual con un formato especial
         String fechaHoraActual = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        // Generamos el uid del documento en donde juntamos el uid y la fecha y hora actuales
         String idDocumento = uid + "_" + fechaHoraActual;
 
+        // Creamos un mapa para poder darle keys y valores
         Map<String, Object> datosBorrado = new HashMap<>();
+        // Establecemos la fecha de borrado
         datosBorrado.put("fechaHoraBorrado", new Date());
+        // Establecemos el uid del usuario
         datosBorrado.put("uidUsuario", uid);
+        // Establecemos el motivo de borrar la cuenta
         datosBorrado.put("motivo", motivo);
 
+        // Creamos en la colección de firebase el documento con todos su datos
         db.collection("CuentasBorradas").document(idDocumento).set(datosBorrado)
+                // Una vez que haya salido bien, llamamos al método para eliminar el perfil y los vehículos
                 .addOnSuccessListener(aVoid -> eliminarPerfilYVehiculos(uid));
     }
 
@@ -175,23 +225,35 @@ public class Ajustes extends AppCompatActivity {
      * a eliminar el documento de la colección de perfiles
      */
     private void eliminarPerfilYVehiculos(String uid) {
+        // Obtenemos la referencia de la colección de perfiles
         CollectionReference perfilesRef = db.collection("perfiles");
 
         perfilesRef.document(uid).get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) {
-                // Obtener lista de vehículos si existen
+            // Comprobamos que exista el documento
+            if (documentSnapshot.exists()) { // En caso de que exista
+                // Obtenengo la lista de vehículos si existen
                 List<String> listaVehiculos = (List<String>) documentSnapshot.get("listaVehiculos");
-                if (listaVehiculos != null && !listaVehiculos.isEmpty()) {
+                // Compruebo que la lista de vehículos no esté vacía
+                if (listaVehiculos != null && !listaVehiculos.isEmpty()) { // En caso negativo
+                    // Llamo al método para eliminar los vehículos de la base de datos
                     eliminarVehiculos(listaVehiculos);
                 }
 
                 perfilesRef.document(uid).delete().addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Cuenta eliminada correctamente", Toast.LENGTH_LONG).show();
+                    // Lanzo un toast indicando al usuario que la cuenta se eliminará
+                    showToast("Cuenta eliminada correctamente");
+                    // Cierro la sesión en el usuario de Google por si acaso
+                    GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut();
+                    // Cierro la sesión del usuario en la autentificación
                     mAuth.signOut();
+                    // Creamos el nuevo intent para ir al inicio de sesión
                     Intent intent = new Intent(this, InicioSesion.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Limpia la pila de actividades
+                    // Limpiamos la pila de actividades
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    // Iniciamos la nueva actividad
                     startActivity(intent);
 
+                    // Finalizo la actividad actual
                     finish();
                 });
             }
@@ -215,7 +277,8 @@ public class Ajustes extends AppCompatActivity {
         }
 
         batch.commit().addOnSuccessListener(aVoid ->
-                Toast.makeText(this, "Vehículos eliminados", Toast.LENGTH_SHORT).show()
+                // Lanzo un toast en donde indico que los vehículos fueron borrados
+                showToast("Vehículos eliminados")
         );
     }
 

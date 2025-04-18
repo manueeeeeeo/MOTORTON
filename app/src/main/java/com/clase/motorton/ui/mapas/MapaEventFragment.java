@@ -29,20 +29,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MapaEventFragment extends Fragment {
+    // Variable para controlar el mapa de la interfaz
     private MapView map = null;
+    // Variable para marcar el punto de empezado
     private Marker startMarker = null;
+    // Variable para marcar el punto de finalización
     private Marker endMarker = null;
+    // Variable para manejar la línea de la ruta
     private Polyline routeLine = null;
+    // Variable para controlar el botón de confirmar ruta
     private Button btnConfirmarRuta = null;
+    // Variable para controlar el botón de borrar ruta
     private Button btnBorrarRuta = null;
+    // Variable para controlar el buscador
     private SearchView searchView = null;
 
+    // Variable para controlar todos los Toast de la actividad
     private Toast mensajeToast = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflo la vista del fragmento
         View view = inflater.inflate(R.layout.fragment_mapa_event, container, false);
+
+        // Obtengo de la interfaz todos los elementos
         map = view.findViewById(R.id.map);
         btnConfirmarRuta = view.findViewById(R.id.btnConfirmarRuta);
         btnBorrarRuta = view.findViewById(R.id.btnBorrarRuta);
@@ -132,6 +143,13 @@ public class MapaEventFragment extends Fragment {
         return  view;
     }
 
+    /**
+     * @param query
+     * Método en el que le pasamos como parametro
+     * la query o busqueda que vamos a realizar y gracias
+     * a un try catch para poder establecer en el mapa
+     * lo que hemos buscado
+     */
     private void buscarLocalizacion(String query) {
         Geocoder geocoder = new Geocoder(getContext());
         try {
@@ -156,6 +174,11 @@ public class MapaEventFragment extends Fragment {
         }
     }
 
+    /**
+     * Método para dibujar la línea
+     * de la ruta para así poder mostrar
+     * al usuario la ruta que ha establecido
+     */
     private void dibujarLineaRuta() {
         if (startMarker != null && endMarker != null) {
             List<GeoPoint> geoPoints = new ArrayList<>();

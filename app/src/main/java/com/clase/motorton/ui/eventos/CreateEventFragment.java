@@ -37,41 +37,60 @@ import java.util.List;
 import javax.crypto.SecretKey;
 
 public class CreateEventFragment extends Fragment {
+    // Variable para manejar el autenticado de firebase
     private FirebaseAuth mAuth = null;
+    // Variable para manejar la base de datos de firebase
     private FirebaseFirestore db = null;
 
+    // Variable para manejar todos los editText del fragmento
     private EditText editTextNombreEvento = null, editTextDescripcion = null, editTextUbicacion = null;
+    // Variable para manejar el spinner del tipo de evento
     private Spinner spinnerTipoEvento = null;
+    // Variable para manejar el selector de fecha
     private DatePicker datePickerFecha = null;
+    // Variable para manejar el botón de crear el evento
     private Button buttonCrearEvento = null;
+    // Variable para visualizar el mapa
     private MapView mapView = null;
+    // Variable para manejar el botón para ir a seleccionar la ruta
     private Button btnIrRuta = null;
+    // Variable para manejar el spinner de las provincias
     private Spinner spinnerProvincia = null;
 
+    // Variable para manejar la latitud del inicio
     private double latInicio = 0.0;
+    // Variable para manejar la latitud del final
     private double latFin = 0.0;
+    // Variable para manejar la longitud del inicio
     private double lonInicio = 0.0;
+    // Variable para manejar la longitud del final
     private double lonFin = 0.0;
+    // Variable para manejar la provincia elegida
     private String provincia = null;
 
+    // Variable para manejar la lista de los tipos de eventos
     private List<String> tiposEvento = new ArrayList<>();
+    // Variable para manejar la lista de las provincias
     private List<String> provincias = new ArrayList<>();
 
+    // Variable para controlar el cifrado de datos
     private CifradoDeDatos cifrar = null;
+    // Variable para controlar la clave secreta del cifrado de datos
     private SecretKey claveSecreta = null;
+    // Variable para manejar los Toast de está actividad
     private Toast mensajeToast= null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflar la vista
+        // Inflamos la vista
         View root = inflater.inflate(R.layout.fragment_create_event, container, false);
 
-        // Inicializar Firebase
+        // Inicializamos Firebase
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        // Obtener referencias a los elementos de la interfaz
+        // Obtenemos referencias a los elementos de la interfaz
         editTextNombreEvento = root.findViewById(R.id.editTextNombreEvento);
         editTextDescripcion = root.findViewById(R.id.editTextDescripcion);
         editTextUbicacion = root.findViewById(R.id.editTextUbicacion);
@@ -86,7 +105,7 @@ public class CreateEventFragment extends Fragment {
         mapView.setBuiltInZoomControls(true);  // Activar controles de zoom
         mapView.setMultiTouchControls(true);
 
-        tiposEvento = new ArrayList<>();
+        // Agrego todos los tipos de eventos posibles
         tiposEvento.add("Quedada Motos");
         tiposEvento.add("Quedada Coches");
         tiposEvento.add("Ruta MultiVehículo");
@@ -97,6 +116,7 @@ public class CreateEventFragment extends Fragment {
         tiposEvento.add("Rally");
         tiposEvento.add("Otros");
 
+        // Agrego todas las provincias posibles
         provincias.add("Álava");
         provincias.add("Albacete");
         provincias.add("Alicante");
@@ -150,24 +170,32 @@ public class CreateEventFragment extends Fragment {
         provincias.add("Ceuta");
         provincias.add("Melilla");
 
-
-
+        // Inicializo el cifrador de datos
         cifrar = new CifradoDeDatos();
+        // Utilizo un try catch para capturar y tratar todas las excepciones que surjan
         try {
+            // Generamos la clave en caso de que no exista
             CifradoDeDatos.generarClaveSiNoExiste();
-        } catch (Exception e) {
+        } catch (Exception e) { // En caso de que surja alguna excepción
+            // Imprimimos por consola la misma
             e.printStackTrace();
         }
 
+        // Inicializo el adaptador para el spinner de eventos
         SpinnerAdaptarNormal adapter = new SpinnerAdaptarNormal(getContext(), tiposEvento);
+        // Establezco el adaptador al spinner
         spinnerTipoEvento.setAdapter(adapter);
 
+        // Inicializo el adaptador para el spinner de provincias
         SpinnerAdaptarNormal adapter2 = new SpinnerAdaptarNormal(getContext(), provincias);
+        // Establezco el adaptador al spinner
         spinnerProvincia.setAdapter(adapter2);
 
+        // Establezco la acción que sucede cuando clicamos el botón de crear evento
         buttonCrearEvento.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Llamo al método para crear el evento
                 crearEvento();
             }
         });
@@ -191,6 +219,7 @@ public class CreateEventFragment extends Fragment {
             }
         });
 
+        // Establezco la acción que sucede cuando clicamos el botón de ir a seleccionar Ruta
         btnIrRuta.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -225,6 +254,15 @@ public class CreateEventFragment extends Fragment {
         return root;
     }
 
+    /**
+     * @param latFin
+     * @param latInicio
+     * @param lonFin
+     * @param lonInicio
+     * Método en el que procedemos a dibujar una línea de ruta
+     * entre dos puntos en un mapa, basandonos en las coodernadas
+     * de inicio y las de fin
+     */
     private void dibujarRuta(double latInicio, double lonInicio, double latFin, double lonFin) {
         GeoPoint puntoInicio = new GeoPoint(latInicio, lonInicio);
         GeoPoint puntoFin = new GeoPoint(latFin, lonFin);
@@ -245,6 +283,9 @@ public class CreateEventFragment extends Fragment {
         mapView.zoomToBoundingBox(boundingBox, true);
     }
 
+    /**
+     * @param puntosRuta
+     * Método en el calculamos*/
     private BoundingBox calculateBoundingBox(List<GeoPoint> puntosRuta) {
         double minLat = Double.MAX_VALUE;
         double maxLat = -Double.MAX_VALUE;
@@ -261,13 +302,21 @@ public class CreateEventFragment extends Fragment {
         return new BoundingBox(maxLat, maxLon, minLat, minLon);
     }
 
+    /**
+     * Método en el que obtenemos todos los valores necesarios
+     * para crear un evento en variables, posteriormente
+     * creamos un objeto de tipo evento y luego ya le subimos a nuestra
+     * base de datos en firebase
+     */
     private void crearEvento() {
+        // Obtenemos todos los datos de los spinners y de los editText
         String nombre = editTextNombreEvento.getText().toString().trim();
         String descripcion = editTextDescripcion.getText().toString().trim();
         String ubicacion = editTextUbicacion.getText().toString().trim();
         String provincia = spinnerProvincia.getSelectedItem().toString();
         String tipoEvento = spinnerTipoEvento.getSelectedItem().toString();
 
+        // Obtengo del seleccionador de fecha todos los datos necesarios
         int dia = datePickerFecha.getDayOfMonth();
         int mes = datePickerFecha.getMonth();
         int anio = datePickerFecha.getYear();
@@ -283,9 +332,12 @@ public class CreateEventFragment extends Fragment {
 
         Date fechaEvento = calendar.getTime();
 
+        // Obtengo el uid del organizador del evento
         String uidOrganizador = mAuth.getCurrentUser().getUid();
 
+        // Creo el objeto
         Evento evento = new Evento();
+        // Establezco todos los parametros que componen al evento
         evento.setNombre(nombre);
         evento.setDescripcion(descripcion);
         evento.setUbicacion(ubicacion);
@@ -298,18 +350,26 @@ public class CreateEventFragment extends Fragment {
         evento.setActivo(true);
         evento.setParticipantes(new ArrayList<>());
 
+        // Procedemos a entrar dentro de la colección de la base de datos de eventos
         db.collection("eventos")
-                .add(evento)
-                .addOnSuccessListener(documentReference -> {
+                .add(evento) // Agregamos el nuevo evento
+                .addOnSuccessListener(documentReference -> { // En caso de que salga bien
+                    // Lanzamos un toast indicandoselo
                     showToast("Evento creado con éxito");
+                    // Llamamos al método para limpiar el formulario
                     limpiarFormulario();
                 })
-                .addOnFailureListener(e -> {
+                .addOnFailureListener(e -> { // En caso de que algo salga mal
+                    // Lanzamos un toast indicandoselo
                     showToast("Error al crear el evento");
                 });
     }
 
-    // Limpiar los campos después de crear el evento
+    /**
+     * Método en el que limpiamos el formulario
+     * restableciendo la fecha del selector de fecha
+     * y los editText
+     */
     private void limpiarFormulario() {
         editTextNombreEvento.setText("");
         editTextDescripcion.setText("");
