@@ -76,27 +76,37 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
     /**
      * @param matricula
      * @param position
-     * */
+     * Método en el que le pasmos la posición
+     * del vehículo a eliminar, le eliminamos de la lista y
+     * posteriormente eliminamos el vehículo de la base de datos
+     * de firestore
+     */
     private void eliminarVehiculo(String matricula, int position) {
         // Comprobamos que la matricula no sea nula, en caso afirmativo retornamos para no proseguir
         if (matricula == null || matricula.isEmpty()) return;
 
         // Obtenemos la instancia de la base de datos de firestore
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("vehiculos")
-                .whereEqualTo("matricula", matricula)
+        db.collection("vehiculos") // Accedemos a la colección de vehículos
+                .whereEqualTo("matricula", matricula) // Filtramos por una query para encontrar una matricula
                 .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                .addOnCompleteListener(task -> { // En caso de que vaya bien
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) { // Comprobamos que la tarea sea correcta
+                        // Utilizamos un for para obtener las respuestas de la tarea
                         for (DocumentSnapshot document : task.getResult()) {
                             db.collection("vehiculos").document(document.getId()).delete()
-                                    .addOnSuccessListener(aVoid -> {
+                                    .addOnSuccessListener(aVoid -> { // En caso de que vaya bien
+                                        // Elimamos de la lista en esa posición el vehículo
                                         vehiculosList.remove(position);
+                                        // Notificamos el cambio de datos
                                         notifyItemRemoved(position);
+                                        // Notificamos el cambio de tamaño de la lista de vehículos
                                         notifyItemRangeChanged(position, vehiculosList.size());
+                                        // Lanzamos un toast indicando que se ha eliminado un vehículo
                                         Toast.makeText(context, "Vehículo eliminado", Toast.LENGTH_SHORT).show();
                                     })
-                                    .addOnFailureListener(e ->
+                                    .addOnFailureListener(e -> // En caso de que algo vaya mal
+                                            // Lanzamos un toast indicando que ocurrió un error
                                             Toast.makeText(context, "Error al eliminar el vehículo", Toast.LENGTH_SHORT).show()
                                     );
                         }
