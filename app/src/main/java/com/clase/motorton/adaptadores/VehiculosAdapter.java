@@ -20,9 +20,18 @@ import java.util.ArrayList;
 
 public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.VehiculoViewHolder> {
 
+    // Variable para manejar la lista de los vehículas
     private final ArrayList<Vehiculo> vehiculosList;
+    // Variable para manejar el contexto
     private final Context context;
 
+    /**
+     * @param context
+     * @param vehiculosList
+     * Constructor en donde inicializo el contexto
+     * y la lista de elementos para mostrar la información
+     * de los vehículos
+     */
     public VehiculosAdapter(ArrayList<Vehiculo> vehiculosList, Context context) {
         this.vehiculosList = vehiculosList;
         this.context = context;
@@ -37,36 +46,42 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
 
     @Override
     public void onBindViewHolder(@NonNull VehiculoViewHolder holder, int position) {
+        // Obtengo en un vehículo el objeto elegido
         Vehiculo vehiculo = vehiculosList.get(position);
 
+        // En caso de que el vehículo sea nulo retornamos par no proseguir
         if (vehiculo == null) return;
 
+        // Marcamos el textview la marca y el modelo del vehículo
         holder.textViewModeloYMarca.setText(vehiculo.getMarca() + " " + vehiculo.getModelo());
+        // Marcamos el textvew la descripción del mismo
         holder.textViewDescripcion.setText(vehiculo.getDescripción());
 
+        // Comprobamos que tipo de vehículo es para marcar un icono u otro
         switch (vehiculo.getTipoVehiculo().toLowerCase()) {
-            case "coches":
+            case "coches": // En caso de que sea coche
                 holder.imageViewTipoVehiculo.setImageResource(R.drawable.ic_coche);
                 break;
-            case "motos":
+            case "motos": // En caso de que sea moto
                 holder.imageViewTipoVehiculo.setImageResource(R.drawable.ic_moto);
                 break;
             default:
                 break;
         }
 
+        // Cuando toquemos el botón de eliminar un vehículo llamamos al método de eliminar y le pasamos la matricula del mismo
         holder.imageViewDelete.setOnClickListener(v -> eliminarVehiculo(vehiculo.getMatricula(), position));
-
-        /*holder.imageViewEdit.setOnClickListener(v -> {
-            Intent intent = new Intent(context, AgregarVehiculos.class);
-            intent.putExtra("vehiculo", vehiculo);
-            context.startActivity(intent);
-        });*/
     }
 
+    /**
+     * @param matricula
+     * @param position
+     * */
     private void eliminarVehiculo(String matricula, int position) {
+        // Comprobamos que la matricula no sea nula, en caso afirmativo retornamos para no proseguir
         if (matricula == null || matricula.isEmpty()) return;
 
+        // Obtenemos la instancia de la base de datos de firestore
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("vehiculos")
                 .whereEqualTo("matricula", matricula)
@@ -85,11 +100,13 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
                                             Toast.makeText(context, "Error al eliminar el vehículo", Toast.LENGTH_SHORT).show()
                                     );
                         }
-                    } else {
+                    } else { // En caso de que la tarea no haya resultado
+                        // Lanzamos un toast indicando que no se pudó encontrar el vehículo
                         Toast.makeText(context, "No se encontró el vehículo", Toast.LENGTH_SHORT).show();
                     }
                 })
-                .addOnFailureListener(e ->
+                .addOnFailureListener(e -> // En caso de que algo falle
+                        // Lanzamos un toast indicando que ocurrio un error al conectar con la bd
                         Toast.makeText(context, "Error al conectar con la base de datos", Toast.LENGTH_SHORT).show()
                 );
     }

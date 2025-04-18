@@ -59,9 +59,13 @@ public class MapaEventFragment extends Fragment {
         btnBorrarRuta = view.findViewById(R.id.btnBorrarRuta);
         searchView = view.findViewById(R.id.searchView);
 
+        // Configuramos para obtener la API de OSM
         Configuration.getInstance().setUserAgentValue(requireContext().getPackageName());
+        // Establecemos como activa que se pueda controlar el mapa con multicontrol
         map.setMultiTouchControls(true);
+        // Establecemos el zoom del mapa a 15
         map.getController().setZoom(15.0);
+        // Establecemos que se quede centrado en españa
         map.getController().setCenter(new GeoPoint(40.4168, -3.7038));
 
         map.setOnTouchListener((v, event) -> false);
@@ -151,25 +155,41 @@ public class MapaEventFragment extends Fragment {
      * lo que hemos buscado
      */
     private void buscarLocalizacion(String query) {
+        // Utilizamos el geocoder para poder buscar
         Geocoder geocoder = new Geocoder(getContext());
+        // Utilizamos un try catch para poder captar y tratar todas las posibles excepciones
         try {
+            // Obtengo una lista de address con la query y el primer resultado que obtengo
             List<Address> addresses = geocoder.getFromLocationName(query, 1);
-            if (addresses != null && !addresses.isEmpty()) {
+            // Compruebo que no sea nula, es decir que no exista el sitio
+            if (addresses != null && !addresses.isEmpty()) { // En caso de que no sea nulo
+                // Obtenemos la primera parte de la dirección
                 android.location.Address address = addresses.get(0);
+                // Creamos un geopunto obteniendo la latitud y longitu de la ubicación
                 GeoPoint geoPoint = new GeoPoint(address.getLatitude(), address.getLongitude());
+                // Establecemos que se centre en el geopunto
                 map.getController().setCenter(geoPoint);
+                // Establecemos el zoom
                 map.getController().setZoom(15.0);
 
+                // Utilizamos un marker para marcar la ubicación que hemos obtenido
                 Marker marker = new Marker(map);
+                // Establecemos la posición en el marcador
                 marker.setPosition(geoPoint);
+                // Establecemos el título
                 marker.setTitle(address.getAddressLine(0));
+                // Establecemos el marcador en el mapa
                 map.getOverlays().add(marker);
+                // Invalidamos el mapa
                 map.invalidate();
-            } else {
+            } else { // En caso de que la ubicación sea nula
+                // Lanzamos un toast indicando que la ubicación no fue encontrada
                 showToast("Ubicación no encontrada");
             }
-        } catch (IOException e) {
+        } catch (IOException e) { // En caso de que surja alguna excepción
+            // La imprimimos por consola
             e.printStackTrace();
+            // Lanzamos un toast indicando que ocurrio un error al buscar la ubicación
             showToast("Error al buscar la ubicación");
         }
     }
@@ -180,15 +200,22 @@ public class MapaEventFragment extends Fragment {
      * al usuario la ruta que ha establecido
      */
     private void dibujarLineaRuta() {
-        if (startMarker != null && endMarker != null) {
+        // Procedemos a comprobar si el marcador del inicio y del final no sean nulos
+        if (startMarker != null && endMarker != null) { // En caso de que no sean nulos
+            // Creamos una lista de geopuntos y la inicializamos
             List<GeoPoint> geoPoints = new ArrayList<>();
+            // Agregamos los dos puntos
             geoPoints.add(startMarker.getPosition());
             geoPoints.add(endMarker.getPosition());
 
+            // Comprobamos que el polyline no sea nulo, en caso de no serlo, le eliminamos del mapa
             if (routeLine != null) map.getOverlayManager().remove(routeLine);
 
+            // Inicializamos una nueva polyline para dibujar
             routeLine = new Polyline();
+            // Establecemos la lista de puntos
             routeLine.setPoints(geoPoints);
+            // Agregamos el dibujo al mapa
             map.getOverlayManager().add(routeLine);
         }
     }

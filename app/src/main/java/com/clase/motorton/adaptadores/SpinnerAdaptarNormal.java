@@ -8,13 +8,21 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SpinnerAdaptarNormal extends ArrayAdapter<String> {
 
-    private Context context;
-    private List<String> items;
+    private Context context = null; // Variable para manejar el contexto
+    private List<String> items = new ArrayList<>(); // Variable para manejar la lista de elementos
 
+    /**
+     * @param context
+     * @param items
+     * Constructor en donde inicializzamos el contexto
+     * y la lista de items de la lista para mostrar
+     * en el spinner
+     */
     public SpinnerAdaptarNormal(Context context, List<String> items) {
         super(context, android.R.layout.simple_spinner_item, items);
         this.context = context;

@@ -200,16 +200,21 @@ public class CreateEventFragment extends Fragment {
             }
         });
 
+        // Establecemos el evento al elegir una opción en el spinner
         spinnerTipoEvento.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                // Obtengo el item elegido
                 String selectedItem = parentView.getItemAtPosition(position).toString();
 
-                if ("Ruta Moto".equals(selectedItem) || "Ruta Coche".equals(selectedItem)) {
+                // Comprobamos si es una ruta o no
+                if ("Ruta Moto".equals(selectedItem) || "Ruta Coche".equals(selectedItem)) { // En caso de ser una ruta
                     mapView.setVisibility(View.VISIBLE);
                     btnIrRuta.setVisibility(View.VISIBLE);
-                } else {
+                } else { // En caso de ser otra opción
+                    // Mantenemos invisible el mapa
                     mapView.setVisibility(View.GONE);
+                    // Mantenemos invisible el botón de ir a legir la ruta
                     btnIrRuta.setVisibility(View.GONE);
                 }
             }
@@ -223,31 +228,47 @@ public class CreateEventFragment extends Fragment {
         btnIrRuta.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Utilizamos un try catch para capturar y tratar todas las posibles excepciones
                 try {
                     Navigation.findNavController(view).navigate(R.id.navigation_map_ruta);
-                } catch (Exception e) {
+                } catch (Exception e) { // En caso de que surja alguna excepción
+                    // Imprimimos la excepción por consola
                     e.printStackTrace();
+                    // Lanzamos un toast indicando que ocurrió un error al navegar
                     showToast("Error al navegar");
                 }
             }
         });
 
+        // Obtenemos si hay datos pasados de un fragmento a otro
         getParentFragmentManager().setFragmentResultListener("rutaSeleccionada", this, (key, bundle) -> {
+            // Obtengo el dato pasado que es un double
             double startLat = bundle.getDouble("startLat", Double.NaN);
+            // Obtengo el dato pasado que es un double
             double startLon = bundle.getDouble("startLon", Double.NaN);
+            // Obtengo el dato pasado que es un double
             double endLat = bundle.getDouble("endLat", Double.NaN);
+            // Obtengo el dato pasado que es un double
             double endLon = bundle.getDouble("endLon", Double.NaN);
 
-            if (Double.isNaN(startLat) || Double.isNaN(startLon) || Double.isNaN(endLat) || Double.isNaN(endLon)) {
+            // Compruebo que sean números y no estén vacíos
+            if (Double.isNaN(startLat) || Double.isNaN(startLon) || Double.isNaN(endLat) || Double.isNaN(endLon)) { // En caso negativo
+                // Lanzo un toast indicando que las coordenadas de la ruta no son válidas
                 showToast("Error: coordenadas de la ruta no válidas");
+                // Retornamos para no proseguir
                 return;
             }
 
+            // Inicializo el valor de inicio de la latitud
             this.latInicio = startLat;
+            // Inicializo el valor de inicio de la longitud
             this.lonInicio = startLon;
+            // Inicializo el valor de final de la latidud
             this.latFin = endLat;
+            // Inicializo el valor de final de la longitud
             this.lonFin = endLon;
 
+            // Llamamos al método para dibujar la ruta en el mapa
             dibujarRuta(latInicio, lonInicio, latFin, lonFin);
         });
 
@@ -264,34 +285,52 @@ public class CreateEventFragment extends Fragment {
      * de inicio y las de fin
      */
     private void dibujarRuta(double latInicio, double lonInicio, double latFin, double lonFin) {
+        // Creamos un geopunto que es el de inicio basandonos en las coordenadas de inicio
         GeoPoint puntoInicio = new GeoPoint(latInicio, lonInicio);
+        // Creamos un geopunto que es el de final basandonos en las coordenadas de final
         GeoPoint puntoFin = new GeoPoint(latFin, lonFin);
 
+        // Hacemos una lista de geopunto para guardar los creados anteriormente
         List<GeoPoint> puntosRuta = new ArrayList<>();
+        // Agregamos todos los puntos
         puntosRuta.add(puntoInicio);
         puntosRuta.add(puntoFin);
 
+        // Creamos un polyline para ir dibujando las líneas
         Polyline polyline = new Polyline();
+        // Establecemos los puntos
         polyline.setPoints(puntosRuta);
+        // Establecemos el color
         polyline.setColor(Color.BLUE);
+        // Establecemos el ancho
         polyline.setWidth(5);
 
+        // Agregamos al mapa el objeto creado
         mapView.getOverlays().add(polyline);
 
+        // Obtenemos el boundingbox basandonos en el calculo que devuelve el metodo que hemos creado
         BoundingBox boundingBox = calculateBoundingBox(puntosRuta);
 
+        // Establecemos que se pueda hacer zoom hacía la zona
         mapView.zoomToBoundingBox(boundingBox, true);
     }
 
     /**
      * @param puntosRuta
-     * Método en el calculamos*/
+     * Método en el calculamos los maximos y minimos
+     * posibles de los double y además calculamos
+     * las coordenadas maximas y minimas para
+     * ajustar todo
+     */
     private BoundingBox calculateBoundingBox(List<GeoPoint> puntosRuta) {
+        // Calculo los máximos y minimos relativos
         double minLat = Double.MAX_VALUE;
         double maxLat = -Double.MAX_VALUE;
         double minLon = Double.MAX_VALUE;
         double maxLon = -Double.MAX_VALUE;
 
+        // Gracias a un foreach para ir estableciento los minimos y maximos basandonos en los calculados antes y en las
+        // coordenadas
         for (GeoPoint point : puntosRuta) {
             minLat = Math.min(minLat, point.getLatitude());
             maxLat = Math.max(maxLat, point.getLatitude());
@@ -299,6 +338,7 @@ public class CreateEventFragment extends Fragment {
             maxLon = Math.max(maxLon, point.getLongitude());
         }
 
+        // Retornamos para justar e boundingbox del mapa
         return new BoundingBox(maxLat, maxLon, minLat, minLon);
     }
 
