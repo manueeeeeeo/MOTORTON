@@ -1,0 +1,84 @@
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    android:layout_margin="8dp"
+    android:background="#FFFFFF">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:background="#FFFFFF">
+
+        <ImageView
+            android:id="@+id/imageViewTipoVehiculo"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_coche"
+            android:contentDescription="Tipo de vehículo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:id="@+id/textViewMarcaModelo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Marca y Modelo"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#212121"
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:layout_constraintStart_toEndOf="@id/imageViewTipoVehiculo"
+            app:layout_constraintTop_toTopOf="@id/imageViewTipoVehiculo"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="8dp" />
+
+        <TextView
+            android:id="@+id/textViewDescripcion"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Descripción breve del vehículo..."
+            android:textSize="14sp"
+            android:textColor="#616161"
+            android:maxLines="2"
+            android:ellipsize="end"
+            app:layout_constraintStart_toStartOf="@id/textViewMarcaModelo"
+            app:layout_constraintTop_toBottomOf="@id/textViewMarcaModelo"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="4dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@id/textViewDescripcion"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageView
+                android:id="@+id/imageViewEdit"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/icono_edit"
+                android:contentDescription="Editar vehículo"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_marginEnd="12dp"/>
+
+            <ImageView
+                android:id="@+id/imageViewDelete"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/icono_dle"
+                android:contentDescription="Eliminar vehículo"
+                android:clickable="true"
+                android:focusable="true"/>
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

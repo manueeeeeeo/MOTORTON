@@ -176,14 +176,6 @@ public class CreacionPerfil extends AppCompatActivity {
 
         // Inicializamos el cifrado de datos
         cifrar = new CifradoDeDatos();
-        // Utilizamos un try catch para poder captar y tratar todas las excepciones
-        try {
-            // Generamos una clave en caso de que no existe
-            CifradoDeDatos.generarClaveSiNoExiste();
-        } catch (Exception e) { // En caso de que surja alguna excepción
-            // Imprimiremos la misma por la consola
-            e.printStackTrace();
-        }
 
         // Evento que sucede cuando tocamos el ediText de la fecha de nacimeinto
         editFechaNacimiento.setOnClickListener(v -> {

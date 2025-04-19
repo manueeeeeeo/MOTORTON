@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
+    tools:context=".ui.mapas.MapaEventFragment">
+
+    <org.osmdroid.views.MapView
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="10dp">
+
+        <android.widget.SearchView
+            android:id="@+id/searchView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginBottom="10dp"
+            android:background="#FFFFFF"
+            android:queryHint="Buscar dirección o municipio"
+            android:iconifiedByDefault="false" />
+
+        <LinearLayout
+            android:id="@+id/buttonContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="20dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btnConfirmarRuta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Confirmar Ruta"
+                android:textColor="#FFF"
+                android:backgroundTint="#007BFF"
+                android:layout_marginBottom="10dp"
+                android:padding="12dp" />
+
+            <Button
+                android:id="@+id/btnBorrarRuta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Reiniciar Ruta"
+                android:textColor="#FFF"
+                android:backgroundTint="#FF0000"
+                android:padding="12dp" />
+
+        </LinearLayout>
+    </RelativeLayout>
+
+</FrameLayout>
