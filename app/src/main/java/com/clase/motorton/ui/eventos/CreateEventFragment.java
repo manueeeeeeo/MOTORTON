@@ -172,14 +172,6 @@ public class CreateEventFragment extends Fragment {
 
         // Inicializo el cifrador de datos
         cifrar = new CifradoDeDatos();
-        // Utilizo un try catch para capturar y tratar todas las excepciones que surjan
-        try {
-            // Generamos la clave en caso de que no exista
-            CifradoDeDatos.generarClaveSiNoExiste();
-        } catch (Exception e) { // En caso de que surja alguna excepción
-            // Imprimimos por consola la misma
-            e.printStackTrace();
-        }
 
         // Inicializo el adaptador para el spinner de eventos
         SpinnerAdaptarNormal adapter = new SpinnerAdaptarNormal(getContext(), tiposEvento);
