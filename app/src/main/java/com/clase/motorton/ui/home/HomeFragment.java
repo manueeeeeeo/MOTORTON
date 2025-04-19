@@ -57,6 +57,20 @@ public class HomeFragment extends Fragment {
         // Inicializamos Firestore
         db = FirebaseFirestore.getInstance();
 
+        binding.swipeRefresh.setOnRefreshListener(() -> cargarConRefresh());
+
+        cargarInicial();
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (!isLoading && layoutManager != null && layoutManager.findLastVisibleItemPosition() == eventoList.size() - 1) {
+                    cargarMasEventos();
+                }
+            }
+        });
+
         return root;
     }
 
@@ -89,6 +103,39 @@ public class HomeFragment extends Fragment {
                     progress.setVisibility(View.GONE);
                     isLoading = false;
                     Log.e("HomeFragment", "Error al cargar eventos", e);
+                });
+    }
+
+    private void cargarMasEventos() {
+        if (lastVisible == null) return;
+
+        ProgressBar progress = binding.progressLoading;
+        progress.setVisibility(View.VISIBLE);
+
+        isLoading = true;
+
+        db.collection("eventos")
+                .startAfter(lastVisible)
+                .limit(10)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        eventoList.addAll(queryDocumentSnapshots.toObjects(Evento.class));
+                        lastVisible = queryDocumentSnapshots.getDocuments()
+                                .get(queryDocumentSnapshots.size() - 1);
+                        eventoAdapter.notifyDataSetChanged();
+
+                        if (queryDocumentSnapshots.size() < 10) {
+                            showToast("No hay más eventos");
+                        }
+                    }
+                    progress.setVisibility(View.GONE);
+                    isLoading = false;
+                })
+                .addOnFailureListener(e -> {
+                    progress.setVisibility(View.GONE);
+                    isLoading = false;
+                    Log.e("HomeFragment", "Error al cargar más eventos", e);
                 });
     }
 
