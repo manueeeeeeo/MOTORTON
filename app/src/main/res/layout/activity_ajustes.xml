@@ -17,11 +17,14 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="⚙ Ajustes"
-            android:textSize="26sp"
+            android:text="⚙️ Ajustes"
+            android:textSize="28sp"
             android:textStyle="bold"
-            android:textColor="#000000"
-            android:paddingBottom="16dp" />
+            android:textColor="#FFFFFF"
+            android:fontFamily="sans-serif-medium"
+            android:paddingBottom="16dp"
+            android:layout_marginTop="13dp"/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -30,65 +33,115 @@
             android:textSize="14sp"
             android:paddingBottom="24dp" />
 
-        <Button
-            android:id="@+id/btnReportarProblema"
+        <LinearLayout
+            android:id="@+id/btnReportar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="🐞 Reportar problema"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#3E8400"
-            android:padding="14dp"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="16dp"
             android:layout_marginBottom="16dp"
-            android:textSize="16dp"/>
+            android:clickable="true"
+            android:focusable="true">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#888888"
-            android:layout_marginBottom="16dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reportar problema"
+                android:textColor="#3E8400"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif-medium"
+                android:paddingBottom="8dp" />
 
-        <Button
-            android:id="@+id/btnVerGraficas"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Describe el problema y envíanoslo"
+                android:textColor="#888888"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/VerGraficas"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="📊 Ver estadísticas"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#005EFF"
-            android:padding="14dp"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="16dp"
             android:layout_marginBottom="16dp"
-            android:textSize="16dp"/>
+            android:clickable="true"
+            android:focusable="true">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#888888"
-            android:layout_marginBottom="16dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ver estadísticas"
+                android:textColor="#005EFF"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif-medium"
+                android:paddingBottom="8dp" />
 
-        <Button
-            android:id="@+id/btnCerrarSesion"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Revisa tus datos y gráficas"
+                android:textColor="#888888"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/CerrarSesion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="🔒 Cerrar Sesión"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#005EFF"
-            android:padding="14dp"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="16dp"
             android:layout_marginBottom="16dp"
-            android:textSize="16dp"/>
+            android:clickable="true"
+            android:focusable="true">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#888888"
-            android:layout_marginBottom="16dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cerrar sesión"
+                android:textColor="#FF9800"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif-medium"
+                android:paddingBottom="8dp" />
 
-        <Button
-            android:id="@+id/btnEliminarCuenta"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cierra tu sesión actual"
+                android:textColor="#888888"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/EliminarCuenta"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="🗑 Eliminar cuenta"
-            android:textColor="#FFFFFF"
-            android:textSize="16dp"
-            android:backgroundTint="#FF0000"
-            android:padding="14dp" />
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="16dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Eliminar cuenta"
+                android:textColor="#FF0000"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif-medium"
+                android:paddingBottom="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Elimina tu cuenta permanentemente"
+                android:textColor="#888888"
+                android:textSize="14sp" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

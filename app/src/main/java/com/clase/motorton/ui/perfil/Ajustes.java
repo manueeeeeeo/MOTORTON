@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -27,12 +28,9 @@ import java.util.Locale;
 import java.util.Map;
 
 public class Ajustes extends AppCompatActivity {
-    // Variable para manejar el boton de reporter problema
-    private Button btnReportarProblema = null;
-    // Variable para manejar el botón de borrar cuenta
-    private Button btnBorrarCuenta = null;
-    // Variable para manejar el botón de cerrar sesión
-    private Button btnCerrarSesion = null;
+    private LinearLayout btnCerrar = null;
+    private LinearLayout btnReportar = null;
+    private LinearLayout btnEliminar = null;
 
     // Variable para manejar todos los Toast de está actividad
     private Toast mensajeToast = null;
@@ -54,12 +52,12 @@ public class Ajustes extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         // Obtengo todos los pelementos visuales de la interfaz
-        btnBorrarCuenta = findViewById(R.id.btnEliminarCuenta);
-        btnReportarProblema = findViewById(R.id.btnReportarProblema);
-        btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
+        btnCerrar = findViewById(R.id.CerrarSesion);
+        btnEliminar = findViewById(R.id.EliminarCuenta);
+        btnReportar = findViewById(R.id.btnReportar);
 
         // Establezco la acción que realiza al tocar el botón de borrar cuenta
-        btnBorrarCuenta.setOnClickListener(new View.OnClickListener() {
+        btnEliminar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Llamo al método para mostrar el dialogo de confirmación y el motivo de borrado
@@ -68,7 +66,7 @@ public class Ajustes extends AppCompatActivity {
         });
 
         // Establezco la acción que realiza al tocar el botón de reportar el problema
-        btnReportarProblema.setOnClickListener(new View.OnClickListener() {
+        btnReportar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Llamo al método para redirigir al usuario a su Email
@@ -77,7 +75,7 @@ public class Ajustes extends AppCompatActivity {
         });
 
         // Establezco la acción que realiza al tocar el botón de cerrar sesión
-        btnCerrarSesion.setOnClickListener(new View.OnClickListener() {
+        btnCerrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Llamo al método para cerrar la sesión
