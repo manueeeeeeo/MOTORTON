@@ -16,11 +16,15 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.clase.motorton.R;
+import com.clase.motorton.adaptadores.EventosAdapter;
 import com.clase.motorton.adaptadores.VehiculosAdapter;
 import com.clase.motorton.cifrado.CifradoDeDatos;
+import com.clase.motorton.modelos.Evento;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -132,7 +136,8 @@ public class MyPerfilFragment extends Fragment {
         btnCoches.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                recyclerViewVehiculos.setLayoutManager(new GridLayoutManager(getContext(), 2));
+                cargarVehiculos(mAuth.getCurrentUser().getUid());
             }
         });
 
@@ -140,7 +145,7 @@ public class MyPerfilFragment extends Fragment {
         btnEventosParticipas.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                cargarEventosParticipas(mAuth.getCurrentUser().getUid());
             }
         });
 
@@ -148,7 +153,8 @@ public class MyPerfilFragment extends Fragment {
         btnEventosCreados.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                recyclerViewVehiculos.setLayoutManager(new LinearLayoutManager(getContext()));
+                cargarEventosCreados(mAuth.getCurrentUser().getUid());
             }
         });
 
@@ -157,6 +163,30 @@ public class MyPerfilFragment extends Fragment {
 
         // Retornamos la vista
         return root;
+    }
+
+    private void cargarEventosParticipas(String uid){
+
+    }
+
+    private void cargarEventosCreados(String uid ){
+        db.collection("eventos")
+                .whereEqualTo("organizador", uid)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        ArrayList<Evento> listaEventosCreados = new ArrayList<>();
+                        for (QueryDocumentSnapshot doc : task.getResult()) {
+                            Evento evento = doc.toObject(Evento.class);
+                            listaEventosCreados.add(evento);
+                        }
+
+                        EventosAdapter adapter = new EventosAdapter(getContext(), listaEventosCreados , uid);
+                        recyclerViewVehiculos.setAdapter(adapter);
+                    } else {
+                        showToast("Error al cargar eventos creados");
+                    }
+                });
     }
 
     /**
