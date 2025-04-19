@@ -29,7 +29,7 @@
                     android:layout_height="wrap_content"
                     android:text="Crear Evento"
                     android:textSize="35dp"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#000000"
                     android:textStyle="bold"
                     android:layout_marginBottom="7dp"/>
 
@@ -39,7 +39,7 @@
                     android:layout_height="wrap_content"
                     android:text="Nombre del Evento"
                     android:textSize="18sp"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#000000"
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp" />
 
@@ -63,7 +63,7 @@
                     android:layout_height="wrap_content"
                     android:text="Descripción del Evento"
                     android:textSize="18sp"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#000000"
                     android:textStyle="bold"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="8dp" />
@@ -91,7 +91,7 @@
                     android:layout_height="wrap_content"
                     android:text="Ubicación del Evento"
                     android:textSize="18sp"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#000000"
                     android:textStyle="bold"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="8dp" />
@@ -116,7 +116,7 @@
                     android:layout_height="wrap_content"
                     android:text="Provincia"
                     android:textSize="18sp"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#000000"
                     android:textStyle="bold"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="8dp" />
@@ -135,7 +135,7 @@
                     android:layout_height="wrap_content"
                     android:text="Tipo de Evento"
                     android:textSize="18sp"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#000000"
                     android:textStyle="bold"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="8dp" />
@@ -172,7 +172,7 @@
                     android:layout_height="wrap_content"
                     android:text="Fecha del Evento"
                     android:textSize="18sp"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#000000"
                     android:textStyle="bold"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="8dp" />
@@ -193,7 +193,7 @@
                     android:layout_height="wrap_content"
                     android:text="Crear Evento"
                     android:textColor="#FFFFFF"
-                    android:backgroundTint="#007BFF"
+                    android:backgroundTint="#000000"
                     android:layout_marginTop="20dp"
                     android:padding="12dp"
                     android:textSize="18sp"
