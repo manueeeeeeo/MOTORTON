@@ -1,10 +1,13 @@
 package com.clase.motorton.ui.home;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -33,6 +36,7 @@ public class HomeFragment extends Fragment {
     private DocumentSnapshot lastVisible = null;
     private boolean isLoading = false;
     private boolean isInitialLoad = false;
+    private Toast mensajeToast = null;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -54,6 +58,85 @@ public class HomeFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
 
         return root;
+    }
+
+    private void cargarInicial() {
+        ProgressBar progress = binding.progressLoading;
+        progress.setVisibility(View.VISIBLE);
+
+        isLoading = true;
+        lastVisible = null;
+
+        db.collection("eventos")
+                .limit(10)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        eventoList.addAll(queryDocumentSnapshots.toObjects(Evento.class));
+                        lastVisible = queryDocumentSnapshots.getDocuments()
+                                .get(queryDocumentSnapshots.size() - 1);
+                        eventoAdapter.notifyDataSetChanged();
+
+                        if (queryDocumentSnapshots.size() < 10) {
+                            showToast("No hay más eventos");
+                        }
+                    }
+                    progress.setVisibility(View.GONE);
+                    isLoading = false;
+                    isInitialLoad = true;
+                })
+                .addOnFailureListener(e -> {
+                    progress.setVisibility(View.GONE);
+                    isLoading = false;
+                    Log.e("HomeFragment", "Error al cargar eventos", e);
+                });
+    }
+
+    private void cargarConRefresh() {
+        binding.swipeRefresh.setRefreshing(true);
+        isLoading = true;
+
+        eventoList.clear();
+        eventoAdapter.notifyDataSetChanged();
+        lastVisible = null;
+
+        db.collection("eventos")
+                .limit(10)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        eventoList.addAll(queryDocumentSnapshots.toObjects(Evento.class));
+                        lastVisible = queryDocumentSnapshots.getDocuments()
+                                .get(queryDocumentSnapshots.size() - 1);
+                        eventoAdapter.notifyDataSetChanged();
+                    }
+                    binding.swipeRefresh.setRefreshing(false);
+                    isLoading = false;
+                })
+                .addOnFailureListener(e -> {
+                    binding.swipeRefresh.setRefreshing(false);
+                    isLoading = false;
+                    Log.e("HomeFragment", "Error al refrescar eventos", e);
+                });
+    }
+
+    /**
+     * @param mensaje
+     * Método para ir matando los Toast y mostrar todos en el mismo para evitar
+     * colas de Toasts y que se ralentice el dispositivo
+     */
+    public void showToast(String mensaje){
+        if (this != null){
+            // Comprobamos si existe algun toast cargado en el toast de la variable global
+            if (mensajeToast != null) { // En caso de que si que exista
+                mensajeToast.cancel(); // Le cancelamos, es decir le "matamos"
+            }
+
+            // Creamos un nuevo Toast con el mensaje que nos dan de argumento en el método
+            mensajeToast = Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT);
+            // Mostramos dicho Toast
+            mensajeToast.show();
+        }
     }
 
     @Override
