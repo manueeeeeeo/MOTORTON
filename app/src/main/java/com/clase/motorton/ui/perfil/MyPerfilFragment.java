@@ -168,22 +168,46 @@ public class MyPerfilFragment extends Fragment {
     }
 
     private void cargarEventosParticipas(String uid) {
+        // Muesto loader y ocultar RecyclerView
+        progressBar.setVisibility(View.VISIBLE);
+        recyclerViewVehiculos.setVisibility(View.GONE);
+
+        // Accedemos a la colección de eventos
         db.collection("eventos")
-                .whereArrayContains("participantes", uid)
+                .whereArrayContains("participantes", uid) // Filtramos por la lista de participantes
                 .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
+                .addOnCompleteListener(task -> { // En caso de que vaya bien
+                    // Ponemos invisible el pogressbar
+                    progressBar.setVisibility(View.GONE);
+
+                    // Comprobamos que la tarea se ejecuto correctamente
+                    if (task.isSuccessful()) { // En caso positivo
                         ArrayList<Evento> listaEventosParticipas = new ArrayList<>();
 
+                        // Utilizamos un for para recorrer la respuesta e ir agregando los objetos a la lista o array
                         for (QueryDocumentSnapshot doc : task.getResult()) {
                             Evento evento = doc.toObject(Evento.class);
                             listaEventosParticipas.add(evento);
                         }
 
-                        EventosAdapter adapter = new EventosAdapter(getContext(), listaEventosParticipas, uid);
+                        // Limpiamos el adaptador anterior
+                        recyclerViewVehiculos.setAdapter(null);
+                        // Iniciamos y le damos el estilo al layout del recycler
                         recyclerViewVehiculos.setLayoutManager(new LinearLayoutManager(getContext()));
+                        // Inicializamos el nuevo adaptador
+                        EventosAdapter adapter = new EventosAdapter(getContext(), listaEventosParticipas, uid);
+                        // Establecemos el apdatador al recycler
                         recyclerViewVehiculos.setAdapter(adapter);
-                    } else {
+                        // Ponemos visible el recycler
+                        recyclerViewVehiculos.setVisibility(View.VISIBLE);
+
+                        if (listaEventosParticipas.isEmpty()) { // En caso de que la lista esté vacía
+                            // Lanzamos un toast indicandolo
+                            showToast("No participas en ningún evento.");
+                        }
+
+                    } else { // En caso negativo
+                        // Lanzamos un toast indicando que ocurrió un error
                         showToast("Error al cargar eventos donde participas");
                     }
                 });
@@ -191,24 +215,50 @@ public class MyPerfilFragment extends Fragment {
 
 
     private void cargarEventosCreados(String uid ){
+        // Muesto loader y ocultar RecyclerView
+        progressBar.setVisibility(View.VISIBLE);
+        recyclerViewVehiculos.setVisibility(View.GONE);
+
+        // Accedemos a la colección de eventos
         db.collection("eventos")
-                .whereEqualTo("organizador", uid)
+                .whereEqualTo("organizador", uid) // Filtramos por organizador de evento
                 .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
+                .addOnCompleteListener(task -> { // En caso de que vaya bien
+                    // Ponemos invisible el pogressbar
+                    progressBar.setVisibility(View.GONE);
+
+                    // Comprobamos que la tarea se ejecuto correctamente
+                    if (task.isSuccessful()) { // En caso afirmativo
                         ArrayList<Evento> listaEventosCreados = new ArrayList<>();
+                        // Utilizamos un for para recorrer la respuesta e ir agregando los objetos a la lista o array
                         for (QueryDocumentSnapshot doc : task.getResult()) {
                             Evento evento = doc.toObject(Evento.class);
                             listaEventosCreados.add(evento);
                         }
 
-                        EventosAdapter adapter = new EventosAdapter(getContext(), listaEventosCreados , uid);
+                        // Limpiamos el adaptador anterior
+                        recyclerViewVehiculos.setAdapter(null);
+                        // Iniciamos y le damos el estilo al layout del recycler
+                        recyclerViewVehiculos.setLayoutManager(new LinearLayoutManager(getContext()));
+                        // Inicializamos el nuevo adaptador
+                        EventosAdapter adapter = new EventosAdapter(getContext(), listaEventosCreados, uid);
+                        // Establecemos el apdatador al recycler
                         recyclerViewVehiculos.setAdapter(adapter);
-                    } else {
+                        // Ponemos visible el recycler
+                        recyclerViewVehiculos.setVisibility(View.VISIBLE);
+
+                        if (listaEventosCreados.isEmpty()) { // En caso de que la lista esté vacía
+                            // Lanzamos un toast indicandolo
+                            showToast("No has creado eventos todavía.");
+                        }
+
+                    } else { // En caso negativo
+                        // Lanzamos un toast indicando que ocurrió un error
                         showToast("Error al cargar eventos creados");
                     }
                 });
     }
+
 
     /**
      * Método en el que procedo a cargar todos los
@@ -335,39 +385,50 @@ public class MyPerfilFragment extends Fragment {
      * que tiene el uid que le pasamos como parametro
      */
     private void cargarVehiculos(String uid) {
-        // Limpiamos la lista e vehículos
+        // Muesto loader y ocultar RecyclerView
+        progressBar.setVisibility(View.VISIBLE);
+        recyclerViewVehiculos.setVisibility(View.GONE);
+
+        // Limpio la lista de vehículos
         listaVehiculos.clear();
 
-        // Accedemos a la colección de vehículos
+        // Accedo a la colección de vehículos
         db.collection("vehiculos")
-                .whereEqualTo("uidDueno", uid) // Filtrando por el uid del usuario
+                .whereEqualTo("uidDueno", uid) // Filtramos por el uid del sueño
                 .get()
-                .addOnCompleteListener(task -> { // En caso de que vaya bien
-                    if (task.isSuccessful()) { // Comprobamos que haya salido bien la tarea
-                        // Comprobamos que la tarea no sea nula
-                        if (!task.getResult().isEmpty()) { // En caso de no ser nula
-                            // Utilizo un foreach para recorrer la lista resultante de la consulta de la base de datos
+                .addOnCompleteListener(task -> {
+                    // Ponemos inivisible el progressbar
+                    progressBar.setVisibility(View.GONE);
+
+                    // Comprobamos que la tarea se ejecuto correctamente
+                    if (task.isSuccessful()) { // En caso afirmativo
+                        if (!task.getResult().isEmpty()) { // En caso de habe resultado
+                            // Utilizamos un for para obtener todos los objetos, convertirlos en Vehículo y agregarlos a la lista
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                // Obtengo en un objeto de tipo vehículo el vehículo de la colección
                                 Vehiculo vehiculo = document.toObject(Vehiculo.class);
-                                // Agrego el vehículo a la lista
                                 listaVehiculos.add(vehiculo);
                             }
-                        } else { // En caso de que sea nula
-                            // Lanzamos un toast indicando que el usuario no tiene vehículos a obtener
-                            showToast("No se encontraron vehículos para este usuario.");
+                        } else { // En caso de no haber resultados
+                            // Lanzamos un toast indicando que no se encontraron los vehículos del usuario
+                            showToast("No se encontraron vehículos para usted.");
                         }
 
+                        // Genero el adaptador para los vehículos
                         vehiculosAdapter = new VehiculosAdapter(listaVehiculos, getContext());
+                        // Establezco al recycler el adaptador
                         recyclerViewVehiculos.setAdapter(vehiculosAdapter);
+                        // Establezco la posición y estilo del mismp
                         recyclerViewVehiculos.setLayoutManager(new GridLayoutManager(getContext(), 2));
+                        // Ponemos visible el recycler
+                        recyclerViewVehiculos.setVisibility(View.VISIBLE);
 
-                    } else { // En caso de no poder
-                        // Lanzamos un toast indicando al usuario que ocurrió algún error
+                    } else { // En caso negativo
+                        // Lanzamos un toast indicando que ocurrió un error al cargar los vehículos
                         showToast("Error al cargar vehículos: " + task.getException().getMessage());
                     }
                 });
     }
+
 
     /**
      * @param mensaje
