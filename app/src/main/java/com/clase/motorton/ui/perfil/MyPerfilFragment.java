@@ -158,6 +158,8 @@ public class MyPerfilFragment extends Fragment {
             }
         });
 
+        recyclerViewVehiculos.setLayoutManager(new GridLayoutManager(getContext(), 2));
+
         // Llamo al método para cargar los datos del perfil
         cargarPerfil();
 
@@ -165,9 +167,28 @@ public class MyPerfilFragment extends Fragment {
         return root;
     }
 
-    private void cargarEventosParticipas(String uid){
+    private void cargarEventosParticipas(String uid) {
+        db.collection("eventos")
+                .whereArrayContains("participantes", uid)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        ArrayList<Evento> listaEventosParticipas = new ArrayList<>();
 
+                        for (QueryDocumentSnapshot doc : task.getResult()) {
+                            Evento evento = doc.toObject(Evento.class);
+                            listaEventosParticipas.add(evento);
+                        }
+
+                        EventosAdapter adapter = new EventosAdapter(getContext(), listaEventosParticipas, uid);
+                        recyclerViewVehiculos.setLayoutManager(new LinearLayoutManager(getContext()));
+                        recyclerViewVehiculos.setAdapter(adapter);
+                    } else {
+                        showToast("Error al cargar eventos donde participas");
+                    }
+                });
     }
+
 
     private void cargarEventosCreados(String uid ){
         db.collection("eventos")
@@ -337,16 +358,9 @@ public class MyPerfilFragment extends Fragment {
                             showToast("No se encontraron vehículos para este usuario.");
                         }
 
-                        // Procedo a comprobar que el adaptador no sea nulo
-                        if (vehiculosAdapter != null) { // En caso de que no sea nulo
-                            // Notificamos al adaptador cambios de datos
-                            vehiculosAdapter.notifyDataSetChanged();
-                        } else { // En caso de que sea nulo
-                            // Inicializamos el nuevo adaptador de vehículos
-                            vehiculosAdapter = new VehiculosAdapter(listaVehiculos, getContext());
-                            // Establecemos al recyclerview el adaptador nuevo inicializado
-                            recyclerViewVehiculos.setAdapter(vehiculosAdapter);
-                        }
+                        vehiculosAdapter = new VehiculosAdapter(listaVehiculos, getContext());
+                        recyclerViewVehiculos.setAdapter(vehiculosAdapter);
+                        recyclerViewVehiculos.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
                     } else { // En caso de no poder
                         // Lanzamos un toast indicando al usuario que ocurrió algún error
