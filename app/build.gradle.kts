@@ -62,4 +62,13 @@ dependencies {
     implementation ("androidx.constraintlayout:constraintlayout:2.0.4")
     implementation ("androidx.recyclerview:recyclerview:1.2.1")
     implementation ("org.json:json:20210307")
+    implementation ("org.osmdroid:osmdroid-android:6.1.16")
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.google.firebase:firebase-messaging:23.1.2")
+    implementation ("androidx.work:work-runtime:2.8.1")
+    implementation("com.google.guava:guava:31.1-android")
+    implementation ("com.github.PhilJay:MPAndroidChart:3.1.0")
+    implementation ("com.itextpdf:kernel:7.2.3")
+    implementation ("com.itextpdf:layout:7.2.3")
 }

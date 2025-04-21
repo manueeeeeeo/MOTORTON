@@ -157,7 +157,7 @@
             android:background="@android:color/transparent"
             android:contentDescription="Mis Coches"
             android:src="@drawable/ic_coche"
-            app:tint="@android:color/white"/>
+            app:tint="@android:color/black" />
 
         <ImageButton
             android:id="@+id/buttonEventosCreados"
@@ -166,8 +166,7 @@
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:contentDescription="Eventos Creados"
-            android:src="@drawable/icono_buscar"
-            app:tint="@android:color/white"
+            android:src="@drawable/icono_creados"
             tools:ignore="UseAppTint" />
 
         <ImageButton
@@ -177,8 +176,7 @@
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:contentDescription="Eventos Apuntados"
-            android:src="@drawable/person"
-            app:tint="@android:color/white" />
+            android:src="@drawable/icono_apuntados" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
