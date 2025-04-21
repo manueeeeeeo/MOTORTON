@@ -24,9 +24,13 @@
         android:theme="@style/Theme.MOTORTON"
         tools:targetApi="31">
         <activity
+            android:name=".pasajero.VersionBeta"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".ui.perfil.EstadisticasVehiculos"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.perfil.Ajustes"
             android:exported="false"
