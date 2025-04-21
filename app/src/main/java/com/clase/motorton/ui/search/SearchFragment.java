@@ -1,6 +1,8 @@
 package com.clase.motorton.ui.search;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,7 +56,33 @@ public class SearchFragment extends Fragment {
         progressBar = root.findViewById(R.id.progressBuscar);
         db = FirebaseFirestore.getInstance();
 
+        searchInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String query = s.toString().trim();
+                if (!query.equals(lastQuery)) {
+                    lastQuery = query;
+                    buscar(query);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
         return root;
+    }
+
+    private void buscar(String texto){
+        if (texto.isEmpty()) {
+            resultadosList.clear();
+            resultadosMap.clear();
+            busquedaAdapter.notifyDataSetChanged();
+            return;
+        }
     }
 
     @Override
