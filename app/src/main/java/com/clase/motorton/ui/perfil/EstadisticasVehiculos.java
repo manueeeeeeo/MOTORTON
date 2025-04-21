@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -123,9 +124,8 @@ public class EstadisticasVehiculos extends AppCompatActivity {
 
     public void generarPDF(PieChart pieChart, BarChart barCoches, BarChart barMotos) {
         try {
-            File pdfDir = new File(getExternalFilesDir(null), "MisEstadisticas");
+            File pdfDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
             if (!pdfDir.exists()) pdfDir.mkdirs();
-
             File file = new File(pdfDir, "EstadisticasVehiculos.pdf");
 
             PdfWriter writer = new PdfWriter(new FileOutputStream(file));
