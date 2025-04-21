@@ -1,5 +1,6 @@
 package com.clase.motorton.ui.search;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,12 +21,15 @@ import com.clase.motorton.R;
 import com.clase.motorton.adaptadores.BusquedaAdapter;
 import com.clase.motorton.databinding.FragmentDashboardBinding;
 import com.clase.motorton.modelos.BusquedaItem;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SearchFragment extends Fragment {
 
@@ -76,12 +80,59 @@ public class SearchFragment extends Fragment {
         return root;
     }
 
-    private void buscar(String texto){
+    private void buscar(String texto) {
         if (texto.isEmpty()) {
             resultadosList.clear();
             resultadosMap.clear();
             busquedaAdapter.notifyDataSetChanged();
             return;
+        }
+
+        progressBar.setVisibility(View.VISIBLE);
+        resultadosMap.clear();
+        AtomicInteger consultasPendientes = new AtomicInteger(2);
+
+        Query queryPerfiles = db.collection("perfiles")
+                .orderBy("username")
+                .startAt(texto).endAt(texto + "\uf8ff")
+                .limit(5);
+
+        Query queryEventos = db.collection("eventos")
+                .orderBy("nombre")
+                .startAt(texto).endAt(texto + "\uf8ff")
+                .limit(5);
+
+        queryPerfiles.get().addOnSuccessListener(perfiles -> {
+            for (DocumentSnapshot doc : perfiles.getDocuments()) {
+                String username = doc.getString("username");
+                if (username != null) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        resultadosMap.putIfAbsent(username, new BusquedaItem(username, "perfil"));
+                    }
+                }
+            }
+            actualizarResultados(consultasPendientes);
+        });
+
+        queryEventos.get().addOnSuccessListener(eventos -> {
+            for (DocumentSnapshot doc : eventos.getDocuments()) {
+                String nombreEvento = doc.getString("nombre");
+                if (nombreEvento != null) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        resultadosMap.putIfAbsent(nombreEvento, new BusquedaItem(nombreEvento, "evento"));
+                    }
+                }
+            }
+            actualizarResultados(consultasPendientes);
+        });
+    }
+
+    private void actualizarResultados(AtomicInteger consultasPendientes) {
+        if (consultasPendientes.decrementAndGet() == 0) {
+            resultadosList.clear();
+            resultadosList.addAll(resultadosMap.values());
+            busquedaAdapter.notifyDataSetChanged();
+            progressBar.setVisibility(View.GONE);
         }
     }
 
