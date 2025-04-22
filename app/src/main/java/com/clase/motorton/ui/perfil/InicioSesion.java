@@ -1,6 +1,7 @@
 package com.clase.motorton.ui.perfil;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
@@ -40,6 +41,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class InicioSesion extends AppCompatActivity {
     // Variable para manejar la autentificación de los usuarios
@@ -302,6 +306,19 @@ public class InicioSesion extends AppCompatActivity {
                                                     if (document.exists()) { // En caso afirmativo
                                                         // Perfil encontrado, redirigimos al MainActivity
                                                         showToast("Inicio de sesión exitoso");
+                                                        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                                                        SharedPreferences prefs = getSharedPreferences("BetaPrefs", MODE_PRIVATE);
+                                                        String codigo = prefs.getString("codigoBeta", null);
+
+                                                        if (codigo != null) {
+                                                            FirebaseFirestore db = FirebaseFirestore.getInstance();
+                                                            Map<String, Object> data = new HashMap<>();
+                                                            data.put("active", true);
+                                                            data.put("usedBy", uid);
+                                                            data.put("logoutCount", 0);
+
+                                                            db.collection("invitationCodes").document(codigo).update(data);
+                                                        }
                                                         Intent intent = new Intent(InicioSesion.this, MainActivity.class);
                                                         intent.putExtra("name", user.getDisplayName()); // Pasamos el username del usuario
                                                         intent.putExtra("email", user.getEmail()); // Pasamos el email del usuario
@@ -366,6 +383,19 @@ public class InicioSesion extends AppCompatActivity {
                                                     if (document.exists()) {
                                                         // Perfil encontrado, redirigimos al MainActivity
                                                         showToast("Inicio de sesión exitoso");
+                                                        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                                                        SharedPreferences prefs = getSharedPreferences("BetaPrefs", MODE_PRIVATE);
+                                                        String codigo = prefs.getString("codigoBeta", null);
+
+                                                        if (codigo != null) {
+                                                            FirebaseFirestore db = FirebaseFirestore.getInstance();
+                                                            Map<String, Object> data = new HashMap<>();
+                                                            data.put("active", true);
+                                                            data.put("usedBy", uid);
+                                                            data.put("logoutCount", 0);
+
+                                                            db.collection("invitationCodes").document(codigo).update(data);
+                                                        }
                                                         Intent intent = new Intent(InicioSesion.this, MainActivity.class);
                                                         intent.putExtra("email", email); // Pasamos el correo del usuario
                                                         startActivity(intent);
