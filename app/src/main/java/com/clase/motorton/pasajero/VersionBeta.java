@@ -55,6 +55,7 @@ public class VersionBeta extends AppCompatActivity {
             return;
         }
 
+        db = FirebaseFirestore.getInstance();
         db.collection("invitationCodes").document(codigoIngresado).get()
                 .addOnSuccessListener(doc -> {
                     if (!doc.exists()) {
@@ -63,10 +64,16 @@ public class VersionBeta extends AppCompatActivity {
                     }
 
                     Boolean activo = doc.getBoolean("active");
+                    Long logoutCount = doc.getLong("logoutCount");
                     String usadoPor = doc.getString("usedBy");
 
-                    if (activo != null && activo) {
-                        showToast("Este código ya fue usado");
+                    if (activo == null || !activo) {
+                        showToast("Este código está desactivado");
+                        return;
+                    }
+
+                    if (logoutCount != null && logoutCount >= 2) {
+                        showToast("Este código ya fue utilizado demasiado");
                         return;
                     }
 
@@ -78,10 +85,9 @@ public class VersionBeta extends AppCompatActivity {
                     startActivity(new Intent(this, InicioSesion.class));
                     finish();
                 })
-                .addOnFailureListener(e ->
-                        showToast("Error al validar código")
-                );
+                .addOnFailureListener(e -> showToast("Error al validar código"));
     }
+
 
     /**
      * @param mensaje
