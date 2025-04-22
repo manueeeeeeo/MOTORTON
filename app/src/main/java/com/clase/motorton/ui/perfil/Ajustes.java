@@ -1,6 +1,7 @@
 package com.clase.motorton.ui.perfil;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -90,7 +91,7 @@ public class Ajustes extends AppCompatActivity {
      * cerramos tanto el autenticador como la cuenta de Google,
      * para así evitar posibles errores
      */
-    private void cerrarSesion(){
+    /*private void cerrarSesion(){
         // Cierro la sesión en el usuario de Google por si acaso
         GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut();
         // Cierro la sesión del usuario en la autentificación
@@ -102,7 +103,55 @@ public class Ajustes extends AppCompatActivity {
         startActivity(intent);
         // Cierro la nueva actividad
         finish();
+    }*/
+
+    private void cerrarSesion() {
+        SharedPreferences prefs = getSharedPreferences("BetaPrefs", MODE_PRIVATE);
+        String codigo = prefs.getString("codigoBeta", null);
+        String uid = FirebaseAuth.getInstance().getCurrentUser() != null ?
+                FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
+
+        if (codigo != null && uid != null) {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("invitationCodes").document(codigo).get()
+                    .addOnSuccessListener(doc -> {
+                        if (doc.exists()) {
+                            Long logoutCount = doc.getLong("logoutCount");
+                            logoutCount = (logoutCount == null) ? 1 : logoutCount + 1;
+
+                            Map<String, Object> updates = new HashMap<>();
+                            updates.put("logoutCount", logoutCount);
+
+                            if (logoutCount >= 2) {
+                                updates.put("active", false);
+                                updates.put("usedBy", null);
+                            }
+
+                            db.collection("invitationCodes").document(codigo).update(updates);
+                        }
+
+                        prefs.edit().remove("codigoBeta").apply();
+
+                        GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut();
+                        FirebaseAuth.getInstance().signOut();
+
+                        Intent intent = new Intent(this, InicioSesion.class);
+                        startActivity(intent);
+                        finish();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Error al cerrar sesión: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+        } else {
+            GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut();
+            FirebaseAuth.getInstance().signOut();
+
+            Intent intent = new Intent(this, InicioSesion.class);
+            startActivity(intent);
+            finish();
+        }
     }
+
 
     /**
      * Método en el que establecemos el destinatario,
