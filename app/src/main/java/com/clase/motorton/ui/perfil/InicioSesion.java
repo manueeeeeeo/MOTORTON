@@ -314,7 +314,7 @@ public class InicioSesion extends AppCompatActivity {
                                                             FirebaseFirestore db = FirebaseFirestore.getInstance();
                                                             Map<String, Object> data = new HashMap<>();
                                                             data.put("active", true);
-                                                            data.put("usedBy", uid);
+                                                            data.put("userUID", uid);
                                                             data.put("logoutCount", 0);
 
                                                             db.collection("invitationCodes").document(codigo).update(data)
@@ -393,7 +393,7 @@ public class InicioSesion extends AppCompatActivity {
                                                             FirebaseFirestore db = FirebaseFirestore.getInstance();
                                                             Map<String, Object> data = new HashMap<>();
                                                             data.put("active", true);
-                                                            data.put("usedBy", uid);
+                                                            data.put("userUID", uid);
                                                             data.put("logoutCount", 0);
 
                                                             db.collection("invitationCodes").document(codigo).update(data)
