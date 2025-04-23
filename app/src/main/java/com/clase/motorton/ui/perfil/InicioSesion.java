@@ -317,7 +317,9 @@ public class InicioSesion extends AppCompatActivity {
                                                             data.put("usedBy", uid);
                                                             data.put("logoutCount", 0);
 
-                                                            db.collection("invitationCodes").document(codigo).update(data);
+                                                            db.collection("invitationCodes").document(codigo).update(data)
+                                                                    .addOnSuccessListener(unused -> showToast("Código beta actualizado correctamente"))
+                                                                    .addOnFailureListener(e -> showToast("Error al actualizar código beta: " + e.getMessage()));
                                                         }
                                                         Intent intent = new Intent(InicioSesion.this, MainActivity.class);
                                                         intent.putExtra("name", user.getDisplayName()); // Pasamos el username del usuario
@@ -394,7 +396,9 @@ public class InicioSesion extends AppCompatActivity {
                                                             data.put("usedBy", uid);
                                                             data.put("logoutCount", 0);
 
-                                                            db.collection("invitationCodes").document(codigo).update(data);
+                                                            db.collection("invitationCodes").document(codigo).update(data)
+                                                                    .addOnSuccessListener(unused -> showToast("Código beta actualizado correctamente"))
+                                                                    .addOnFailureListener(e -> showToast("Error al actualizar código beta: " + e.getMessage()));
                                                         }
                                                         Intent intent = new Intent(InicioSesion.this, MainActivity.class);
                                                         intent.putExtra("email", email); // Pasamos el correo del usuario

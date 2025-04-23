@@ -20,6 +20,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.clase.motorton.MainActivity;
 import com.clase.motorton.R;
+import com.clase.motorton.pasajero.VersionBeta;
 import com.clase.motorton.ui.perfil.CreacionPerfil;
 import com.clase.motorton.ui.perfil.InicioSesion;
 import com.google.firebase.auth.FirebaseAuth;
@@ -131,7 +132,7 @@ public class PantallaCarga extends AppCompatActivity {
                 } else { // En caso de que ya haya superado el 100 la variable
                     // Compruebo si el usuario es nulo
                     if (user == null) { // En caso de que sea nulo
-                        startActivity(new Intent(PantallaCarga.this, InicioSesion.class));
+                        startActivity(new Intent(PantallaCarga.this, VersionBeta.class));
                         finish();
                     }else{ // En caso de que no sea nulo
                         // Verifico si el usuario tiene perfil en la base de datos
@@ -169,7 +170,7 @@ public class PantallaCarga extends AppCompatActivity {
                     // Lanzo un toast indicando que ha ocurrido un error a la hora verificar el perfil
                     showToast("Error al verificar perfil");
                     // Inicio una nueva actividad para mandar al usuario a la pantalla de inicio de sesión
-                    startActivity(new Intent(PantallaCarga.this, InicioSesion.class));
+                    startActivity(new Intent(PantallaCarga.this, VersionBeta.class));
                     // Finalizo la actividad actual
                     finish();
                 });
