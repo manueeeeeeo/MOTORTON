@@ -40,4 +40,17 @@
         android:name="com.clase.motorton.ui.mapas.MapaEventFragment"
         android:label="@string/title_map"
         tools:layout="@layout/fragment_mapa_event" />
+
+
+    <fragment
+        android:id="@+id/navigation_info_evento"
+        android:name="com.clase.motorton.ui.eventos.InfoEventoFragment"
+        android:label="@string/title_info_evento"
+        tools:layout="@layout/fragment_info_evento" />
+
+    <fragment
+        android:id="@+id/navigation_info_otro_perfil"
+        android:name="com.clase.motorton.ui.perfil.InfoOtroPerfilFragment"
+        android:label="@string/title_info_orto_perfil"
+        tools:layout="@layout/fragment_info_otro_perfil" />
 </navigation>

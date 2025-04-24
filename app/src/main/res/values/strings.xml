@@ -5,6 +5,8 @@
     <string name="title_crear">Crear</string>
     <string name="title_map">Mapa</string>
     <string name="title_perfil">Perfil</string>
+    <string name="title_info_evento">Información Evento</string>
+    <string name="title_info_orto_perfil">Información Perfil</string>
     <string name="client_id">157393031901-v2gfvsjrjcr68b6n96ig41h33hntnnrm.apps.googleusercontent.com</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
