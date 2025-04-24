@@ -1,9 +1,11 @@
 package com.clase.motorton.ui.perfil;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,8 +27,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Registrarse extends AppCompatActivity {
     // Variable para manejar el boton de registro
@@ -255,6 +261,43 @@ public class Registrarse extends AppCompatActivity {
                                                     } else { // En caso de no existir
                                                         // Lanzamos un Toast para que el usuario sepa que está pasando algo
                                                         showToast("Redirigiendo para completar perfil...");
+                                                        SharedPreferences prefs = getSharedPreferences("BetaPrefs", MODE_PRIVATE);
+                                                        String codigo = prefs.getString("codigoBeta", null);
+                                                        Log.d("BetaCode", "Código beta recuperado: " + codigo);
+
+                                                        if (codigo != null) {
+                                                            FirebaseFirestore db = FirebaseFirestore.getInstance();
+                                                            DocumentReference docRef = db.collection("invitationCodes").document(codigo);
+
+                                                            Map<String, Object> data = new HashMap<>();
+                                                            data.put("active", true);
+                                                            data.put("userUID", uid);
+                                                            data.put("logoutCount", 0);
+
+                                                            docRef.get().addOnSuccessListener(snapshot -> {
+                                                                if (snapshot.exists()) {
+                                                                    docRef.update(data)
+                                                                            .addOnSuccessListener(unused -> {
+                                                                                Log.d("Firebase", "Código beta actualizado correctamente");
+                                                                                showToast("Código beta actualizado correctamente");
+                                                                            })
+                                                                            .addOnFailureListener(e -> {
+                                                                                Log.e("Firebase", "Error al actualizar código beta", e);
+                                                                                showToast("Error al actualizar código beta: " + e.getMessage());
+                                                                            });
+                                                                } else {
+                                                                    Log.e("Firebase", "El documento del código beta no existe");
+                                                                    showToast("Error: el código beta no existe");
+                                                                }
+                                                            }).addOnFailureListener(e -> {
+                                                                Log.e("Firebase", "Error al comprobar existencia del documento", e);
+                                                                showToast("Error al validar el código beta: " + e.getMessage());
+                                                            });
+                                                        } else {
+                                                            Log.e("BetaCode", "El código beta es null en SharedPreferences");
+                                                            showToast("Código beta no encontrado en preferencias");
+                                                        }
+
                                                         // Creamos un nuevo intent indicando de donde partimos y a donde vamos
                                                         Intent intent = new Intent(Registrarse.this, CreacionPerfil.class);
                                                         intent.putExtra("uid", uid); // Pasamos el UID del usuario
