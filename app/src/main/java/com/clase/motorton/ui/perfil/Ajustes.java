@@ -32,6 +32,7 @@ public class Ajustes extends AppCompatActivity {
     private LinearLayout btnCerrar = null;
     private LinearLayout btnReportar = null;
     private LinearLayout btnEliminar = null;
+    private LinearLayout btnEstadisticas = null;
 
     // Variable para manejar todos los Toast de está actividad
     private Toast mensajeToast = null;
@@ -56,6 +57,15 @@ public class Ajustes extends AppCompatActivity {
         btnCerrar = findViewById(R.id.CerrarSesion);
         btnEliminar = findViewById(R.id.EliminarCuenta);
         btnReportar = findViewById(R.id.btnReportar);
+        btnEstadisticas = findViewById(R.id.VerGraficas);
+
+        btnEstadisticas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(Ajustes.this, EstadisticasVehiculos.class);
+                startActivity(i);
+            }
+        });
 
         // Establezco la acción que realiza al tocar el botón de borrar cuenta
         btnEliminar.setOnClickListener(new View.OnClickListener() {
