@@ -1,18 +1,24 @@
 package com.clase.motorton.ui.mapas;
 
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.clase.motorton.R;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -91,6 +97,73 @@ public class MapaFragment extends Fragment {
         for (String prov : coordsRelativas.keySet()) {
             eventosPorProvincia.put(prov, 0);
         }
+
+        db.collection("eventos").get().addOnSuccessListener(snapshot -> {
+            for (QueryDocumentSnapshot doc : snapshot) {
+                String provincia = doc.getString("provincia");
+                if (provincia != null && eventosPorProvincia.containsKey(provincia)) {
+                    int count = eventosPorProvincia.get(provincia);
+                    eventosPorProvincia.put(provincia, count + 1);
+                }
+            }
+
+            ImageView mapaEspana = view.findViewById(R.id.mapaEspana);
+
+            mapaEspana.post(() -> {
+                int viewWidth = mapaEspana.getWidth();
+                int viewHeight = mapaEspana.getHeight();
+
+                Drawable drawable = mapaEspana.getDrawable();
+                if (drawable == null) return;
+
+                int imgWidth = drawable.getIntrinsicWidth();
+                int imgHeight = drawable.getIntrinsicHeight();
+
+                float scale = Math.min((float) viewWidth / imgWidth, (float) viewHeight / imgHeight);
+
+                int scaledImgWidth = (int) (imgWidth * scale);
+                int scaledImgHeight = (int) (imgHeight * scale);
+
+                int offsetX = (viewWidth - scaledImgWidth) / 2;
+                int offsetY = (viewHeight - scaledImgHeight) / 2;
+
+                for (Map.Entry<String, float[]> entry : coordsRelativas.entrySet()) {
+                    String provincia = entry.getKey();
+                    float[] rel = entry.getValue();
+                    int eventos = eventosPorProvincia.get(provincia);
+
+                    TextView label = new TextView(getContext());
+                    label.setText(String.valueOf(eventos));
+                    label.setTextSize(10);
+                    label.setPadding(6, 3, 6, 3);
+                    int maxEventos = Collections.max(eventosPorProvincia.values());
+                    int color = getColorFromValue(eventos, maxEventos);
+
+                    label.setTextColor(getContrastingTextColor(color));
+                    label.setBackgroundColor(color);
+                    label.setGravity(Gravity.CENTER);
+
+                    int x = offsetX + (int) (rel[0] * scaledImgWidth);
+                    int y = offsetY + (int) (rel[1] * scaledImgHeight);
+
+                    label.setLayoutParams(new FrameLayout.LayoutParams(
+                            FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
+
+                    mapaContainer.addView(label);
+
+                    label.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+                    int labelWidth = label.getMeasuredWidth();
+                    int labelHeight = label.getMeasuredHeight();
+
+                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) label.getLayoutParams();
+                    params.leftMargin = x - (labelWidth / 2);
+                    params.topMargin = y - (labelHeight / 2);
+                    label.setLayoutParams(params);
+
+                }
+            });
+
+        });
 
         return view;
     }
