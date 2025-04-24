@@ -1,5 +1,6 @@
 package com.clase.motorton.ui.mapas;
 
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -92,5 +93,31 @@ public class MapaFragment extends Fragment {
         }
 
         return view;
+    }
+
+    private int getColorFromValue(int value, int max) {
+        if (max == 0) return Color.rgb(0, 100, 0);
+
+        float ratio = (float) value / max;
+
+        int r, g;
+        if (ratio < 0.5f) {
+            r = (int) (200 * (ratio * 2));
+            g = 180 + (int)(75 * ratio * 2);
+        } else {
+            r = 200 + (int)(55 * (ratio - 0.5f) * 2);
+            g = (int) (180 * (1 - (ratio - 0.5f) * 2));
+        }
+
+        return Color.rgb(r, g, 0);
+    }
+
+    private int getContrastingTextColor(int backgroundColor) {
+        int r = Color.red(backgroundColor);
+        int g = Color.green(backgroundColor);
+        int b = Color.blue(backgroundColor);
+
+        double luminance = (0.299 * r + 0.587 * g + 0.114 * b);
+        return luminance > 140 ? Color.BLACK : Color.WHITE;
     }
 }
