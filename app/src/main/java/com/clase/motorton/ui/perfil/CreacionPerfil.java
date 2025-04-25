@@ -56,8 +56,6 @@ public class CreacionPerfil extends AppCompatActivity {
     private EditText editUsername = null;
     // Variable para manejar el editText del nombre completo
     private EditText editNombre = null;
-    // Variable para manejar el editText de los años conduciendo
-    private EditText anosConduciendo = null;
     // Variable para manejar el editText de la ubicación
     private EditText editUbi = null;
     // Variable para manejar el editText del código postal
