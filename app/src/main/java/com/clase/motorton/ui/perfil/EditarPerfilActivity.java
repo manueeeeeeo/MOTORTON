@@ -4,9 +4,11 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,14 +25,18 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.clase.motorton.MainActivity;
 import com.clase.motorton.R;
 import com.clase.motorton.cifrado.CifradoDeDatos;
+import com.clase.motorton.modelos.Perfil;
 import com.clase.motorton.ui.mapas.ElegirUbicacion;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -225,6 +231,113 @@ public class EditarPerfilActivity extends AppCompatActivity {
             // Retornamos para no proseguir con el método
             return;
         }
+
+        // Obtenemos en una variable el uid del usuario
+        String uid = user.getUid();
+        // Obtenemos en una variable el email del usuario
+        String email = user.getEmail();
+
+        // Obtenemos en una variable el username del usuario
+        String campoUsername = editUsername.getText().toString();
+
+        // Obtenemos en una variable el email cifrado del usuario
+        String emailCifrado = CifradoDeDatos.cifrar(email);
+
+        // Obtenemos en una variable el recurso que se ha puesto en la imageview de la imagen de perfil
+        BitmapDrawable drawable = (BitmapDrawable) imagenPerfil.getDrawable();
+        // Obtenemos en una variable el bitmao de la imagen elegida
+        Bitmap fotoBitmap = drawable != null ? drawable.getBitmap() : null;
+
+        // Creo una variable de tipo texto donde almacenar la foto en base64
+        String fotoPerfilBase64 = null;
+        // Procedemos a comprobar si el bitmap es nulo
+        if (fotoBitmap != null) { // En caso de no ser nulo
+            // Creamos un array de bytes para comprimir la imagen
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            // Procedemos a comprimmir la imagen a un 85% y además, le establecemos como un JPEG
+            fotoBitmap.compress(Bitmap.CompressFormat.JPEG, 85, baos);
+
+            // Creamos una cadena de bytes en donde almacenamos la imagen
+            byte[] fotoBytes = baos.toByteArray();
+            // Y guardamos en la variable antes creado la codificación en base64
+            fotoPerfilBase64 = Base64.encodeToString(fotoBytes, Base64.DEFAULT);
+        }
+
+        // Creamos un objeto del modelo de perfil de usuario para tener todos los valores rellenos y a mano
+        Perfil perfil = new Perfil(
+                uid,
+                campoUsername,
+                emailCifrado,
+                null,
+                ubicacionSeleccionada,
+                0,
+                null,
+                cp.isEmpty() ? 0 : Integer.parseInt(cp),
+                new ArrayList<>(),
+                fotoBitmap,
+                descripcion,
+                anosPermiso.isEmpty() ? 0 : Integer.parseInt(anosPermiso)
+        );
+
+        // Creamos un nuevo Map para darle los nombres y los valores a los documentos dentro de la colección
+        Map<String, Object> perfilMap = new HashMap<>();
+        // Guardamos el uid del usuario
+        perfilMap.put("uid", perfil.getUid());
+        // Guardamos el username del usuario
+        perfilMap.put("username", perfil.getUsername());
+        // Guardamos la ubicación del usuario cifrada
+        perfilMap.put("ubicacion", perfil.getUbicacion());
+        // Guardamos la edad del usuario
+        perfilMap.put("edad", perfil.getEdad());
+        // Guardamos el código postal del usuario
+        perfilMap.put("cp", perfil.getCp());
+        // Guardamos el correo del usuario cifrado
+        perfilMap.put("email", perfil.getEmail());
+        // Guardamos los años que lleva conduciendo el usuario
+        perfilMap.put("aniosConduciendo", perfil.getAniosConduciendo());
+        // Guardamos la foto de perfil en base 64
+        perfilMap.put("fotoPerfil", fotoPerfilBase64);
+        // Guardamos la descripción del usuario
+        perfilMap.put("descripcion", perfil.getDescripcion());
+
+        // Obtenemos en una variable el username a querer ingresar
+        String usernameNuevo = perfilMap.get("username").toString();
+
+        // Procedemos a comprobar si ya existe un perfil con ese username
+        db.collection("perfiles")
+                .whereEqualTo("username", usernameNuevo)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> { // En caso de que todo vaya bien
+                    if (queryDocumentSnapshots.isEmpty()) { // En caso de que la consulta esté vacía
+                        // No existe ningún usuario con ese username, entonces podemos crear el perfil
+                        db.collection("perfiles").document(uid).update(perfilMap)
+                                .addOnSuccessListener(aVoid -> { // En caso de que todo vaya bien
+                                    // Lanzamos un Toast indicando que se creo el perfil correctamente
+                                    showToast("Perfil actualizado exitosamente");
+                                    // Creamos un nuevo intent indicando a la nueva pantalla que vamos a saltar
+                                    Intent i = new Intent(EditarPerfilActivity.this, MainActivity.class);
+                                    // Pasamos como parametro un uid
+                                    i.putExtra("uid", uid);
+                                    // Iniciamos la nueva actividad
+                                    startActivity(i);
+                                    // Establecemos una animcación para que se vea más visual
+                                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                                    finish(); // Cerramos la actividad actual
+                                })
+                                .addOnFailureListener(e -> { // En caso de que algo falle
+                                    // Lanzamos un Toast indicando al usuario que ocurrio un error al crear el perfil
+                                    showToast("Error al crear perfil: " + e.getMessage());
+                                });
+                    } else { // En caso de que si que exista
+                        // Lanzaremos un Toast indicando al usuario que ese username ya está en uso
+                        showToast("El nombre de usuario ya está en uso. Por favor elige otro.");
+                    }
+                })
+                .addOnFailureListener(e -> { // En caso de que surja algún error
+                    // Lanzaremos un toast indicando que ocurrido un error al verificar el username
+                    showToast("Error al verificar username: " + e.getMessage());
+                });
     }
 
     /**
