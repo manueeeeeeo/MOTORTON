@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -218,6 +219,59 @@ public class EditarPerfilActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public void CargarDatos(){
+        // Obtenemos el usuario que está autenticado en ese momento
+        FirebaseUser user = auth.getCurrentUser();
+
+        // Procedemos a comprobar si el usuario no es nulo
+        if (user == null) { // En caso de ser nulo
+            // Indicamos al usuario que ha de iniciar sesión de nuevo
+            showToast("No se pudo obtener la información del usuario. Inicia sesión nuevamente.");
+            // Retornamos para no proseguir con el método
+            return;
+        }
+
+        // Obtenemos en una variable el uid del usuario
+        String uid = user.getUid();
+        // Obtenemos en una variable el email del usuario
+        String email = user.getEmail();
+
+        db.collection("perfiles")
+                .document(uid)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String campoUsername = documentSnapshot.getString("username");
+                        //String ubicacionSeleccionada = documentSnapshot.getString("ubicacion");
+                        String cpString = documentSnapshot.getString("cp");
+                        String descripcion = documentSnapshot.getString("descripcion");
+                        String anosPermisoString = documentSnapshot.getString("aniosConduciendo");
+                        String fotoBase64 = documentSnapshot.getString("fotoPerfil");
+
+                        int codigoPostal = cpString != null && !cpString.isEmpty() ? Integer.parseInt(cpString) : 0;
+                        int anosPermiso = anosPermisoString != null && !anosPermisoString.isEmpty() ? Integer.parseInt(anosPermisoString) : 0;
+
+                        editUsername.setText(campoUsername != null ? campoUsername : "");
+                        //btnElegirUbicacion.setText(ubicacionSeleccionada != null ? ubicacionSeleccionada : "");
+                        editCP.setText(String.valueOf(codigoPostal));
+                        editDescrip.setText(descripcion != null ? descripcion : "");
+                        editAnoCon.setText(String.valueOf(anosPermiso));
+
+                        if (fotoBase64 != null && !fotoBase64.isEmpty()) {
+                            byte[] decodedString = Base64.decode(fotoBase64, Base64.DEFAULT);
+                            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                            imagenPerfil.setImageBitmap(decodedByte);
+                        }
+
+                    } else {
+                        showToast("No se encontró el perfil del usuario.");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    showToast("Error al obtener los datos del perfil: " + e.getMessage());
+                });
     }
 
     public void actualizarPerfil(){
