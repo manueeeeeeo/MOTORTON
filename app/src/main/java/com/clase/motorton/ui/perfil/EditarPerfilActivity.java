@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -16,13 +17,17 @@ import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.clase.motorton.R;
 import com.clase.motorton.cifrado.CifradoDeDatos;
+import com.clase.motorton.ui.mapas.ElegirUbicacion;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
@@ -148,6 +153,78 @@ public class EditarPerfilActivity extends AppCompatActivity {
 
         // Inicializamos el cifrado de datos
         cifrar = new CifradoDeDatos();
+
+        // Evento que sucede cuando pulsamos sobre el imageview de la imagen de perfil
+        imagenPerfil.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (ContextCompat.checkSelfPermission(EditarPerfilActivity.this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+                        ContextCompat.checkSelfPermission(EditarPerfilActivity.this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+                    ActivityCompat.requestPermissions(EditarPerfilActivity.this,
+                            new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.READ_EXTERNAL_STORAGE},
+                            PERMISSION_REQUEST_CODE);
+                } else { // En caso de tener los permisos concedidos
+                    // Llamamos al método para mostrar el dialogo de elegir de donde sacar la foto
+                    showImagePickerDialog();
+                }
+            }
+        });
+
+        // Evento que sucede cuando pulsamos el botón de elegir ubicación
+        btnElegirUbicacion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Creamos un nuevo intent para ir a la actividad en donde elegimos nuestra ubicación
+                Intent intent = new Intent(EditarPerfilActivity.this, ElegirUbicacion.class);
+                // Obtenemos lo que nos devuelva la actividad de elegir nuestra ubicación
+                startActivityForResult(intent, 1);
+            }
+        });
+
+        // Evento que sucede cuando pulsamos el botón de borrar los campos
+        btnBorrarCampos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Llamamos al método para resetear los campos
+                resetarCampos();
+            }
+        });
+
+        // Evento que sucede cuando pulsamos el botón de crear perfil
+        btnCrear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Obtengo en las variable todos los valores de los editText
+                username = editUsername.getText().toString();
+                anosPermiso = editAnoCon.getText().toString();
+                descripcion = editDescrip.getText().toString();
+                cp = editCP.getText().toString();
+
+                // Procedemos a comprobar si están todos los campos rellenos
+                if(username.isEmpty() || anosPermiso.isEmpty() || descripcion.isEmpty()
+                        || cp.isEmpty()){ // En caso de faltar alguno
+                    // Lanzamos un Toast indicando que tiene que completar todos los campos
+                    showToast("Usted ha de completar todos los campos, por favor!!");
+                }else{ // En caso de estar todos rellenos
+                    // Llamamos al método para insertar el perfil
+                    actualizarPerfil();
+                }
+            }
+        });
+    }
+
+    public void actualizarPerfil(){
+        // Obtenemos el usuario que está autenticado en ese momento
+        FirebaseUser user = auth.getCurrentUser();
+
+        // Procedemos a comprobar si el usuario no es nulo
+        if (user == null) { // En caso de ser nulo
+            // Indicamos al usuario que ha de iniciar sesión de nuevo
+            showToast("No se pudo obtener la información del usuario. Inicia sesión nuevamente.");
+            // Retornamos para no proseguir con el método
+            return;
+        }
     }
 
     /**
