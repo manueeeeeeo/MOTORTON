@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp"
-            android:background="#393939">
+            android:background="#0a0c3e">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -74,7 +74,7 @@
                             android:layout_height="wrap_content"
                             android:text="Editar perfil"
                             android:textColor="#FFFFFF"
-                            android:backgroundTint="#3F51B5"
+                            android:backgroundTint="#2c2c4c"
                             android:textSize="14sp"
                             android:layout_marginEnd="8dp"/>
                     </LinearLayout>
@@ -121,8 +121,8 @@
 
         <ImageView
             android:id="@+id/buttonAjustes"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_marginEnd="24dp"
             android:src="@drawable/icono_ajustes"
             android:contentDescription="Ajustes"
@@ -131,8 +131,8 @@
 
         <ImageView
             android:id="@+id/buttonAgregarVehiculo"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:src="@drawable/icono_agregar"
             android:contentDescription="Agregar vehículo"
             android:background="?attr/selectableItemBackgroundBorderless"
@@ -157,7 +157,7 @@
             android:background="@android:color/transparent"
             android:contentDescription="Mis Coches"
             android:src="@drawable/ic_coche"
-            app:tint="@android:color/black" />
+            app:tint="#2c2c4c" />
 
         <ImageButton
             android:id="@+id/buttonEventosCreados"

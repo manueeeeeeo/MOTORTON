@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:background="#E4E4E4">
+        android:background="#5c5c7c">
 
         <ImageView
             android:id="@+id/imagenEvento"
@@ -32,7 +32,7 @@
             android:text="Título del Evento"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="@color/black"
+            android:textColor="#FFFFFF"
             app:layout_constraintStart_toEndOf="@id/imagenEvento"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:text="Tipo de Evento (Conferencia, Fiesta, etc.)"
             android:textSize="14sp"
-            android:textColor="#000000"
+            android:textColor="#FFFFFF"
             app:layout_constraintStart_toEndOf="@id/imagenEvento"
             app:layout_constraintTop_toBottomOf="@id/tituloEvento"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -54,7 +54,7 @@
             android:layout_height="wrap_content"
             android:text="Fecha: 2023-12-31"
             android:textSize="14sp"
-            android:textColor="#000000"
+            android:textColor="#FFFFFF"
             app:layout_constraintStart_toEndOf="@id/imagenEvento"
             app:layout_constraintTop_toBottomOf="@id/tipoEvento"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -76,7 +76,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Apuntarse"
-            android:backgroundTint="#3F51B5"
+            android:backgroundTint="#2c2c4c"
             android:textColor="#FFFFFF"
             android:layout_marginTop="26dp"
             app:layout_constraintStart_toStartOf="parent"

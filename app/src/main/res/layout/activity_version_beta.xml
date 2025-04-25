@@ -30,7 +30,7 @@
                 android:layout_height="wrap_content"
                 android:text="Acceso Beta"
                 android:textAlignment="center"
-                android:textColor="#000000"
+                android:textColor="#141524"
                 android:textSize="30sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="24dp" />
@@ -41,7 +41,7 @@
                 android:layout_height="wrap_content"
                 android:text="Introduce el código de acceso para acceder a la versión beta."
                 android:textAlignment="center"
-                android:textColor="#595959"
+                android:textColor="#141524"
                 android:textSize="16sp"
                 android:layout_marginBottom="24dp" />
 
@@ -65,7 +65,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginHorizontal="32dp"
-                android:backgroundTint="#007BFF"
+                android:backgroundTint="#2c2c4c"
                 android:text="Enviar Código"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp" />
