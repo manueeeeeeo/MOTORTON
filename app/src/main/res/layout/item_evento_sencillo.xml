@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp"
-        android:background="#E4E4E4">
+        android:background="#5c5c7c">
 
         <ImageView
             android:id="@+id/imagenEvento"
@@ -35,7 +35,7 @@
                 android:text="Título del Evento"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="@color/black" />
+                android:textColor="#FFFFFF" />
 
             <TextView
                 android:id="@+id/tipoEvento"
@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:text="Tipo de Evento"
                 android:textSize="14sp"
-                android:textColor="#000000" />
+                android:textColor="#FFFFFF" />
 
             <TextView
                 android:id="@+id/fechaEvento"
@@ -51,15 +51,15 @@
                 android:layout_height="wrap_content"
                 android:text="Fecha: 2023-12-31"
                 android:textSize="14sp"
-                android:textColor="#000000" />
+                android:textColor="#FFFFFF" />
         </LinearLayout>
 
         <Button
             android:id="@+id/botonApuntarse"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Apuntarse"
-            android:backgroundTint="#3F51B5"
+            android:text="Ver Más"
+            android:backgroundTint="#2c2c4c"
             android:textColor="#FFFFFF"
             android:layout_gravity="center_vertical" />
     </LinearLayout>

@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="12dp"
     app:cardCornerRadius="12dp"
-    app:cardBackgroundColor="#6200EE"
+    app:cardBackgroundColor="#0a0c3e"
     app:cardElevation="6dp"
     app:contentPadding="4dp">
 
@@ -48,7 +48,7 @@
                 android:id="@+id/textSubtitulo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Información adicional"
+                android:text="Clicke para más información"
                 android:textSize="14sp"
                 android:textColor="#BBDEFB"
                 android:layout_marginTop="4dp" />

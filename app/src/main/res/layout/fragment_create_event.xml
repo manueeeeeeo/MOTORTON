@@ -127,7 +127,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
                     android:backgroundTint="#0a0c3e"
-                    android:popupBackground="#FFFFFF" />
+                    android:popupBackground="#0a0c3e"
+                    android:textColor="#FFFFFF"/>
 
                 <TextView
                     android:id="@+id/textViewTipoEvento"
@@ -146,6 +147,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
                     android:textColor="#FFFFFF"
+                    android:popupBackground="#0a0c3e"
                     android:backgroundTint="#0a0c3e"/>
 
                 <org.osmdroid.views.MapView
