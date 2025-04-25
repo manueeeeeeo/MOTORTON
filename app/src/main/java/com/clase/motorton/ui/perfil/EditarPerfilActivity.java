@@ -1,9 +1,12 @@
 package com.clase.motorton.ui.perfil;
 
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -145,5 +148,112 @@ public class EditarPerfilActivity extends AppCompatActivity {
 
         // Inicializamos el cifrado de datos
         cifrar = new CifradoDeDatos();
+    }
+
+    /**
+     * Método para resetear el valor
+     * de todos los campos del formulario
+     */
+    public void resetarCampos(){
+        editAnoCon.setText("");
+        editUsername.setText("");
+        editDescrip.setText("");
+        editUsername.setText("");
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+                    grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                showImagePickerDialog();
+            } else {
+                showToast("Permisos necesarios no otorgados");
+            }
+        }
+    }
+
+    /**
+     * Método en el que mostramos al usuario un
+     * dialogo para que él, eliga de donde quiere sacar
+     * la imagen para su perfil, o desde camara o desde
+     * galeria
+     */
+    private void showImagePickerDialog() {
+        // Variable en donde cargamos todas las opciones a la hora de subir la foto
+        CharSequence[] options = {"Tomar Foto", "Elegir de Galería"};
+
+        // Creo un nuevo dialogo de alerta
+        new AlertDialog.Builder(EditarPerfilActivity.this)
+                .setTitle("Elegir Imagen") // Establecemos el título
+                .setItems(options, (dialog, which) -> {
+                    // Utilizamos un if para comprobar la opción que eligio el usuario
+                    if (which == 0) { // En caso de ser la opción 0 (Foto de la Camara)
+                        // Creamos un intent para abrir la camara dentro de nuestra app
+                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        // Al lanzar obtenemos el resultado de la camara
+                        cameraResult.launch(takePictureIntent);
+                    } else if (which == 1) { // En caso de ser la opción 1 (Foto de la Galeria)
+                        // Creamos un intent para abrir la galeria y elegir una foto de la misma
+                        Intent pickPhotoIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        // Al lanzar obtenemos el resultado de la galeri
+                        galleryResult.launch(pickPhotoIntent);
+                    }
+                })
+                .show(); // Mostramos el dialogo
+    }
+
+    /**
+     * @param mensaje
+     * Método para ir matando los Toast y mostrar todos en el mismo para evitar
+     * colas de Toasts y que se ralentice el dispositivo
+     */
+    public void showToast(String mensaje){
+        if (this != null){
+            // Comprobamos si existe algun toast cargado en el toast de la variable global
+            if (mensajeToast != null) { // En caso de que si que exista
+                mensajeToast.cancel(); // Le cancelamos, es decir le "matamos"
+            }
+
+            // Creamos un nuevo Toast con el mensaje que nos dan de argumento en el método
+            mensajeToast = Toast.makeText(this, mensaje, Toast.LENGTH_SHORT);
+            // Mostramos dicho Toast
+            mensajeToast.show();
+        }
+    }
+
+    /**
+     * @param data
+     * @param requestCode
+     * @param resultCode
+     * Método en el que tratamos y obtenemos todos
+     * los parametros de la ubicación del usuario.
+     * Obtenemos la latitud, longitud y dirección
+     * de la ubicación elegida por el usuario
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            // Obtenemos la latitud y si no existe la ponemos como 0.0
+            double latitud = data.getDoubleExtra("latitud", 0.0);
+            // Obtenemos la longitud y si no existe la ponemos como 0.0
+            double longitud = data.getDoubleExtra("longitud", 0.0);
+            // Obtenemos la dirección
+            String direccion = data.getStringExtra("direccion");
+
+            // Inicializamos la ubicación seleccionada como un nuevo HashMap
+            ubicacionSeleccionada = new HashMap<>();
+            // Guardamos la latitud cifrada
+            ubicacionSeleccionada.put("latitud", CifradoDeDatos.cifrar(String.valueOf(latitud)));
+            // Guardamos la longtiud cifrada
+            ubicacionSeleccionada.put("longitud", CifradoDeDatos.cifrar(String.valueOf(longitud)));
+            // Guardamos la dirección cifrada
+            ubicacionSeleccionada.put("direccion", CifradoDeDatos.cifrar(direccion));
+
+            // Establecemos al botón el texto de la dirección obtenida
+            btnElegirUbicacion.setText(direccion);
+        }
     }
 }
