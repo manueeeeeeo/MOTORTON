@@ -5,6 +5,8 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Base64;
 import android.view.LayoutInflater;
@@ -16,11 +18,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.clase.motorton.R;
+import com.clase.motorton.adaptadores.VehiculosAdapter;
 import com.clase.motorton.cifrado.CifradoDeDatos;
+import com.clase.motorton.modelos.Vehiculo;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class InfoOtroPerfilFragment extends Fragment {
@@ -33,6 +39,13 @@ public class InfoOtroPerfilFragment extends Fragment {
     private TextView textUbicacion = null;
     private ImageView imagenPerfil = null;
     private Button btnLike = null;
+    private RecyclerView recycleVehiculos = null;
+
+    // Variable para manejar la lista de vehículos del usuario
+    private ArrayList<Vehiculo> listaVehiculos = new ArrayList<>();
+
+    // Variable para manejar el aaptador para los vehículos
+    private VehiculosAdapter vehiculosAdapter = null;
 
     // Variable para manejar el autenticado de firebase
     private FirebaseAuth mAuth = null;
@@ -55,6 +68,9 @@ public class InfoOtroPerfilFragment extends Fragment {
         textNombreCompleto = (TextView) root.findViewById(R.id.textViewNombreCompletoOtroUsuario);
         imagenPerfil = (ImageView) root.findViewById(R.id.imageViewPerfilOtroUsuario);
         btnLike = (Button) root.findViewById(R.id.buttonLike);
+        recycleVehiculos = (RecyclerView) root.findViewById(R.id.recyclerViewVehiculosOtroUsuario);
+
+        recycleVehiculos.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
         btnLike.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,7 +172,48 @@ public class InfoOtroPerfilFragment extends Fragment {
     }
 
     public void cargarVehiculosOtroPerfil(String uidPasado){
+        // Muesto loader y ocultar RecyclerView
+        //progressBar.setVisibility(View.VISIBLE);
+        recycleVehiculos.setVisibility(View.GONE);
 
+        // Limpio la lista de vehículos
+        listaVehiculos.clear();
+
+        // Accedo a la colección de vehículos
+        db.collection("vehiculos")
+                .whereEqualTo("uidDueno", uidPasado) // Filtramos por el uid del sueño
+                .get()
+                .addOnCompleteListener(task -> {
+                    // Ponemos inivisible el progressbar
+                    //progressBar.setVisibility(View.GONE);
+
+                    // Comprobamos que la tarea se ejecuto correctamente
+                    if (task.isSuccessful()) { // En caso afirmativo
+                        if (!task.getResult().isEmpty()) { // En caso de habe resultado
+                            // Utilizamos un for para obtener todos los objetos, convertirlos en Vehículo y agregarlos a la lista
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Vehiculo vehiculo = document.toObject(Vehiculo.class);
+                                listaVehiculos.add(vehiculo);
+                            }
+                        } else { // En caso de no haber resultados
+                            // Lanzamos un toast indicando que no se encontraron los vehículos del usuario
+                            showToast("No se encontraron vehículos para usted.");
+                        }
+
+                        // Genero el adaptador para los vehículos
+                        vehiculosAdapter = new VehiculosAdapter(listaVehiculos, getContext());
+                        // Establezco al recycler el adaptador
+                        recycleVehiculos.setAdapter(vehiculosAdapter);
+                        // Establezco la posición y estilo del mismp
+                        recycleVehiculos.setLayoutManager(new GridLayoutManager(getContext(), 2));
+                        // Ponemos visible el recycler
+                        recycleVehiculos.setVisibility(View.VISIBLE);
+
+                    } else { // En caso negativo
+                        // Lanzamos un toast indicando que ocurrió un error al cargar los vehículos
+                        showToast("Error al cargar vehículos: " + task.getException().getMessage());
+                    }
+                });
     }
 
     /**
