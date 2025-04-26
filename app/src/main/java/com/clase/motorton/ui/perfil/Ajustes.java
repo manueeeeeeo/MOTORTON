@@ -134,7 +134,7 @@ public class Ajustes extends AppCompatActivity {
 
                             if (logoutCount >= 2) {
                                 updates.put("active", false);
-                                updates.put("usedBy", null);
+                                updates.put("userUID", null);
                             }
 
                             db.collection("invitationCodes").document(codigo).update(updates);

@@ -40,16 +40,17 @@ public class BusquedaAdapter extends RecyclerView.Adapter<BusquedaAdapter.ViewHo
         BusquedaItem item = listaResultados.get(position);
         holder.nombre.setText(item.getNombre());
 
-        int icono = item.getTipo().equals("perfil") ? R.drawable.icono_persona : R.drawable.evento;
+        int icono = item.getTipo().equals("perfil") ? R.drawable.icono_persona : R.drawable.icono_evento;
         holder.icono.setImageResource(icono);
 
         holder.cardView.setOnClickListener(view -> {
             Bundle bundle = new Bundle();
-            bundle.putString("documentoNombre", item.getId());
 
             if (item.getTipo().equals("perfil")) {
+                bundle.putString("perfilId", item.getId());
                 Navigation.findNavController(view).navigate(R.id.navigation_info_otro_perfil, bundle);
             } else {
+                bundle.putString("eventoId", item.getId());
                 Navigation.findNavController(view).navigate(R.id.navigation_info_evento, bundle);
             }
         });

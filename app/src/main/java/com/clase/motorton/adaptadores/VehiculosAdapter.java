@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.clase.motorton.modelos.Vehiculo;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.clase.motorton.R;
@@ -52,10 +53,17 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
         // En caso de que el vehículo sea nulo retornamos par no proseguir
         if (vehiculo == null) return;
 
+        String uidUser = FirebaseAuth.getInstance().getUid();
+
         // Marcamos el textview la marca y el modelo del vehículo
         holder.textViewModeloYMarca.setText(vehiculo.getMarca() + " " + vehiculo.getModelo());
         // Marcamos el textvew la descripción del mismo
         holder.textViewDescripcion.setText(vehiculo.getDescripción());
+
+        if(!uidUser.equals(vehiculo.getUidDueno())){
+            holder.imageViewDelete.setVisibility(View.INVISIBLE);
+            holder.imageViewEdit.setVisibility(View.INVISIBLE);
+        }
 
         // Comprobamos que tipo de vehículo es para marcar un icono u otro
         switch (vehiculo.getTipoVehiculo().toLowerCase()) {
@@ -71,6 +79,13 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
 
         // Cuando toquemos el botón de eliminar un vehículo llamamos al método de eliminar y le pasamos la matricula del mismo
         holder.imageViewDelete.setOnClickListener(v -> eliminarVehiculo(vehiculo.getMatricula(), position));
+
+        holder.imageViewEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
     }
 
     /**

@@ -5,19 +5,20 @@
     app:cardCornerRadius="12dp"
     app:cardElevation="4dp"
     android:layout_margin="8dp"
-    android:background="#FFFFFF">
+    android:background="#5c5c7c">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:background="#FFFFFF">
+        android:background="#5c5c7c">
 
         <ImageView
             android:id="@+id/imageViewTipoVehiculo"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:src="@drawable/ic_coche"
+            app:tint="#FFFFFF"
             android:contentDescription="Tipo de vehículo"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
@@ -29,7 +30,7 @@
             android:text="Marca y Modelo"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="#212121"
+            android:textColor="#FFFFFF"
             android:maxLines="1"
             android:ellipsize="end"
             app:layout_constraintStart_toEndOf="@id/imageViewTipoVehiculo"
@@ -43,7 +44,7 @@
             android:layout_height="wrap_content"
             android:text="Descripción breve del vehículo..."
             android:textSize="14sp"
-            android:textColor="#616161"
+            android:textColor="#FFFFFF"
             android:maxLines="2"
             android:ellipsize="end"
             app:layout_constraintStart_toStartOf="@id/textViewMarcaModelo"
@@ -68,6 +69,7 @@
                 android:contentDescription="Editar vehículo"
                 android:clickable="true"
                 android:focusable="true"
+                app:tint="#ccd4cc"
                 android:layout_marginEnd="12dp"/>
 
             <ImageView

@@ -24,6 +24,16 @@
         android:theme="@style/Theme.MOTORTON"
         tools:targetApi="31">
         <activity
+            android:name=".ui.perfil.EditarPerfilActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
+
+        <service
+            android:name=".notifications.NotificacionDiariaWorker"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <activity
             android:name=".pasajero.VersionBeta"
             android:exported="false"
             android:screenOrientation="portrait" />
