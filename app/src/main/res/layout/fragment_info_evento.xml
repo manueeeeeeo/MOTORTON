@@ -1,14 +1,236 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.eventos.InfoEventoFragment">
+    tools:context=".ui.eventos.InfoEventoFragment"
+    android:background="@drawable/gradient_background">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:padding="24dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/rounded_corner"
+            android:padding="24dp"
+            android:elevation="8dp">
+
+            <TextView
+                android:id="@+id/textNombre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nombre del evento"
+                android:textStyle="bold"
+                android:textSize="28sp"
+                android:textColor="#141524"
+                android:paddingBottom="16dp"
+                android:fontFamily="sans-serif-condensed" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingBottom="12dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/icono_descripcion"
+                    app:tint="#2c2c4c"
+                    tools:ignore="UseAppTint" />
+
+                <TextView
+                    android:id="@+id/textDescripcion"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Descripción del evento"
+                    android:textColor="#141524"
+                    android:textSize="18sp"
+                    android:paddingStart="12dp"
+                    android:fontFamily="sans-serif" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingBottom="12dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/icono_location"
+                    app:tint="#2c2c4c"
+                    tools:ignore="UseAppTint" />
+
+                <TextView
+                    android:id="@+id/textUbicacion"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Ubicación del evento"
+                    android:textColor="#141524"
+                    android:textSize="18sp"
+                    android:paddingStart="12dp"
+                    android:fontFamily="sans-serif" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingBottom="12dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ci_mapa"
+                    app:tint="#2c2c4c"
+                    tools:ignore="UseAppTint" />
+
+                <TextView
+                    android:id="@+id/textProvincia"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Provincia del evento"
+                    android:textColor="#141524"
+                    android:textSize="18sp"
+                    android:paddingStart="12dp"
+                    android:fontFamily="sans-serif" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingBottom="12dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_event"
+                    app:tint="#2c2c4c"
+                    tools:ignore="UseAppTint" />
+
+                <TextView
+                    android:id="@+id/textTipoEvento"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Tipo de evento"
+                    android:textColor="#141524"
+                    android:textSize="18sp"
+                    android:paddingStart="12dp"
+                    android:fontFamily="sans-serif" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingBottom="12dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/icono_organizador"
+                    app:tint="#2c2c4c" />
+
+                <TextView
+                    android:id="@+id/textOrganizador"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Organizador del evento"
+                    android:textColor="#141524"
+                    android:textSize="18sp"
+                    android:paddingStart="12dp"
+                    android:fontFamily="sans-serif" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingBottom="12dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/icono_calendario"
+                    app:tint="#2c2c4c"
+                    tools:ignore="UseAppTint" />
+
+                <TextView
+                    android:id="@+id/textFecha"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Fecha del evento"
+                    android:textColor="#141524"
+                    android:textSize="18sp"
+                    android:paddingStart="12dp"
+                    android:fontFamily="sans-serif" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingBottom="12dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/icono_activo"
+                    app:tint="#2c2c4c" />
+
+                <TextView
+                    android:id="@+id/textActivo"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Activo"
+                    android:textColor="#141524"
+                    android:textSize="18sp"
+                    android:paddingStart="12dp"
+                    android:fontFamily="sans-serif" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textInfoParticipantes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Participantes del Evento:"
+                android:textColor="#141524"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:paddingBottom="12dp"
+                android:fontFamily="sans-serif-condensed" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewParticipantes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </FrameLayout>
