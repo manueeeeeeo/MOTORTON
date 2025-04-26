@@ -1,9 +1,12 @@
 package com.clase.motorton.ui.perfil;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +16,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.clase.motorton.R;
+import com.clase.motorton.cifrado.CifradoDeDatos;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.Map;
 
 public class InfoOtroPerfilFragment extends Fragment {
     // Variable para manejar los Toast de está actividad
@@ -56,7 +63,128 @@ public class InfoOtroPerfilFragment extends Fragment {
             }
         });
 
+        if (getArguments() != null && getArguments().containsKey("perfilId")) {
+            String uidPasado = getArguments().getString("perfilId");
+            cargarDatosPerfil(uidPasado);
+        }
+
         return root;
+    }
+
+    public void cargarDatosPerfil(String uidPasado){
+        // Establezco visible el progressbar
+        //progressBar.setVisibility(View.VISIBLE);
+
+        // Obtengo el uid del usuario autenticado
+        String uid = uidPasado;
+        // Procedo a comprobar que el uid no sea nulo
+        if (uid == null) { // En caso de que sea nulo
+            // Lanzamos un toast indicando que el usuario no está autenticado
+            showToast("Usuario no autenticado");
+            // Ponemos como invisible el progressbar
+            //progressBar.setVisibility(View.GONE);
+            // Retornamos para no seguir ejecutando el método
+            return;
+        }
+
+        // Ontenemos la refrencia a la colección de perfiles basandonos en el uid del usuario para acceder al documento
+        DocumentReference docRef = db.collection("perfiles").document(uid);
+
+        // Procedemos a comprobar si ha salido bien
+        docRef.get().addOnSuccessListener(documentSnapshot -> { // En caso de que vaya bien
+            // Comprobamos si el documento existe o no
+            if (documentSnapshot.exists()) { // En caso de que no exista
+                // Obtengo todos los valores del perfil del usuario
+                String username = documentSnapshot.getString("username");
+                Long edadLong = documentSnapshot.getLong("edad");
+                String edad = edadLong != null ? edadLong.toString() : "N/A";
+                String fotoPerfilBase64 = documentSnapshot.getString("fotoPerfil");
+                String email = documentSnapshot.getString("email");
+                String nombreCompleto = documentSnapshot.getString("nombre_completo");
+
+                // Obtenemos en un mapa todos los valores de la ubicación guardados
+                Map<String, Object> ubicacionMap = (Map<String, Object>) documentSnapshot.get("ubicacion");
+                // Inicializamos la dirección como no disponible
+                String direccion = "Ubicación no disponible";
+
+                // Procedemos a comprobar que la ubicación no sea nula
+                if (ubicacionMap != null) { // En caso de que no sea nula
+                    // Establecemos en el string solo la dirección
+                    direccion = (String) ubicacionMap.get("direccion");
+                }
+
+                // Comprobamos que estén todos los datos
+                if (username != null && edad != null && direccion != null && email != null && nombreCompleto != null) { // En caso afirmativo
+                    // Establecemos en los textview todos los valores del usuario descifrados y todo
+                    textUsername.setText(username);
+                    textEdad.setText("Edad: " + edad);
+                    textUbicacion.setText("Ubicación: " + CifradoDeDatos.descifrar(direccion));
+                    textNombreCompleto.setText("Nombre Completo: "+CifradoDeDatos.descifrar(nombreCompleto));
+
+                    // Comprobamos que la foto de perfil no sea nula o esté vacía
+                    if (fotoPerfilBase64 != null && !fotoPerfilBase64.isEmpty()) { // En caso de no estar vacía
+                        // Creo un bitmap de lo obtenido en la decodificación de base64 a bitmap
+                        Bitmap bitmap = convertirBase64AImagen(fotoPerfilBase64);
+                        if (bitmap != null) { // En caso de que el bitmap esté vacío
+                            imagenPerfil.setImageBitmap(bitmap);
+                        } else { // En caso de estar vacía
+                            imagenPerfil.setImageResource(R.drawable.icono);
+                        }
+                    } else { // En caso de que la foto sea nula o esté vacía
+                        // Establecemos en el imageview el recurso de imagen por defecto del icono de la app
+                        imagenPerfil.setImageResource(R.drawable.icono);
+                    }
+
+                    // Llamamos al método para cargar los vehículos
+                    cargarVehiculosOtroPerfil(uid);
+                } else { // En caso de que falle algún dato
+                    // Lanzamos un toast indicando que los datos del perfil son incompletos
+                    showToast("Datos incompletos en el perfil");
+                }
+            } else { // En caso de que no exista
+                // Lanzamos un toast indicando que el perfil no se encontró
+                showToast("Perfil no encontrado");
+            }
+            // Ponemos invisible la progressbar
+            //progressBar.setVisibility(View.GONE);
+        }).addOnFailureListener(e -> { // En caso de que falle algo
+            // Ponemos invisible la progressbar
+            //progressBar.setVisibility(View.GONE);
+            // Lanzamos un toast indicando al usuario que ha ocurrido un error al cagar el perfil
+            showToast("Error al cargar perfil: " + e.getMessage());
+        });
+    }
+
+    public void cargarVehiculosOtroPerfil(String uidPasado){
+
+    }
+
+    /**
+     * @return
+     * @param base64String
+     * Método en donde pasamos una cadena y procedemos a convertir
+     * el texto en base 64 a un bitmap legible para establecerle
+     * en un imageview
+     */
+    private Bitmap convertirBase64AImagen(String base64String) {
+        // Utilizamos un try catch para capturar y tratar las posibles excepciones
+        try {
+            // Remplazo algunos parametros para evitar errores al descifrar la imagen
+            base64String = base64String.replace("\n", "").replace("\r", "");
+
+            // Genero un conjutno de bytes en donde decodifico la cadena
+            byte[] decodedString = Base64.decode(base64String, Base64.DEFAULT);
+
+            // Retornamos la descodificación de texto a bitmap
+            return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        } catch (IllegalArgumentException e) { // En caso de que surja alguna excepción
+            // Imprimimos por consola la excepción
+            e.printStackTrace();
+            // Lanzamos un Toast indicando que ocurrió un error
+            showToast("Error al convertir imagen Base64");
+            // Retornamos nulo
+            return null;
+        }
     }
 
     /**
