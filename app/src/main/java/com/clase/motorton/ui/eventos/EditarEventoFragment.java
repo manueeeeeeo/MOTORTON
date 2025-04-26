@@ -87,19 +87,16 @@ public class EditarEventoFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
 
         // Obtenemos referencias a los elementos de la interfaz
-        editTextNombreEvento = view.findViewById(R.id.editTextNombreEvento);
         editTextDescripcion = view.findViewById(R.id.editTextDescripcion);
-        editTextUbicacion = view.findViewById(R.id.editTextUbicacion);
-        spinnerTipoEvento = view.findViewById(R.id.spinnerTipoEvento);
         datePickerFecha = view.findViewById(R.id.datePickerFecha);
         buttonCrearEvento = view.findViewById(R.id.buttonCrearEvento);
         mapView = view.findViewById(R.id.map);
         btnIrRuta = view.findViewById(R.id.buttonIrRuta);
-        spinnerProvincia = view.findViewById(R.id.spinnerProvincia);
         tituloEvento = view.findViewById(R.id.textView11);
 
-        editTextNombreEvento.setEnabled(false);
+        cargarEvento();
 
+        editTextNombreEvento.setEnabled(false);
 
         mapView.setTileSource(TileSourceFactory.MAPNIK);  // Usar Mapnik para el fondo del mapa
         mapView.setBuiltInZoomControls(true);  // Activar controles de zoom

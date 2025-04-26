@@ -32,30 +32,6 @@
                     android:layout_marginBottom="7dp"/>
 
                 <TextView
-                    android:id="@+id/textViewTituloEvento"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Nombre del Evento"
-                    android:textSize="18sp"
-                    android:textColor="#141524"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
-
-                <EditText
-                    android:id="@+id/editTextNombreEvento"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Ingrese el nombre del evento"
-                    android:textColor="#000000"
-                    android:textSize="19dp"
-                    android:textColorHint="#727272"
-                    android:inputType="textCapWords"
-                    android:layout_marginBottom="16dp"
-                    android:padding="12dp"
-                    android:maxLength="40"
-                    android:background="@drawable/rounded_editext" />
-
-                <TextView
                     android:id="@+id/textViewDescripcion"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -82,71 +58,6 @@
                     android:layout_marginBottom="16dp"
                     android:padding="12dp"
                     android:background="@drawable/rounded_editext" />
-
-                <TextView
-                    android:id="@+id/textViewUbicacion"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Ubicación del Evento"
-                    android:textSize="18sp"
-                    android:textColor="#141524"
-                    android:textStyle="bold"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="8dp" />
-
-                <EditText
-                    android:id="@+id/editTextUbicacion"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Ingrese la ubicación"
-                    android:textColor="#000000"
-                    android:textSize="19dp"
-                    android:textColorHint="#727272"
-                    android:inputType="textCapWords"
-                    android:layout_marginBottom="16dp"
-                    android:padding="12dp"
-                    android:maxLength="120"
-                    android:background="@drawable/rounded_editext" />
-
-                <TextView
-                    android:id="@+id/textViewProvincia"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Provincia"
-                    android:textSize="18sp"
-                    android:textColor="#141524"
-                    android:textStyle="bold"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="8dp" />
-
-                <Spinner
-                    android:id="@+id/spinnerProvincia"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:backgroundTint="#0a0c3e"
-                    android:popupBackground="#0a0c3e"
-                    android:textColor="#FFFFFF"/>
-
-                <TextView
-                    android:id="@+id/textViewTipoEvento"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Tipo de Evento"
-                    android:textSize="18sp"
-                    android:textColor="#141524"
-                    android:textStyle="bold"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="8dp" />
-
-                <Spinner
-                    android:id="@+id/spinnerTipoEvento"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:textColor="#FFFFFF"
-                    android:popupBackground="#0a0c3e"
-                    android:backgroundTint="#0a0c3e"/>
 
                 <org.osmdroid.views.MapView
                     android:id="@+id/map"

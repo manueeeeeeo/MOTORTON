@@ -32,6 +32,7 @@ import com.clase.motorton.modelos.Vehiculo;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.crypto.SecretKey;
@@ -57,6 +58,7 @@ public class MyPerfilFragment extends Fragment {
     private ImageView btnEventosParticipas = null;
     // Variable para manejar el recyclerview de vehículos del usuario
     private RecyclerView recyclerViewVehiculos = null;
+    private TextView textVievNLikes = null;
     // Variable para manejar el aaptador para los vehículos
     private VehiculosAdapter vehiculosAdapter = null;
     // Variable para manejar la lista de vehículos del usuario
@@ -100,6 +102,7 @@ public class MyPerfilFragment extends Fragment {
         btnCoches = root.findViewById(R.id.buttonMisCoches);
         btnEventosCreados = root.findViewById(R.id.buttonEventosCreados);
         btnEventosParticipas = root.findViewById(R.id.buttonEventosActivos);
+        textVievNLikes = root.findViewById(R.id.textViewLikes);
 
         // Inicializo el cifrador de datos
         cifrar = new CifradoDeDatos();
@@ -309,6 +312,14 @@ public class MyPerfilFragment extends Fragment {
                 if (ubicacionMap != null) { // En caso de que no sea nula
                     // Establecemos en el string solo la dirección
                     direccion = (String) ubicacionMap.get("direccion");
+                }
+
+                List<String> numeroLikes = (List<String>) documentSnapshot.get("likes");
+                if(numeroLikes!=null){
+                    int cantidadLikes = numeroLikes.size();
+                    textVievNLikes.setText("Nº Likes: "+cantidadLikes);
+                }else{
+                    textVievNLikes.setText("Nº Likes: 0");
                 }
 
                 // Comprobamos que estén todos los datos
