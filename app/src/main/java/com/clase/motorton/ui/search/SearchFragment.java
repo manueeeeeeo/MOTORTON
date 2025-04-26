@@ -105,9 +105,10 @@ public class SearchFragment extends Fragment {
         queryPerfiles.get().addOnSuccessListener(perfiles -> {
             for (DocumentSnapshot doc : perfiles.getDocuments()) {
                 String username = doc.getString("username");
+                String idPerfil = doc.getId();
                 if (username != null) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        resultadosMap.putIfAbsent(username, new BusquedaItem(username, "perfil"));
+                        resultadosMap.putIfAbsent(username, new BusquedaItem(idPerfil, username, "perfil", null));
                     }
                 }
             }
@@ -117,9 +118,10 @@ public class SearchFragment extends Fragment {
         queryEventos.get().addOnSuccessListener(eventos -> {
             for (DocumentSnapshot doc : eventos.getDocuments()) {
                 String nombreEvento = doc.getString("nombre");
+                String idEvento = doc.getString("id");
                 if (nombreEvento != null) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        resultadosMap.putIfAbsent(nombreEvento, new BusquedaItem(nombreEvento, "evento"));
+                        resultadosMap.putIfAbsent(nombreEvento, new BusquedaItem(idEvento, nombreEvento, "evento", null));
                     }
                 }
             }
