@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.clase.motorton.R;
@@ -50,6 +51,7 @@ public class EditarEventoFragment extends Fragment {
     private Button btnIrRuta = null;
     // Variable para manejar el spinner de las provincias
     private Spinner spinnerProvincia = null;
+    private TextView tituloEvento = null;
 
     // Variable para manejar la latitud del inicio
     private double latInicio = 0.0;
@@ -94,6 +96,7 @@ public class EditarEventoFragment extends Fragment {
         mapView = view.findViewById(R.id.map);
         btnIrRuta = view.findViewById(R.id.buttonIrRuta);
         spinnerProvincia = view.findViewById(R.id.spinnerProvincia);
+        tituloEvento = view.findViewById(R.id.textView11);
 
         editTextNombreEvento.setEnabled(false);
 
@@ -185,7 +188,7 @@ public class EditarEventoFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 // Llamo al método para crear el evento
-                //actualizarEvento();
+                actualizarEvento();
             }
         });
 
@@ -262,6 +265,14 @@ public class EditarEventoFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void cargarEvento(){
+
+    }
+
+    private void actualizarEvento(){
+
     }
 
     /**

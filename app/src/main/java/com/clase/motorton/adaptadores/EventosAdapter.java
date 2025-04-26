@@ -178,6 +178,17 @@ public class EventosAdapter extends RecyclerView.Adapter<EventosAdapter.ViewHold
                 navController.navigate(R.id.navigation_info_evento, bundle);
             }
         });
+
+        holder.botonEditar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Bundle bundle = new Bundle();
+                bundle.putString("eventoId", evento.getId());
+
+                NavController navController = Navigation.findNavController(view);
+                navController.navigate(R.id.navigation_editar_evento, bundle);
+            }
+        });
     }
 
     @Override
