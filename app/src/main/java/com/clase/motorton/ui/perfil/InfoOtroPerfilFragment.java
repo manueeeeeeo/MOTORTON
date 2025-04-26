@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Base64;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +42,9 @@ public class InfoOtroPerfilFragment extends Fragment {
     private ImageView imagenPerfil = null;
     private Button btnLike = null;
     private RecyclerView recycleVehiculos = null;
+
+    private ProgressBar progressBarOtroUsuario = null;
+    private View progressOverlay = null;
 
     // Variable para manejar la lista de vehículos del usuario
     private ArrayList<Vehiculo> listaVehiculos = new ArrayList<>();
@@ -69,8 +74,10 @@ public class InfoOtroPerfilFragment extends Fragment {
         imagenPerfil = (ImageView) root.findViewById(R.id.imageViewPerfilOtroUsuario);
         btnLike = (Button) root.findViewById(R.id.buttonLike);
         recycleVehiculos = (RecyclerView) root.findViewById(R.id.recyclerViewVehiculosOtroUsuario);
+        progressBarOtroUsuario = root.findViewById(R.id.progressBarOtroUsuario);
+        progressOverlay = root.findViewById(R.id.progressOverlay);
 
-        recycleVehiculos.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        recycleVehiculos.setLayoutManager(new LinearLayoutManager(getContext()));
 
         btnLike.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,9 +94,21 @@ public class InfoOtroPerfilFragment extends Fragment {
         return root;
     }
 
+    private void mostrarLoader() {
+        if (progressOverlay != null) {
+            progressOverlay.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void ocultarLoader() {
+        if (progressOverlay != null) {
+            progressOverlay.setVisibility(View.GONE);
+        }
+    }
+
     public void cargarDatosPerfil(String uidPasado){
         // Establezco visible el progressbar
-        //progressBar.setVisibility(View.VISIBLE);
+        mostrarLoader();
 
         // Obtengo el uid del usuario autenticado
         String uid = uidPasado;
@@ -98,7 +117,7 @@ public class InfoOtroPerfilFragment extends Fragment {
             // Lanzamos un toast indicando que el usuario no está autenticado
             showToast("Usuario no autenticado");
             // Ponemos como invisible el progressbar
-            //progressBar.setVisibility(View.GONE);
+            ocultarLoader();
             // Retornamos para no seguir ejecutando el método
             return;
         }
@@ -135,7 +154,7 @@ public class InfoOtroPerfilFragment extends Fragment {
                     textUsername.setText(username);
                     textEdad.setText("Edad: " + edad);
                     textUbicacion.setText("Ubicación: " + CifradoDeDatos.descifrar(direccion));
-                    textNombreCompleto.setText("Nombre Completo: "+CifradoDeDatos.descifrar(nombreCompleto));
+                    textNombreCompleto.setText(CifradoDeDatos.descifrar(nombreCompleto));
 
                     // Comprobamos que la foto de perfil no sea nula o esté vacía
                     if (fotoPerfilBase64 != null && !fotoPerfilBase64.isEmpty()) { // En caso de no estar vacía
@@ -162,10 +181,10 @@ public class InfoOtroPerfilFragment extends Fragment {
                 showToast("Perfil no encontrado");
             }
             // Ponemos invisible la progressbar
-            //progressBar.setVisibility(View.GONE);
+            ocultarLoader();
         }).addOnFailureListener(e -> { // En caso de que falle algo
             // Ponemos invisible la progressbar
-            //progressBar.setVisibility(View.GONE);
+            ocultarLoader();
             // Lanzamos un toast indicando al usuario que ha ocurrido un error al cagar el perfil
             showToast("Error al cargar perfil: " + e.getMessage());
         });
@@ -173,7 +192,7 @@ public class InfoOtroPerfilFragment extends Fragment {
 
     public void cargarVehiculosOtroPerfil(String uidPasado){
         // Muesto loader y ocultar RecyclerView
-        //progressBar.setVisibility(View.VISIBLE);
+        mostrarLoader();
         recycleVehiculos.setVisibility(View.GONE);
 
         // Limpio la lista de vehículos
@@ -185,7 +204,7 @@ public class InfoOtroPerfilFragment extends Fragment {
                 .get()
                 .addOnCompleteListener(task -> {
                     // Ponemos inivisible el progressbar
-                    //progressBar.setVisibility(View.GONE);
+                    ocultarLoader();
 
                     // Comprobamos que la tarea se ejecuto correctamente
                     if (task.isSuccessful()) { // En caso afirmativo
@@ -205,7 +224,7 @@ public class InfoOtroPerfilFragment extends Fragment {
                         // Establezco al recycler el adaptador
                         recycleVehiculos.setAdapter(vehiculosAdapter);
                         // Establezco la posición y estilo del mismp
-                        recycleVehiculos.setLayoutManager(new GridLayoutManager(getContext(), 2));
+                        recycleVehiculos.setLayoutManager(new LinearLayoutManager(getContext()));
                         // Ponemos visible el recycler
                         recycleVehiculos.setVisibility(View.VISIBLE);
 
