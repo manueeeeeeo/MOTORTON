@@ -113,7 +113,7 @@
                         android:text="❤️ Me gusta"
                         android:textSize="16sp"
                         android:textColor="#FFFFFF"
-                        android:backgroundTint="#FF4081"
+                        android:backgroundTint="#2c2c4c"
                         android:padding="12dp"
                         android:layout_marginTop="24dp"
                         android:layout_marginBottom="16dp"
@@ -125,11 +125,9 @@
                 android:id="@+id/recyclerViewVehiculosOtroUsuario"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:clipToPadding="false"
-                android:padding="8dp"
-                android:background="@drawable/rounded_corner_light"
-                android:elevation="6dp" />
+                android:padding="8dp"/>
 
         </LinearLayout>
     </ScrollView>
