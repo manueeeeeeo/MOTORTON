@@ -50,8 +50,6 @@ public class EditarPerfilActivity extends AppCompatActivity {
     private Button btnBorrarCampos = null;
     // Variable para manejar el editText del username
     private EditText editUsername = null;
-    // Variable para manejar el editText de la ubicación
-    private EditText editUbi = null;
     // Variable para manejar el editText del código postal
     private EditText editCP = null;
     // Variable para manejar el editText de la descripción
@@ -62,11 +60,11 @@ public class EditarPerfilActivity extends AppCompatActivity {
     private ImageView imagenPerfil = null;
     // Variable para manejar el botón de ir a elegir la ubicación
     private Button btnElegirUbicacion = null;
+    // Variable para manejar el editText para editar el nombre completo
+    private EditText editNombreComple = null;
     // Variable para manejar todos los Toast de está pantalla
     private Toast mensajeToast = null;
 
-    // Variable para guardar la ubicación
-    private String ubicacion = null;
     // Variable para guardar el username
     private String username = null;
     // Variable para guardar el código postal
@@ -75,6 +73,8 @@ public class EditarPerfilActivity extends AppCompatActivity {
     private String descripcion = null;
     // Variable para guardar los años que ha conducido el usuario
     private String anosPermiso = null;
+    // Variable para manejar la foto de perfil anterior
+    private String fotoPerfilAnterior = null;
 
     // Variable para formatear la la fecha de nacimiento
     private SimpleDateFormat dateFormat = null;
@@ -127,6 +127,9 @@ public class EditarPerfilActivity extends AppCompatActivity {
     // Variable para manejar la autentificación del usuario
     private FirebaseAuth auth = null;
 
+    // Variable en donde guardamos los datos actuales del perfil del usuario
+    private Perfil perfilActual = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -151,6 +154,7 @@ public class EditarPerfilActivity extends AppCompatActivity {
         imagenPerfil = (ImageView) findViewById(R.id.imagenPerfil);
         editAnoCon = (EditText) findViewById(R.id.years_driving_input);
         btnElegirUbicacion = findViewById(R.id.btnElegirUbicacion);
+        editNombreComple = (EditText) findViewById(R.id.full_name_input);
 
         // Inicializamos el hashMap
         ubicacionSeleccionada = new HashMap<>();
@@ -219,51 +223,72 @@ public class EditarPerfilActivity extends AppCompatActivity {
                 }
             }
         });
+
+        cargarDatos();
     }
 
-    public void CargarDatos(){
-        // Obtenemos el usuario que está autenticado en ese momento
+    public void cargarDatos() {
         FirebaseUser user = auth.getCurrentUser();
 
-        // Procedemos a comprobar si el usuario no es nulo
-        if (user == null) { // En caso de ser nulo
-            // Indicamos al usuario que ha de iniciar sesión de nuevo
+        if (user == null) {
             showToast("No se pudo obtener la información del usuario. Inicia sesión nuevamente.");
-            // Retornamos para no proseguir con el método
             return;
         }
 
-        // Obtenemos en una variable el uid del usuario
         String uid = user.getUid();
-        // Obtenemos en una variable el email del usuario
-        String email = user.getEmail();
 
         db.collection("perfiles")
                 .document(uid)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        String campoUsername = documentSnapshot.getString("username");
-                        //String ubicacionSeleccionada = documentSnapshot.getString("ubicacion");
+                        String username1 = documentSnapshot.getString("username");
+                        String nombreCompleto = documentSnapshot.getString("nombre_completo");
+                        String fechaNaci = documentSnapshot.getString("fechaNaci");
+                        String emailCifrado = documentSnapshot.getString("email");
+                        Map<String, Object> ubicacion = (Map<String, Object>) documentSnapshot.get("ubicacion");
                         String cpString = documentSnapshot.getString("cp");
-                        String descripcion = documentSnapshot.getString("descripcion");
+                        String descripcion1 = documentSnapshot.getString("descripcion");
                         String anosPermisoString = documentSnapshot.getString("aniosConduciendo");
                         String fotoBase64 = documentSnapshot.getString("fotoPerfil");
+                        fotoPerfilAnterior = fotoBase64;
 
-                        int codigoPostal = cpString != null && !cpString.isEmpty() ? Integer.parseInt(cpString) : 0;
-                        int anosPermiso = anosPermisoString != null && !anosPermisoString.isEmpty() ? Integer.parseInt(anosPermisoString) : 0;
+                        int cp = (cpString != null && !cpString.isEmpty()) ? Integer.parseInt(cpString) : 0;
+                        int anosPermiso = (anosPermisoString != null && !anosPermisoString.isEmpty()) ? Integer.parseInt(anosPermisoString) : 0;
 
-                        editUsername.setText(campoUsername != null ? campoUsername : "");
-                        //btnElegirUbicacion.setText(ubicacionSeleccionada != null ? ubicacionSeleccionada : "");
-                        editCP.setText(String.valueOf(codigoPostal));
-                        editDescrip.setText(descripcion != null ? descripcion : "");
+                        editUsername.setText(username1 != null ? username1 : "");
+                        editCP.setText(String.valueOf(cp));
+                        editDescrip.setText(descripcion1 != null ? descripcion1 : "");
                         editAnoCon.setText(String.valueOf(anosPermiso));
 
                         if (fotoBase64 != null && !fotoBase64.isEmpty()) {
-                            byte[] decodedString = Base64.decode(fotoBase64, Base64.DEFAULT);
-                            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                            imagenPerfil.setImageBitmap(decodedByte);
+                            Bitmap decodedBitmap = convertirBase64ABitmap(fotoBase64);
+                            imagenPerfil.setImageBitmap(decodedBitmap);
                         }
+
+                        if (ubicacion != null) {
+                            ubicacionSeleccionada = new HashMap<>(ubicacion);
+                            Object direccionCifrada = ubicacion.get("direccion");
+                            if (direccionCifrada != null) {
+                                String direccion = CifradoDeDatos.descifrar(direccionCifrada.toString());
+                                btnElegirUbicacion.setText(direccion);
+                            }
+                        }
+
+                        perfilActual = new Perfil(
+                                uid,
+                                username1,
+                                emailCifrado,
+                                nombreCompleto,
+                                ubicacion,
+                                0,
+                                fechaNaci,
+                                cp,
+                                new ArrayList<>(),
+                                null,
+                                descripcion1,
+                                anosPermiso
+                        );
 
                     } else {
                         showToast("No se encontró el perfil del usuario.");
@@ -274,123 +299,114 @@ public class EditarPerfilActivity extends AppCompatActivity {
                 });
     }
 
-    public void actualizarPerfil(){
-        // Obtenemos el usuario que está autenticado en ese momento
+    public void actualizarPerfil() {
         FirebaseUser user = auth.getCurrentUser();
 
-        // Procedemos a comprobar si el usuario no es nulo
-        if (user == null) { // En caso de ser nulo
-            // Indicamos al usuario que ha de iniciar sesión de nuevo
+        if (user == null) {
             showToast("No se pudo obtener la información del usuario. Inicia sesión nuevamente.");
-            // Retornamos para no proseguir con el método
             return;
         }
 
-        // Obtenemos en una variable el uid del usuario
-        String uid = user.getUid();
-        // Obtenemos en una variable el email del usuario
-        String email = user.getEmail();
-
-        // Obtenemos en una variable el username del usuario
-        String campoUsername = editUsername.getText().toString();
-
-        // Obtenemos en una variable el email cifrado del usuario
-        String emailCifrado = CifradoDeDatos.cifrar(email);
-
-        // Obtenemos en una variable el recurso que se ha puesto en la imageview de la imagen de perfil
-        BitmapDrawable drawable = (BitmapDrawable) imagenPerfil.getDrawable();
-        // Obtenemos en una variable el bitmao de la imagen elegida
-        Bitmap fotoBitmap = drawable != null ? drawable.getBitmap() : null;
-
-        // Creo una variable de tipo texto donde almacenar la foto en base64
-        String fotoPerfilBase64 = null;
-        // Procedemos a comprobar si el bitmap es nulo
-        if (fotoBitmap != null) { // En caso de no ser nulo
-            // Creamos un array de bytes para comprimir la imagen
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-            // Procedemos a comprimmir la imagen a un 85% y además, le establecemos como un JPEG
-            fotoBitmap.compress(Bitmap.CompressFormat.JPEG, 85, baos);
-
-            // Creamos una cadena de bytes en donde almacenamos la imagen
-            byte[] fotoBytes = baos.toByteArray();
-            // Y guardamos en la variable antes creado la codificación en base64
-            fotoPerfilBase64 = Base64.encodeToString(fotoBytes, Base64.DEFAULT);
+        if (perfilActual == null) {
+            showToast("No se ha cargado el perfil original.");
+            return;
         }
 
-        // Creamos un objeto del modelo de perfil de usuario para tener todos los valores rellenos y a mano
-        Perfil perfil = new Perfil(
-                uid,
-                campoUsername,
-                emailCifrado,
-                null,
-                ubicacionSeleccionada,
-                0,
-                null,
-                cp.isEmpty() ? 0 : Integer.parseInt(cp),
-                new ArrayList<>(),
-                fotoBitmap,
-                descripcion,
-                anosPermiso.isEmpty() ? 0 : Integer.parseInt(anosPermiso)
-        );
+        String uid = user.getUid();
 
-        // Creamos un nuevo Map para darle los nombres y los valores a los documentos dentro de la colección
-        Map<String, Object> perfilMap = new HashMap<>();
-        // Guardamos el uid del usuario
-        perfilMap.put("uid", perfil.getUid());
-        // Guardamos el username del usuario
-        perfilMap.put("username", perfil.getUsername());
-        // Guardamos la ubicación del usuario cifrada
-        perfilMap.put("ubicacion", perfil.getUbicacion());
-        // Guardamos la edad del usuario
-        perfilMap.put("edad", perfil.getEdad());
-        // Guardamos el código postal del usuario
-        perfilMap.put("cp", perfil.getCp());
-        // Guardamos el correo del usuario cifrado
-        perfilMap.put("email", perfil.getEmail());
-        // Guardamos los años que lleva conduciendo el usuario
-        perfilMap.put("aniosConduciendo", perfil.getAniosConduciendo());
-        // Guardamos la foto de perfil en base 64
-        perfilMap.put("fotoPerfil", fotoPerfilBase64);
-        // Guardamos la descripción del usuario
-        perfilMap.put("descripcion", perfil.getDescripcion());
+        String nuevoUsername = editUsername.getText().toString().trim();
+        String nuevoNombreCompleto = editNombreComple.getText().toString().trim();
+        String nuevoCP = editCP.getText().toString().trim();
+        String nuevaDescripcion = editDescrip.getText().toString().trim();
+        String nuevosAniosPermiso = editAnoCon.getText().toString().trim();
 
-        // Obtenemos en una variable el username a querer ingresar
-        String usernameNuevo = perfilMap.get("username").toString();
+        BitmapDrawable drawable = (BitmapDrawable) imagenPerfil.getDrawable();
+        Bitmap nuevaFotoBitmap = drawable != null ? drawable.getBitmap() : null;
 
-        // Procedemos a comprobar si ya existe un perfil con ese username
+        String nuevaFotoBase64 = null;
+        if (nuevaFotoBitmap != null) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            nuevaFotoBitmap.compress(Bitmap.CompressFormat.JPEG, 85, baos);
+            byte[] fotoBytes = baos.toByteArray();
+            nuevaFotoBase64 = Base64.encodeToString(fotoBytes, Base64.DEFAULT);
+        }
+
+        Map<String, Object> cambios = new HashMap<>();
+
+        if (!nuevoUsername.equals(perfilActual.getUsername())) {
+            cambios.put("username", nuevoUsername);
+        }
+        if (!nuevoNombreCompleto.equals(perfilActual.getNombre_completo())) {
+            cambios.put("nombre_completo", nuevoNombreCompleto);
+        }
+        if (!nuevoCP.equals(String.valueOf(perfilActual.getCp()))) {
+            cambios.put("cp", nuevoCP.isEmpty() ? 0 : Integer.parseInt(nuevoCP));
+        }
+        if (!nuevaDescripcion.equals(perfilActual.getDescripcion())) {
+            cambios.put("descripcion", nuevaDescripcion);
+        }
+        if (!nuevosAniosPermiso.equals(String.valueOf(perfilActual.getAniosConduciendo()))) {
+            cambios.put("aniosConduciendo", nuevosAniosPermiso.isEmpty() ? 0 : Integer.parseInt(nuevosAniosPermiso));
+        }
+        if (nuevaFotoBase64 != null && !nuevaFotoBase64.equals(fotoPerfilAnterior)) {
+            cambios.put("fotoPerfil", nuevaFotoBase64);
+        }
+        if (!ubicacionesSonIguales(perfilActual.getUbicacion(), ubicacionSeleccionada)) {
+            cambios.put("ubicacion", ubicacionSeleccionada);
+        }
+
+        if (cambios.isEmpty()) {
+            showToast("No se detectaron cambios para actualizar.");
+            return;
+        }
+
+        if (cambios.containsKey("username")) {
+            db.collection("perfiles")
+                    .whereEqualTo("username", nuevoUsername)
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        if (queryDocumentSnapshots.isEmpty() || (queryDocumentSnapshots.size() == 1 && queryDocumentSnapshots.getDocuments().get(0).getId().equals(uid))) {
+                            actualizarEnFirestore(uid, cambios);
+                        } else {
+                            showToast("El nombre de usuario ya está en uso. Por favor elige otro.");
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        showToast("Error al verificar el nombre de usuario: " + e.getMessage());
+                    });
+        } else {
+            actualizarEnFirestore(uid, cambios);
+        }
+    }
+
+    private boolean ubicacionesSonIguales(Map<String, Object> a, Map<String, Object> b) {
+        if (a == null && b == null) return true;
+        if (a == null || b == null) return false;
+        if (a.size() != b.size()) return false;
+
+        for (String key : a.keySet()) {
+            Object valorA = a.get(key);
+            Object valorB = b.get(key);
+            if (valorA == null && valorB != null) return false;
+            if (valorA != null && !valorA.equals(valorB)) return false;
+        }
+        return true;
+    }
+
+    private void actualizarEnFirestore(String uid, Map<String, Object> cambios) {
         db.collection("perfiles")
-                .whereEqualTo("username", usernameNuevo)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> { // En caso de que todo vaya bien
-                    if (queryDocumentSnapshots.isEmpty()) { // En caso de que la consulta esté vacía
-                        // No existe ningún usuario con ese username, entonces podemos crear el perfil
-                        db.collection("perfiles").document(uid).update(perfilMap)
-                                .addOnSuccessListener(aVoid -> { // En caso de que todo vaya bien
-                                    // Lanzamos un Toast indicando que se creo el perfil correctamente
-                                    showToast("Perfil actualizado exitosamente");
-                                    // Creamos un nuevo intent indicando a la nueva pantalla que vamos a saltar
-                                    Intent i = new Intent(EditarPerfilActivity.this, MainActivity.class);
-                                    // Pasamos como parametro un uid
-                                    i.putExtra("uid", uid);
-                                    // Iniciamos la nueva actividad
-                                    startActivity(i);
-                                    // Establecemos una animcación para que se vea más visual
-                                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                                    finish(); // Cerramos la actividad actual
-                                })
-                                .addOnFailureListener(e -> { // En caso de que algo falle
-                                    // Lanzamos un Toast indicando al usuario que ocurrio un error al crear el perfil
-                                    showToast("Error al crear perfil: " + e.getMessage());
-                                });
-                    } else { // En caso de que si que exista
-                        // Lanzaremos un Toast indicando al usuario que ese username ya está en uso
-                        showToast("El nombre de usuario ya está en uso. Por favor elige otro.");
-                    }
+                .document(uid)
+                .update(cambios)
+                .addOnSuccessListener(aVoid -> {
+                    showToast("Perfil actualizado exitosamente.");
+                    Intent i = new Intent(EditarPerfilActivity.this, MainActivity.class);
+                    i.putExtra("uid", uid);
+                    startActivity(i);
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                    finish();
                 })
-                .addOnFailureListener(e -> { // En caso de que surja algún error
-                    // Lanzaremos un toast indicando que ocurrido un error al verificar el username
-                    showToast("Error al verificar username: " + e.getMessage());
+                .addOnFailureListener(e -> {
+                    showToast("Error al actualizar el perfil: " + e.getMessage());
                 });
     }
 
@@ -403,6 +419,12 @@ public class EditarPerfilActivity extends AppCompatActivity {
         editUsername.setText("");
         editDescrip.setText("");
         editUsername.setText("");
+    }
+
+    public static Bitmap convertirBase64ABitmap(String base64) {
+        if (base64 == null || base64.isEmpty()) return null;
+        byte[] decodedBytes = Base64.decode(base64, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
     }
 
     @Override
