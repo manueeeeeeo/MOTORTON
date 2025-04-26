@@ -1,6 +1,7 @@
 package com.clase.motorton.adaptadores;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 import com.clase.motorton.R;
 import com.clase.motorton.modelos.Evento;
@@ -163,6 +166,17 @@ public class EventosAdapter extends RecyclerView.Adapter<EventosAdapter.ViewHold
                         // Ponemos invisible la barra de progreso
                         holder.progressBar.setVisibility(View.GONE);
                     });
+        });
+
+        holder.botonVerMas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Bundle bundle = new Bundle();
+                bundle.putString("eventoId", evento.getId());
+
+                NavController navController = Navigation.findNavController(view);
+                navController.navigate(R.id.navigation_info_evento, bundle);
+            }
         });
     }
 
