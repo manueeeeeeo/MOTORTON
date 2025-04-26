@@ -91,6 +91,9 @@ public class InfoOtroPerfilFragment extends Fragment {
         }
 
         String finalUidPasado = uidPasado;
+
+        comprobarLike(finalUidPasado, uidUser);
+
         btnLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -100,6 +103,30 @@ public class InfoOtroPerfilFragment extends Fragment {
 
         return root;
     }
+
+    private void comprobarLike(String uidPerfil, String miUid) {
+        db.collection("perfiles").document(uidPerfil)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        List<String> likes = (List<String>) documentSnapshot.get("likes");
+
+                        if (likes != null && likes.contains(miUid)) {
+                            btnLike.setText("❤\uFE0F Quitar Like");
+                        } else {
+                            btnLike.setText("❤\uFE0F Dar Like");
+                        }
+                    } else {
+                        showToast("Perfil no encontrado");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    showToast("Error al obtener el perfil");
+                })
+                .addOnCompleteListener(task -> {
+                });
+    }
+
 
     private void darLike(String uidPerfil, String miUid) {
         db.collection("perfiles").document(uidPerfil)
