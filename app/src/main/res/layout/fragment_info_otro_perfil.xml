@@ -1,14 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
     tools:context=".ui.perfil.InfoOtroPerfilFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ProgressBar
+        android:id="@+id/progressBarOtroUsuario"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        style="?android:attr/progressBarStyleLarge"
+        android:indeterminateTint="#FFD700" />
+
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:padding="16dp">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardViewPerfilOtroUsuario"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="12dp"
+                app:cardBackgroundColor="#1E1E1E"
+                android:foreground="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:padding="24dp">
+
+                    <ImageView
+                        android:id="@+id/imageViewPerfilOtroUsuario"
+                        android:layout_width="140dp"
+                        android:layout_height="140dp"
+                        android:src="@drawable/icono"
+                        android:scaleType="centerCrop"
+                        android:background="@drawable/circle_background"
+                        android:elevation="4dp" />
+
+                    <TextView
+                        android:id="@+id/textViewUsernameOtroUsuario"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Usuario"
+                        android:textSize="28sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:layout_marginTop="16dp"
+                        android:fontFamily="sans-serif-condensed" />
+
+                    <TextView
+                        android:id="@+id/textViewNombreCompletoOtroUsuario"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nombre Completo:"
+                        android:textSize="18sp"
+                        android:textColor="#FFD700"
+                        android:layout_marginTop="12dp"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:id="@+id/textViewEdadOtroUsuario"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Edad: 0"
+                        android:textSize="16sp"
+                        android:textColor="#D1D1D1"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="sans-serif" />
+
+                    <TextView
+                        android:id="@+id/textViewAnosConduciendoOtroUsuario"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Años conduciendo: 0"
+                        android:textSize="16sp"
+                        android:textColor="#D1D1D1"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="sans-serif" />
+
+                    <TextView
+                        android:id="@+id/textViewUbicacionOtroUsuario"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ubicación:"
+                        android:textSize="16sp"
+                        android:textColor="#D1D1D1"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="sans-serif" />
+
+                    <Button
+                        android:id="@+id/buttonLike"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="❤️ Me gusta"
+                        android:textSize="16sp"
+                        android:textColor="#FFFFFF"
+                        android:backgroundTint="#FF4081"
+                        android:padding="12dp"
+                        android:layout_marginTop="24dp"
+                        android:layout_marginBottom="16dp"
+                        android:fontFamily="sans-serif-medium" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewVehiculosOtroUsuario"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:clipToPadding="false"
+                android:padding="8dp"
+                android:background="@drawable/rounded_corner_light"
+                android:elevation="6dp" />
+
+        </LinearLayout>
+    </ScrollView>
 </FrameLayout>

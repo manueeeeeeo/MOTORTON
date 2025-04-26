@@ -27,7 +27,7 @@
                 android:text="Nombre del evento"
                 android:textStyle="bold"
                 android:textSize="28sp"
-                android:textColor="#141524"
+                android:textColor="#FFFFFF"
                 android:paddingBottom="16dp"
                 android:fontFamily="sans-serif-condensed" />
 
@@ -51,7 +51,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Descripción del evento"
-                    android:textColor="#141524"
+                    android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:paddingStart="12dp"
                     android:fontFamily="sans-serif" />
@@ -77,7 +77,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Ubicación del evento"
-                    android:textColor="#141524"
+                    android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:paddingStart="12dp"
                     android:fontFamily="sans-serif" />
@@ -103,7 +103,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Provincia del evento"
-                    android:textColor="#141524"
+                    android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:paddingStart="12dp"
                     android:fontFamily="sans-serif" />
@@ -129,7 +129,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Tipo de evento"
-                    android:textColor="#141524"
+                    android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:paddingStart="12dp"
                     android:fontFamily="sans-serif" />
@@ -154,7 +154,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Organizador del evento"
-                    android:textColor="#141524"
+                    android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:paddingStart="12dp"
                     android:fontFamily="sans-serif" />
@@ -179,7 +179,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Nº Participantes"
-                    android:textColor="#141524"
+                    android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:paddingStart="12dp"
                     android:fontFamily="sans-serif" />
@@ -205,7 +205,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Fecha del evento"
-                    android:textColor="#141524"
+                    android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:paddingStart="12dp"
                     android:fontFamily="sans-serif" />
@@ -230,7 +230,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Activo"
-                    android:textColor="#141524"
+                    android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:paddingStart="12dp"
                     android:fontFamily="sans-serif" />
@@ -241,7 +241,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Participantes del Evento:"
-                android:textColor="#141524"
+                android:textColor="#FFFFFF"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:paddingBottom="12dp"
