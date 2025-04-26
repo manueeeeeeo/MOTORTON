@@ -38,19 +38,13 @@ public class EditarEventoFragment extends Fragment {
     private FirebaseFirestore db = null;
 
     // Variable para manejar todos los editText del fragmento
-    private EditText editTextNombreEvento = null, editTextDescripcion = null, editTextUbicacion = null;
-    // Variable para manejar el spinner del tipo de evento
-    private Spinner spinnerTipoEvento = null;
+    private EditText editTextDescripcion = null;
     // Variable para manejar el selector de fecha
     private DatePicker datePickerFecha = null;
     // Variable para manejar el botón de crear el evento
     private Button buttonCrearEvento = null;
     // Variable para visualizar el mapa
     private MapView mapView = null;
-    // Variable para manejar el botón para ir a seleccionar la ruta
-    private Button btnIrRuta = null;
-    // Variable para manejar el spinner de las provincias
-    private Spinner spinnerProvincia = null;
     private TextView tituloEvento = null;
 
     // Variable para manejar la latitud del inicio
@@ -91,12 +85,9 @@ public class EditarEventoFragment extends Fragment {
         datePickerFecha = view.findViewById(R.id.datePickerFecha);
         buttonCrearEvento = view.findViewById(R.id.buttonCrearEvento);
         mapView = view.findViewById(R.id.map);
-        btnIrRuta = view.findViewById(R.id.buttonIrRuta);
         tituloEvento = view.findViewById(R.id.textView11);
 
         cargarEvento();
-
-        editTextNombreEvento.setEnabled(false);
 
         mapView.setTileSource(TileSourceFactory.MAPNIK);  // Usar Mapnik para el fondo del mapa
         mapView.setBuiltInZoomControls(true);  // Activar controles de zoom
@@ -170,62 +161,12 @@ public class EditarEventoFragment extends Fragment {
         // Inicializo el cifrador de datos
         cifrar = new CifradoDeDatos();
 
-        // Inicializo el adaptador para el spinner de eventos
-        SpinnerAdaptarNormal adapter = new SpinnerAdaptarNormal(getContext(), tiposEvento);
-        // Establezco el adaptador al spinner
-        spinnerTipoEvento.setAdapter(adapter);
-
-        // Inicializo el adaptador para el spinner de provincias
-        SpinnerAdaptarNormal adapter2 = new SpinnerAdaptarNormal(getContext(), provincias);
-        // Establezco el adaptador al spinner
-        spinnerProvincia.setAdapter(adapter2);
-
         // Establezco la acción que sucede cuando clicamos el botón de crear evento
         buttonCrearEvento.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Llamo al método para crear el evento
                 actualizarEvento();
-            }
-        });
-
-        // Establecemos el evento al elegir una opción en el spinner
-        spinnerTipoEvento.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                // Obtengo el item elegido
-                String selectedItem = parentView.getItemAtPosition(position).toString();
-
-                // Comprobamos si es una ruta o no
-                if ("Ruta Moto".equals(selectedItem) || "Ruta Coche".equals(selectedItem)) { // En caso de ser una ruta
-                    mapView.setVisibility(View.VISIBLE);
-                    btnIrRuta.setVisibility(View.VISIBLE);
-                } else { // En caso de ser otra opción
-                    // Mantenemos invisible el mapa
-                    mapView.setVisibility(View.GONE);
-                    // Mantenemos invisible el botón de ir a legir la ruta
-                    btnIrRuta.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-            }
-        });
-
-        // Establezco la acción que sucede cuando clicamos el botón de ir a seleccionar Ruta
-        btnIrRuta.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Utilizamos un try catch para capturar y tratar todas las posibles excepciones
-                try {
-                    Navigation.findNavController(view).navigate(R.id.navigation_map_ruta);
-                } catch (Exception e) { // En caso de que surja alguna excepción
-                    // Imprimimos la excepción por consola
-                    e.printStackTrace();
-                    // Lanzamos un toast indicando que ocurrió un error al navegar
-                    showToast("Error al navegar");
-                }
             }
         });
 
@@ -278,9 +219,7 @@ public class EditarEventoFragment extends Fragment {
      * y los editText
      */
     private void limpiarFormulario() {
-        editTextNombreEvento.setText("");
         editTextDescripcion.setText("");
-        editTextUbicacion.setText("");
         datePickerFecha.updateDate(Calendar.getInstance().get(Calendar.YEAR),
                 Calendar.getInstance().get(Calendar.MONTH),
                 Calendar.getInstance().get(Calendar.DAY_OF_MONTH));

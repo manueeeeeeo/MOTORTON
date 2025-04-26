@@ -1,5 +1,6 @@
 package com.clase.motorton.adaptadores;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -52,6 +53,7 @@ public class EventosAdapter extends RecyclerView.Adapter<EventosAdapter.ViewHold
         return new ViewHolder(view);
     }
 
+    @SuppressLint("RecyclerView")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         // Obtengo en un evento el objeto elegido
