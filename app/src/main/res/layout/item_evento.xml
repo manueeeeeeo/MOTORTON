@@ -96,16 +96,36 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/fechaEvento" />
 
-        <ImageView
-            android:id="@+id/botonEditar"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/icono_edit"
-            android:contentDescription="Editar evento"
-            android:visibility="gone"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_margin="8dp"/>
+        <LinearLayout
+            android:id="@+id/layoutBotonesAccion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@id/botonApuntarse"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageView
+                android:id="@+id/imageViewEditarEvento"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/icono_edit"
+                android:contentDescription="Editar evento"
+                android:clickable="true"
+                android:focusable="true"
+                app:tint="#ccd4cc"
+                android:layout_marginEnd="12dp"/>
+
+            <ImageView
+                android:id="@+id/imageViewEliminarEvento"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/icono_dle"
+                android:contentDescription="Eliminar evento"
+                android:clickable="true"
+                android:focusable="true"/>
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
