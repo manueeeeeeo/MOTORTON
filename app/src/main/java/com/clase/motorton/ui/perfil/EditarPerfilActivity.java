@@ -126,6 +126,7 @@ public class EditarPerfilActivity extends AppCompatActivity {
 
     // Variable para manejar la autentificación del usuario
     private FirebaseAuth auth = null;
+    private FirebaseUser user = null;
 
     // Variable en donde guardamos los datos actuales del perfil del usuario
     private Perfil perfilActual = null;
@@ -228,7 +229,7 @@ public class EditarPerfilActivity extends AppCompatActivity {
     }
 
     public void cargarDatos() {
-        FirebaseUser user = auth.getCurrentUser();
+        user = auth.getCurrentUser();
 
         if (user == null) {
             showToast("No se pudo obtener la información del usuario. Inicia sesión nuevamente.");
@@ -247,19 +248,18 @@ public class EditarPerfilActivity extends AppCompatActivity {
                         String fechaNaci = documentSnapshot.getString("fechaNaci");
                         String emailCifrado = documentSnapshot.getString("email");
                         Map<String, Object> ubicacion = (Map<String, Object>) documentSnapshot.get("ubicacion");
-                        String cpString = documentSnapshot.getString("cp");
+                        Long cpLong = documentSnapshot.getLong("cp");
+                        int cp = (cpLong != null) ? cpLong.intValue() : 0;
                         String descripcion1 = documentSnapshot.getString("descripcion");
-                        String anosPermisoString = documentSnapshot.getString("aniosConduciendo");
+                        Long aniosPermisoLong = documentSnapshot.getLong("aniosConduciendo");
+                        int aniosPermiso = (aniosPermisoLong != null) ? aniosPermisoLong.intValue() : 0;
                         String fotoBase64 = documentSnapshot.getString("fotoPerfil");
                         fotoPerfilAnterior = fotoBase64;
-
-                        int cp = (cpString != null && !cpString.isEmpty()) ? Integer.parseInt(cpString) : 0;
-                        int anosPermiso = (anosPermisoString != null && !anosPermisoString.isEmpty()) ? Integer.parseInt(anosPermisoString) : 0;
 
                         editUsername.setText(username1 != null ? username1 : "");
                         editCP.setText(String.valueOf(cp));
                         editDescrip.setText(descripcion1 != null ? descripcion1 : "");
-                        editAnoCon.setText(String.valueOf(anosPermiso));
+                        editAnoCon.setText(String.valueOf(aniosPermiso));
 
                         if (fotoBase64 != null && !fotoBase64.isEmpty()) {
                             Bitmap decodedBitmap = convertirBase64ABitmap(fotoBase64);
@@ -270,7 +270,14 @@ public class EditarPerfilActivity extends AppCompatActivity {
                             ubicacionSeleccionada = new HashMap<>(ubicacion);
                             Object direccionCifrada = ubicacion.get("direccion");
                             if (direccionCifrada != null) {
-                                String direccion = CifradoDeDatos.descifrar(direccionCifrada.toString());
+                                String direccion = "";
+                                if (direccionCifrada != null) {
+                                    try {
+                                        direccion = CifradoDeDatos.descifrar(direccionCifrada.toString());
+                                    } catch (Exception e) {
+                                        showToast("Error al descifrar la dirección.");
+                                    }
+                                }
                                 btnElegirUbicacion.setText(direccion);
                             }
                         }
@@ -287,7 +294,7 @@ public class EditarPerfilActivity extends AppCompatActivity {
                                 new ArrayList<>(),
                                 null,
                                 descripcion1,
-                                anosPermiso
+                                aniosPermiso
                         );
 
                     } else {
@@ -316,9 +323,23 @@ public class EditarPerfilActivity extends AppCompatActivity {
 
         String nuevoUsername = editUsername.getText().toString().trim();
         String nuevoNombreCompleto = editNombreComple.getText().toString().trim();
-        String nuevoCP = editCP.getText().toString().trim();
+        String nuevoCPStr = editCP.getText().toString().trim();
+        int nuevoCP = 0;
+        try {
+            nuevoCP = nuevoCPStr.isEmpty() ? 0 : Integer.parseInt(nuevoCPStr);
+        } catch (NumberFormatException e) {
+            showToast("El código postal debe ser un número válido.");
+            return;
+        }
         String nuevaDescripcion = editDescrip.getText().toString().trim();
-        String nuevosAniosPermiso = editAnoCon.getText().toString().trim();
+        String nuevosAniosPermisoStr = editAnoCon.getText().toString().trim();
+        int nuevosAniosPermiso = 0;
+        try {
+            nuevosAniosPermiso = nuevosAniosPermisoStr.isEmpty() ? 0 : Integer.parseInt(nuevosAniosPermisoStr);
+        } catch (NumberFormatException e) {
+            showToast("Los años conduciendo deben ser un número válido.");
+            return;
+        }
 
         BitmapDrawable drawable = (BitmapDrawable) imagenPerfil.getDrawable();
         Bitmap nuevaFotoBitmap = drawable != null ? drawable.getBitmap() : null;
@@ -332,21 +353,20 @@ public class EditarPerfilActivity extends AppCompatActivity {
         }
 
         Map<String, Object> cambios = new HashMap<>();
-
         if (!nuevoUsername.equals(perfilActual.getUsername())) {
             cambios.put("username", nuevoUsername);
         }
         if (!nuevoNombreCompleto.equals(perfilActual.getNombre_completo())) {
             cambios.put("nombre_completo", nuevoNombreCompleto);
         }
-        if (!nuevoCP.equals(String.valueOf(perfilActual.getCp()))) {
-            cambios.put("cp", nuevoCP.isEmpty() ? 0 : Integer.parseInt(nuevoCP));
+        if (nuevoCP != perfilActual.getCp()) {
+            cambios.put("cp", nuevoCP);
         }
         if (!nuevaDescripcion.equals(perfilActual.getDescripcion())) {
             cambios.put("descripcion", nuevaDescripcion);
         }
-        if (!nuevosAniosPermiso.equals(String.valueOf(perfilActual.getAniosConduciendo()))) {
-            cambios.put("aniosConduciendo", nuevosAniosPermiso.isEmpty() ? 0 : Integer.parseInt(nuevosAniosPermiso));
+        if (nuevosAniosPermiso != perfilActual.getAniosConduciendo()) {
+            cambios.put("aniosConduciendo", nuevosAniosPermiso);
         }
         if (nuevaFotoBase64 != null && !nuevaFotoBase64.equals(fotoPerfilAnterior)) {
             cambios.put("fotoPerfil", nuevaFotoBase64);
