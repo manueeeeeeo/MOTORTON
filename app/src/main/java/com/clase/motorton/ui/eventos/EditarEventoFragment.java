@@ -44,25 +44,10 @@ public class EditarEventoFragment extends Fragment {
     private DatePicker datePickerFecha = null;
     // Variable para manejar el botón de crear el evento
     private Button buttonCrearEvento = null;
-    // Variable para visualizar el mapa
-    private MapView mapView = null;
     private TextView tituloEvento = null;
-
-    // Variable para manejar la latitud del inicio
-    private double latInicio = 0.0;
-    // Variable para manejar la latitud del final
-    private double latFin = 0.0;
-    // Variable para manejar la longitud del inicio
-    private double lonInicio = 0.0;
-    // Variable para manejar la longitud del final
-    private double lonFin = 0.0;
-    // Variable para manejar la provincia elegida
-    private String provincia = null;
 
     // Variable para controlar el cifrado de datos
     private CifradoDeDatos cifrar = null;
-    // Variable para controlar la clave secreta del cifrado de datos
-    private SecretKey claveSecreta = null;
     // Variable para manejar los Toast de está actividad
     private Toast mensajeToast= null;
 
@@ -79,19 +64,14 @@ public class EditarEventoFragment extends Fragment {
         // Obtenemos referencias a los elementos de la interfaz
         editTextDescripcion = view.findViewById(R.id.editTextDescripcion);
         datePickerFecha = view.findViewById(R.id.datePickerFecha);
-        buttonCrearEvento = view.findViewById(R.id.buttonCrearEvento);
-        mapView = view.findViewById(R.id.map);
-        tituloEvento = view.findViewById(R.id.textView11);
+        buttonCrearEvento = view.findViewById(R.id.buttonActualizarEvento);
+        tituloEvento = view.findViewById(R.id.textViewTituloEventoAc);
 
         String idPasado = null;
         if (getArguments() != null && getArguments().containsKey("eventoId")) {
             idPasado = getArguments().getString("eventoId");
             cargarEvento(idPasado);
         }
-
-        mapView.setTileSource(TileSourceFactory.MAPNIK);  // Usar Mapnik para el fondo del mapa
-        mapView.setBuiltInZoomControls(true);  // Activar controles de zoom
-        mapView.setMultiTouchControls(true);
 
         // Inicializo el cifrador de datos
         cifrar = new CifradoDeDatos();
@@ -103,38 +83,6 @@ public class EditarEventoFragment extends Fragment {
                 // Llamo al método para crear el evento
                 actualizarEvento();
             }
-        });
-
-        // Obtenemos si hay datos pasados de un fragmento a otro
-        getParentFragmentManager().setFragmentResultListener("rutaSeleccionada", this, (key, bundle) -> {
-            // Obtengo el dato pasado que es un double
-            double startLat = bundle.getDouble("startLat", Double.NaN);
-            // Obtengo el dato pasado que es un double
-            double startLon = bundle.getDouble("startLon", Double.NaN);
-            // Obtengo el dato pasado que es un double
-            double endLat = bundle.getDouble("endLat", Double.NaN);
-            // Obtengo el dato pasado que es un double
-            double endLon = bundle.getDouble("endLon", Double.NaN);
-
-            // Compruebo que sean números y no estén vacíos
-            if (Double.isNaN(startLat) || Double.isNaN(startLon) || Double.isNaN(endLat) || Double.isNaN(endLon)) { // En caso negativo
-                // Lanzo un toast indicando que las coordenadas de la ruta no son válidas
-                showToast("Error: coordenadas de la ruta no válidas");
-                // Retornamos para no proseguir
-                return;
-            }
-
-            // Inicializo el valor de inicio de la latitud
-            this.latInicio = startLat;
-            // Inicializo el valor de inicio de la longitud
-            this.lonInicio = startLon;
-            // Inicializo el valor de final de la latidud
-            this.latFin = endLat;
-            // Inicializo el valor de final de la longitud
-            this.lonFin = endLon;
-
-            // Llamamos al método para dibujar la ruta en el mapa
-            //dibujarRuta(latInicio, lonInicio, latFin, lonFin);
         });
 
         return view;
