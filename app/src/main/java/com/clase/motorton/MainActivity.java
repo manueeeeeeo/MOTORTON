@@ -1,5 +1,7 @@
 package com.clase.motorton;
 
+import static com.clase.motorton.notifications.FirebaseNotificationDaily.suscribirAnotificacionDiaria;
+
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.clase.motorton.notifications.FirebaseNotificationDaily;
 import com.clase.motorton.notifications.NotificacionReceiver;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -51,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         programarNotificacionDiaria();
+
+        FirebaseNotificationDaily.suscribirAnotificacionDiaria(this);
     }
 
     private void programarNotificacionDiaria() {

@@ -71,4 +71,5 @@ dependencies {
     implementation ("com.github.PhilJay:MPAndroidChart:3.1.0")
     implementation ("com.itextpdf:kernel:7.2.3")
     implementation ("com.itextpdf:layout:7.2.3")
+    implementation("com.google.firebase:firebase-messaging:23.1.2")
 }
