@@ -20,6 +20,7 @@ import com.clase.motorton.R;
 import com.clase.motorton.adaptadores.SpinnerAdaptarNormal;
 import com.clase.motorton.cifrado.CifradoDeDatos;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -58,11 +59,6 @@ public class EditarEventoFragment extends Fragment {
     // Variable para manejar la provincia elegida
     private String provincia = null;
 
-    // Variable para manejar la lista de los tipos de eventos
-    private List<String> tiposEvento = new ArrayList<>();
-    // Variable para manejar la lista de las provincias
-    private List<String> provincias = new ArrayList<>();
-
     // Variable para controlar el cifrado de datos
     private CifradoDeDatos cifrar = null;
     // Variable para controlar la clave secreta del cifrado de datos
@@ -87,76 +83,15 @@ public class EditarEventoFragment extends Fragment {
         mapView = view.findViewById(R.id.map);
         tituloEvento = view.findViewById(R.id.textView11);
 
-        cargarEvento();
+        String idPasado = null;
+        if (getArguments() != null && getArguments().containsKey("eventoId")) {
+            idPasado = getArguments().getString("eventoId");
+            cargarEvento(idPasado);
+        }
 
         mapView.setTileSource(TileSourceFactory.MAPNIK);  // Usar Mapnik para el fondo del mapa
         mapView.setBuiltInZoomControls(true);  // Activar controles de zoom
         mapView.setMultiTouchControls(true);
-
-        // Agrego todos los tipos de eventos posibles
-        tiposEvento.add("Quedada Motos");
-        tiposEvento.add("Quedada Coches");
-        tiposEvento.add("Ruta MultiVehículo");
-        tiposEvento.add("Ruta Moto");
-        tiposEvento.add("Ruta Coche");
-        tiposEvento.add("Ruta");
-        tiposEvento.add("Slalom");
-        tiposEvento.add("Rally");
-        tiposEvento.add("Otros");
-
-        // Agrego todas las provincias posibles
-        provincias.add("Álava");
-        provincias.add("Albacete");
-        provincias.add("Alicante");
-        provincias.add("Almería");
-        provincias.add("Asturias");
-        provincias.add("Ávila");
-        provincias.add("Badajoz");
-        provincias.add("Barcelona");
-        provincias.add("Burgos");
-        provincias.add("Cáceres");
-        provincias.add("Cádiz");
-        provincias.add("Cantabria");
-        provincias.add("Castellón");
-        provincias.add("Ciudad Real");
-        provincias.add("Córdoba");
-        provincias.add("La Coruña");
-        provincias.add("Cuenca");
-        provincias.add("Gerona");
-        provincias.add("Granada");
-        provincias.add("Guadalajara");
-        provincias.add("Guipúzcoa");
-        provincias.add("Huelva");
-        provincias.add("Huesca");
-        provincias.add("Islas Baleares");
-        provincias.add("Jaén");
-        provincias.add("León");
-        provincias.add("Lérida");
-        provincias.add("Lugo");
-        provincias.add("Madrid");
-        provincias.add("Málaga");
-        provincias.add("Murcia");
-        provincias.add("Navarra");
-        provincias.add("Orense");
-        provincias.add("Palencia");
-        provincias.add("Las Palmas");
-        provincias.add("Pontevedra");
-        provincias.add("La Rioja");
-        provincias.add("Salamanca");
-        provincias.add("Santa Cruz de Tenerife");
-        provincias.add("Segovia");
-        provincias.add("Sevilla");
-        provincias.add("Soria");
-        provincias.add("Tarragona");
-        provincias.add("Teruel");
-        provincias.add("Toledo");
-        provincias.add("Valencia");
-        provincias.add("Valladolid");
-        provincias.add("Vizcaya");
-        provincias.add("Zamora");
-        provincias.add("Zaragoza");
-        provincias.add("Ceuta");
-        provincias.add("Melilla");
 
         // Inicializo el cifrador de datos
         cifrar = new CifradoDeDatos();
@@ -205,8 +140,38 @@ public class EditarEventoFragment extends Fragment {
         return view;
     }
 
-    private void cargarEvento(){
+    private void cargarEvento(String eventoID) {
+        db.collection("eventos")
+                .whereEqualTo("id", eventoID)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        DocumentSnapshot document = queryDocumentSnapshots.getDocuments().get(0);
 
+                        String nombre = document.getString("nombre");
+                        String fecha = document.getString("fecha");
+                        String descripcion = document.getString("descripcion");
+
+                        tituloEvento.setText("Evento "+nombre);
+                        editTextDescripcion.setText(descripcion);
+
+                        if (fecha != null) {
+                            String[] partes = fecha.split("-");
+                            if (partes.length == 3) {
+                                int year = Integer.parseInt(partes[0]);
+                                int month = Integer.parseInt(partes[1]) - 1; // DatePicker: enero=0
+                                int day = Integer.parseInt(partes[2]);
+                                datePickerFecha.updateDate(year, month, day);
+                            }
+                        }
+
+                    } else {
+                        showToast("No se encontró el evento.");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    showToast("Error al cargar el evento.");
+                });
     }
 
     private void actualizarEvento(){
