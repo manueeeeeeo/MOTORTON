@@ -72,4 +72,5 @@ dependencies {
     implementation ("com.itextpdf:kernel:7.2.3")
     implementation ("com.itextpdf:layout:7.2.3")
     implementation("com.google.firebase:firebase-messaging:23.1.2")
+    implementation ("com.google.android.material:material:1.11.0")
 }
