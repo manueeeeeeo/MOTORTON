@@ -72,10 +72,15 @@ public class EditarEventoFragment extends Fragment {
         buttonCrearEvento = view.findViewById(R.id.buttonActualizarEvento);
         tituloEvento = view.findViewById(R.id.textViewTituloEventoAc);
 
-        String idPasado = null;
-        if (getArguments() != null && getArguments().containsKey("eventoId")) {
-            idPasado = getArguments().getString("eventoId");
-            cargarEvento(idPasado);
+        if (getArguments() != null) {
+            String eventoId = getArguments().getString("eventoId");
+            if (eventoId != null) {
+                cargarEvento(eventoId);
+            } else {
+                showToast("Error: No se recibió el ID del evento");
+            }
+        } else {
+            showToast("Error: Argumentos nulos");
         }
 
         // Inicializo el cifrador de datos
