@@ -29,11 +29,13 @@ import org.osmdroid.views.MapView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 
 
 import javax.crypto.SecretKey;
@@ -50,12 +52,18 @@ public class EditarEventoFragment extends Fragment {
     private DatePicker datePickerFecha = null;
     // Variable para manejar el botón de crear el evento
     private Button buttonCrearEvento = null;
+    // Variable para manejar el textview del título
     private TextView tituloEvento = null;
 
     // Variable para controlar el cifrado de datos
     private CifradoDeDatos cifrar = null;
     // Variable para manejar los Toast de está actividad
     private Toast mensajeToast= null;
+
+    private String descripAnti = null;
+    private Timestamp fechaAnti = null;
+    private Date fechaEvento = null;
+    private String documentoEventoID = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -88,6 +96,7 @@ public class EditarEventoFragment extends Fragment {
         if (getArguments() != null && getArguments().containsKey("eventoId")) {
             String eventId = getArguments().getString("eventoId");
             if (eventId != null) {
+                documentoEventoID = eventId;
                 cargarEvento(eventId);
             } else {
                 showToast("Error: No se recibió el ID del evento");
@@ -117,6 +126,9 @@ public class EditarEventoFragment extends Fragment {
                             descripcion = ""; // Valor predeterminado
                         }
 
+                        descripAnti = descripcion;
+                        fechaAnti = timestamp;
+
                         tituloEvento.setText("Evento "+nombre);
                         editTextDescripcion.setText(descripcion);
 
@@ -131,6 +143,8 @@ public class EditarEventoFragment extends Fragment {
                             int day = calendar.get(Calendar.DAY_OF_MONTH);
 
                             datePickerFecha.updateDate(year, month, day);
+
+                            fechaEvento = calendar.getTime();
                         }
 
                     } else {
@@ -142,8 +156,48 @@ public class EditarEventoFragment extends Fragment {
                 });
     }
 
-    private void actualizarEvento(){
+    private void actualizarEvento() {
+        Map<String, Object> cambios = new HashMap<>();
 
+        if (!descripAnti.equals(editTextDescripcion.getText().toString())) {
+            cambios.put("descripcion", editTextDescripcion.getText().toString());
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(datePickerFecha.getYear(), datePickerFecha.getMonth(), datePickerFecha.getDayOfMonth());
+        Date nuevaFecha = calendar.getTime();
+
+        if (!fechaAnti.toDate().equals(nuevaFecha)) {
+            cambios.put("fecha", nuevaFecha);
+        }
+
+        if (!cambios.isEmpty() && documentoEventoID != null) {
+            db.collection("eventos")
+                    .whereEqualTo("id", documentoEventoID)
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        if (!queryDocumentSnapshots.isEmpty()) {
+                            String docId = queryDocumentSnapshots.getDocuments().get(0).getId();
+
+                            db.collection("eventos").document(docId)
+                                    .update(cambios)
+                                    .addOnSuccessListener(aVoid -> {
+                                        showToast("Evento actualizado correctamente.");
+                                        Navigation.findNavController(requireView()).navigate(R.id.navigation_home, null);
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        showToast("Error al actualizar el evento.");
+                                    });
+                        } else {
+                            showToast("No se encontró el evento para actualizar.");
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        showToast("Error al buscar el evento.");
+                    });
+        } else {
+            showToast("No hay cambios para actualizar.");
+        }
     }
 
     /**
