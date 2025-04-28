@@ -29,6 +29,11 @@ import org.osmdroid.views.MapView;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 
 import javax.crypto.SecretKey;
 
@@ -104,12 +109,21 @@ public class EditarEventoFragment extends Fragment {
                         editTextDescripcion.setText(descripcion);
 
                         if (fecha != null) {
-                            String[] partes = fecha.split("-");
-                            if (partes.length == 3) {
-                                int year = Integer.parseInt(partes[0]);
-                                int month = Integer.parseInt(partes[1]) - 1; // DatePicker: enero=0
-                                int day = Integer.parseInt(partes[2]);
+                            SimpleDateFormat formatoEntrada = new SimpleDateFormat("d 'de' MMMM 'de' yyyy, hh:mm:ss a", new Locale("es", "ES"));
+
+                            try {
+                                Date fechaDate = formatoEntrada.parse(fecha);
+                                Calendar calendar = Calendar.getInstance();
+                                calendar.setTime(fechaDate);
+
+                                int year = calendar.get(Calendar.YEAR);
+                                int month = calendar.get(Calendar.MONTH);
+                                int day = calendar.get(Calendar.DAY_OF_MONTH);
+
                                 datePickerFecha.updateDate(year, month, day);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                                showToast("Error al leer la fecha");
                             }
                         }
 
