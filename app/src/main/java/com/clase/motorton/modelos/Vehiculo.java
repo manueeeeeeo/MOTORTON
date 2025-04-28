@@ -9,6 +9,16 @@ public class Vehiculo {
     private boolean exportado;
     private String descripción;
     private String tipoVehiculo;
+    private String tuboEscape;
+    private String ruedas;
+    private String aleron;
+    private String dbKiller;
+    private boolean bodyKit;
+    private boolean lucesLed;
+    private double cv;
+    private double maxVelocidad;
+    private String foto;
+    private int choques;
 
     public Vehiculo() {
     }
@@ -22,6 +32,86 @@ public class Vehiculo {
         this.exportado = exportado;
         this.descripción = descripción;
         this.tipoVehiculo = tipoVehiculo;
+    }
+
+    public int getChoques() {
+        return choques;
+    }
+
+    public void setChoques(int choques) {
+        this.choques = choques;
+    }
+
+    public String getTuboEscape() {
+        return tuboEscape;
+    }
+
+    public void setTuboEscape(String tuboEscape) {
+        this.tuboEscape = tuboEscape;
+    }
+
+    public String getRuedas() {
+        return ruedas;
+    }
+
+    public void setRuedas(String ruedas) {
+        this.ruedas = ruedas;
+    }
+
+    public String getAleron() {
+        return aleron;
+    }
+
+    public void setAleron(String aleron) {
+        this.aleron = aleron;
+    }
+
+    public String getDbKiller() {
+        return dbKiller;
+    }
+
+    public void setDbKiller(String dbKiller) {
+        this.dbKiller = dbKiller;
+    }
+
+    public boolean isBodyKit() {
+        return bodyKit;
+    }
+
+    public void setBodyKit(boolean bodyKit) {
+        this.bodyKit = bodyKit;
+    }
+
+    public boolean isLucesLed() {
+        return lucesLed;
+    }
+
+    public void setLucesLed(boolean lucesLed) {
+        this.lucesLed = lucesLed;
+    }
+
+    public double getCv() {
+        return cv;
+    }
+
+    public void setCv(double cv) {
+        this.cv = cv;
+    }
+
+    public double getMaxVelocidad() {
+        return maxVelocidad;
+    }
+
+    public void setMaxVelocidad(double maxVelocidad) {
+        this.maxVelocidad = maxVelocidad;
+    }
+
+    public String getFoto() {
+        return foto;
+    }
+
+    public void setFoto(String foto) {
+        this.foto = foto;
     }
 
     public String getUidDueno() {
