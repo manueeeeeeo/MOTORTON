@@ -34,6 +34,28 @@ public class Vehiculo {
         this.tipoVehiculo = tipoVehiculo;
     }
 
+    public Vehiculo(String uidDueno, String matricula, String marca, String modelo, int anos, boolean exportado,
+                    String descripción, String tipoVehiculo, String tubo, String ruedas, String aleron, String dbkiller,
+                    boolean bodyKt, boolean lucesL, double maxVel, String foto, int creash) {
+        this.uidDueno = uidDueno;
+        this.matricula = matricula;
+        this.marca = marca;
+        this.modelo = modelo;
+        this.anos = anos;
+        this.exportado = exportado;
+        this.descripción = descripción;
+        this.tipoVehiculo = tipoVehiculo;
+        this.tuboEscape = tubo;
+        this.ruedas = ruedas;
+        this.aleron = aleron;
+        this.dbKiller = dbkiller;
+        this.bodyKit = bodyKt;
+        this.lucesLed = lucesL;
+        this.maxVelocidad = maxVel;
+        this.foto = foto;
+        this.choques = creash;
+    }
+
     public int getChoques() {
         return choques;
     }
