@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.clase.motorton.R;
 import com.clase.motorton.adaptadores.SpinnerAdaptarNormal;
 import com.clase.motorton.cifrado.CifradoDeDatos;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -107,37 +108,29 @@ public class EditarEventoFragment extends Fragment {
                         DocumentSnapshot document = queryDocumentSnapshots.getDocuments().get(0);
 
                         String nombre = document.getString("nombre");
-                        String fecha = document.getString("fecha");
+                        if (nombre == null) {
+                            nombre = "Sin nombre"; // Valor predeterminado
+                        }
+                        Timestamp timestamp = document.getTimestamp("fecha");
                         String descripcion = document.getString("descripcion");
+                        if (descripcion == null) {
+                            descripcion = ""; // Valor predeterminado
+                        }
 
                         tituloEvento.setText("Evento "+nombre);
                         editTextDescripcion.setText(descripcion);
 
-                        if (fecha != null) {
-                            fecha = fecha.replace("\u202F", " ");
+                        if (timestamp != null) {
+                            Date fechaDate = timestamp.toDate();
 
-                            if (fecha.contains("UTC")) {
-                                fecha = fecha.substring(0, fecha.indexOf("UTC")).trim();
-                            }
+                            Calendar calendar = Calendar.getInstance();
+                            calendar.setTime(fechaDate);
 
-                            fecha = fecha.replace("a.m.", "a. m.").replace("p.m.", "p. m.");
+                            int year = calendar.get(Calendar.YEAR);
+                            int month = calendar.get(Calendar.MONTH);
+                            int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-                            SimpleDateFormat formatoEntrada = new SimpleDateFormat("d 'de' MMMM 'de' yyyy, hh:mm:ss a", new Locale("es", "ES"));
-
-                            try {
-                                Date fechaDate = formatoEntrada.parse(fecha);
-                                Calendar calendar = Calendar.getInstance();
-                                calendar.setTime(fechaDate);
-
-                                int year = calendar.get(Calendar.YEAR);
-                                int month = calendar.get(Calendar.MONTH);
-                                int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-                                datePickerFecha.updateDate(year, month, day);
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                                showToast("Error al leer la fecha");
-                            }
+                            datePickerFecha.updateDate(year, month, day);
                         }
 
                     } else {
