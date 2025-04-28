@@ -25,10 +25,12 @@ import com.clase.motorton.cifrado.CifradoDeDatos;
 import com.clase.motorton.modelos.Vehiculo;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class InfoOtroPerfilFragment extends Fragment {
@@ -56,6 +58,7 @@ public class InfoOtroPerfilFragment extends Fragment {
     private FirebaseAuth mAuth = null;
     // Variable para manejar la base de datos de firebase
     private FirebaseFirestore db = null;
+    private String uidUser = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -79,19 +82,94 @@ public class InfoOtroPerfilFragment extends Fragment {
 
         recycleVehiculos.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        btnLike.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        uidUser = mAuth.getUid();
 
-            }
-        });
-
+        String uidPasado = null;
         if (getArguments() != null && getArguments().containsKey("perfilId")) {
-            String uidPasado = getArguments().getString("perfilId");
+            uidPasado = getArguments().getString("perfilId");
             cargarDatosPerfil(uidPasado);
         }
 
+        String finalUidPasado = uidPasado;
+
+        comprobarLike(finalUidPasado, uidUser);
+
+        btnLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                darLike(finalUidPasado, uidUser);
+            }
+        });
+
         return root;
+    }
+
+    private void comprobarLike(String uidPerfil, String miUid) {
+        db.collection("perfiles").document(uidPerfil)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        List<String> likes = (List<String>) documentSnapshot.get("likes");
+
+                        if (likes != null && likes.contains(miUid)) {
+                            btnLike.setText("❤\uFE0F Quitar Like");
+                        } else {
+                            btnLike.setText("❤\uFE0F Dar Like");
+                        }
+                    } else {
+                        showToast("Perfil no encontrado");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    showToast("Error al obtener el perfil");
+                })
+                .addOnCompleteListener(task -> {
+                });
+    }
+
+
+    private void darLike(String uidPerfil, String miUid) {
+        db.collection("perfiles").document(uidPerfil)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        List<String> likes = (List<String>) documentSnapshot.get("likes");
+
+                        if (likes == null) {
+                            likes = new ArrayList<>();
+                        }
+
+                        boolean yaDioLike = likes.contains(miUid);
+
+                        if (yaDioLike) {
+                            likes.remove(miUid);
+                        } else {
+                            likes.add(miUid);
+                        }
+
+                        db.collection("perfiles").document(uidPerfil)
+                                .update("likes", likes)
+                                .addOnSuccessListener(aVoid -> {
+                                    if (yaDioLike) {
+                                        btnLike.setText("❤\uFE0F Dar Like");
+                                        showToast("Has quitado el like");
+                                    } else {
+                                        btnLike.setText("❤\uFE0F Quitar Like");
+                                        showToast("Has dado like");
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    showToast("Error al actualizar el like");
+                                });
+                    } else {
+                        showToast("Perfil no encontrado");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    showToast("Error al obtener el perfil");
+                })
+                .addOnCompleteListener(task -> {
+                });
     }
 
     private void mostrarLoader() {

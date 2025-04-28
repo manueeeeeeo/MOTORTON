@@ -1,5 +1,6 @@
 package com.clase.motorton.adaptadores;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -52,6 +53,7 @@ public class EventosAdapter extends RecyclerView.Adapter<EventosAdapter.ViewHold
         return new ViewHolder(view);
     }
 
+    @SuppressLint("RecyclerView")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         // Obtengo en un evento el objeto elegido
@@ -71,9 +73,11 @@ public class EventosAdapter extends RecyclerView.Adapter<EventosAdapter.ViewHold
         if (evento.getOrganizador() != null && evento.getOrganizador().equals(currentUserId)) {
             // En caso de ser el mismo activamos el botón de editar
             holder.botonEditar.setVisibility(View.VISIBLE);
+            holder.botonBorrar.setVisibility(View.VISIBLE);
         } else { // En caso de ser otro
             // Ocultamos el botón de editar
             holder.botonEditar.setVisibility(View.GONE);
+            holder.botonBorrar.setVisibility(View.GONE);
         }
 
         // Accedemos a la colección de eventos
@@ -178,6 +182,60 @@ public class EventosAdapter extends RecyclerView.Adapter<EventosAdapter.ViewHold
                 navController.navigate(R.id.navigation_info_evento, bundle);
             }
         });
+
+        holder.botonEditar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Bundle bundle = new Bundle();
+                bundle.putString("eventoId", evento.getId());
+
+                NavController navController = Navigation.findNavController(view);
+                navController.navigate(R.id.navigation_editar_evento, bundle);
+            }
+        });
+
+        holder.botonBorrar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                eliminarEvento(evento, position);
+            }
+        });
+    }
+
+    private void eliminarEvento(Evento evento, int position){
+        new androidx.appcompat.app.AlertDialog.Builder(context)
+                .setTitle("Confirmar eliminación")
+                .setMessage("¿Estás seguro de que quieres eliminar este evento?")
+                .setPositiveButton("Eliminar", (dialog, which) -> {
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    db.collection("eventos")
+                            .whereEqualTo("id", evento.getId())
+                            .get()
+                            .addOnSuccessListener(queryDocumentSnapshots -> {
+                                if (!queryDocumentSnapshots.isEmpty()) {
+                                    DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get(0);
+                                    String eventoId = documentSnapshot.getId();
+                                    db.collection("eventos").document(eventoId)
+                                            .delete()
+                                            .addOnSuccessListener(aVoid -> {
+                                                eventoList.remove(position);
+                                                notifyItemRemoved(position);
+                                                notifyItemRangeChanged(position, eventoList.size());
+                                                Toast.makeText(context, "Evento eliminado", Toast.LENGTH_SHORT).show();
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                Toast.makeText(context, "Error al eliminar el evento", Toast.LENGTH_SHORT).show();
+                                            });
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(context, "Error al buscar el evento para eliminar", Toast.LENGTH_SHORT).show();
+                            });
+                })
+                .setNegativeButton("Cancelar", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .show();
     }
 
     @Override
@@ -187,7 +245,7 @@ public class EventosAdapter extends RecyclerView.Adapter<EventosAdapter.ViewHold
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView nombre, tipoEvento, fecha;
-        ImageView imagenEvento, botonEditar;
+        ImageView imagenEvento, botonEditar, botonBorrar;
         Button botonApuntarse, botonVerMas;
         ProgressBar progressBar;
 
@@ -200,7 +258,8 @@ public class EventosAdapter extends RecyclerView.Adapter<EventosAdapter.ViewHold
             fecha = itemView.findViewById(R.id.fechaEvento);
             botonApuntarse = itemView.findViewById(R.id.botonApuntarse);
             botonVerMas = itemView.findViewById(R.id.botonVerMas);
-            botonEditar = itemView.findViewById(R.id.botonEditar);
+            botonEditar = itemView.findViewById(R.id.imageViewEditarEvento);
+            botonBorrar = itemView.findViewById(R.id.imageViewEliminarEvento);
         }
     }
 }

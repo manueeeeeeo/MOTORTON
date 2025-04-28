@@ -1,10 +1,16 @@
 package com.clase.motorton;
 
+import static com.clase.motorton.notifications.FirebaseNotificationDaily.suscribirAnotificacionDiaria;
+
 import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.clase.motorton.notifications.FirebaseNotificationDaily;
+import com.clase.motorton.notifications.NotificacionReceiver;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -47,35 +53,32 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        configurarNotificacionDiariaConWorkManager(getApplicationContext());
+        programarNotificacionDiaria();
+
+        FirebaseNotificationDaily.suscribirAnotificacionDiaria(this);
     }
 
-    private static void configurarNotificacionDiariaConWorkManager(android.content.Context context) {
-        long delay = calcularDelayProximaNotificacion();
-
-        PeriodicWorkRequest notificacionDiaria =
-                new PeriodicWorkRequest.Builder(com.clase.motorton.notifications.NotificacionDiariaWorker.class, 1, TimeUnit.DAYS)
-                        .setInitialDelay(delay, TimeUnit.MILLISECONDS)
-                        .build();
-
-        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-                "notificacion_diaria",
-                ExistingPeriodicWorkPolicy.KEEP,
-                notificacionDiaria
-        );
-    }
-
-    private static long calcularDelayProximaNotificacion() {
+    private void programarNotificacionDiaria() {
         Calendar calendar = Calendar.getInstance();
-        Calendar ahora = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 17);
-        calendar.set(Calendar.MINUTE, 30);
+        calendar.set(Calendar.HOUR_OF_DAY, 19);
+        calendar.set(Calendar.MINUTE, 15);
         calendar.set(Calendar.SECOND, 0);
 
-        if (calendar.before(ahora)) {
+        if (calendar.before(Calendar.getInstance())) {
             calendar.add(Calendar.DAY_OF_YEAR, 1);
         }
 
-        return calendar.getTimeInMillis() - ahora.getTimeInMillis();
+        android.app.AlarmManager alarmManager = (android.app.AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, NotificacionReceiver.class);
+        android.app.PendingIntent pendingIntent = android.app.PendingIntent.getBroadcast(this, 0, intent, android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE);
+
+        if (alarmManager != null) {
+            alarmManager.setRepeating(
+                    android.app.AlarmManager.RTC_WAKEUP,
+                    calendar.getTimeInMillis(),
+                    android.app.AlarmManager.INTERVAL_DAY,
+                    pendingIntent
+            );
+        }
     }
 }

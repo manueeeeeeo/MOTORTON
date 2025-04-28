@@ -428,7 +428,8 @@ public class CreacionPerfil extends AppCompatActivity {
           new ArrayList<>(),
           fotoBitmap,
           descripcion,
-          anosPermiso.isEmpty() ? 0 : Integer.parseInt(anosPermiso)
+          anosPermiso.isEmpty() ? 0 : Integer.parseInt(anosPermiso),
+          new ArrayList<>()
         );
 
         // Creamos un nuevo Map para darle los nombres y los valores a los documentos dentro de la colección
@@ -457,6 +458,8 @@ public class CreacionPerfil extends AppCompatActivity {
         perfilMap.put("fotoPerfil", fotoPerfilBase64);
         // Guardamos la descripción del usuario
         perfilMap.put("descripcion", perfil.getDescripcion());
+        // Guardamos la lista de likes del usuario
+        perfilMap.put("likes", perfil.getUsuariosLikeYou());
 
         // Obtenemos en una variable el username a querer ingresar
         String usernameNuevo = perfilMap.get("username").toString();

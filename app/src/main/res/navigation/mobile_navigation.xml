@@ -53,4 +53,10 @@
         android:name="com.clase.motorton.ui.perfil.InfoOtroPerfilFragment"
         android:label="@string/title_info_orto_perfil"
         tools:layout="@layout/fragment_info_otro_perfil" />
+
+    <fragment
+        android:id="@+id/navigation_editar_evento"
+        android:name="com.clase.motorton.ui.eventos.EditarEventoFragment"
+        android:label="@string/title_editar_evento"
+        tools:layout="@layout/fragment_editar_evento" />
 </navigation>
