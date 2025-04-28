@@ -67,21 +67,10 @@ public class EditarEventoFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
 
         // Obtenemos referencias a los elementos de la interfaz
-        editTextDescripcion = view.findViewById(R.id.editTextDescripcion);
-        datePickerFecha = view.findViewById(R.id.datePickerFecha);
-        buttonCrearEvento = view.findViewById(R.id.buttonActualizarEvento);
-        tituloEvento = view.findViewById(R.id.textViewTituloEventoAc);
-
-        if (getArguments() != null) {
-            String eventoId = getArguments().getString("eventoId");
-            if (eventoId != null) {
-                cargarEvento(eventoId);
-            } else {
-                showToast("Error: No se recibió el ID del evento");
-            }
-        } else {
-            showToast("Error: Argumentos nulos");
-        }
+        editTextDescripcion = (EditText) view.findViewById(R.id.editTextDescripcion);
+        datePickerFecha = (DatePicker) view.findViewById(R.id.datePickerFecha);
+        buttonCrearEvento = (Button) view.findViewById(R.id.buttonActualizarEvento);
+        tituloEvento = (TextView) view.findViewById(R.id.textViewTituloEventoAc);
 
         // Inicializo el cifrador de datos
         cifrar = new CifradoDeDatos();
@@ -94,6 +83,17 @@ public class EditarEventoFragment extends Fragment {
                 actualizarEvento();
             }
         });
+
+        if (getArguments() != null && getArguments().containsKey("eventoId")) {
+            String eventId = getArguments().getString("eventoId");
+            if (eventId != null) {
+                cargarEvento(eventId);
+            } else {
+                showToast("Error: No se recibió el ID del evento");
+            }
+        } else {
+            showToast("Error: Argumentos nulos");
+        }
 
         return view;
     }
@@ -114,6 +114,14 @@ public class EditarEventoFragment extends Fragment {
                         editTextDescripcion.setText(descripcion);
 
                         if (fecha != null) {
+                            fecha = fecha.replace("\u202F", " ");
+
+                            if (fecha.contains("UTC")) {
+                                fecha = fecha.substring(0, fecha.indexOf("UTC")).trim();
+                            }
+
+                            fecha = fecha.replace("a.m.", "a. m.").replace("p.m.", "p. m.");
+
                             SimpleDateFormat formatoEntrada = new SimpleDateFormat("d 'de' MMMM 'de' yyyy, hh:mm:ss a", new Locale("es", "ES"));
 
                             try {
