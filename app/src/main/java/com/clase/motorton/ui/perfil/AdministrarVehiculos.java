@@ -13,6 +13,8 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -79,6 +81,15 @@ public class AdministrarVehiculos extends AppCompatActivity {
     private Toast mensajeToast = null;
     // Variable para almacenar el modelo
     private String modeloVehi = "";
+    private String tubo = null;
+    private String ruedas = null;
+    private String aleron = null;
+    private int choques = 0;
+    private double cv = 0.0;
+    private double maxVe = 0.0;
+    private boolean luces = false;
+    private boolean bodykit = false;
+    private String foto = null;
 
     // Variable para manejar la autentificación del usuario
     private FirebaseAuth auth = null;
@@ -97,6 +108,8 @@ public class AdministrarVehiculos extends AppCompatActivity {
     // Variable para guardar y manejar todos los modelos
     private List<String> modelos = new ArrayList<>();
 
+    private ActivityResultLauncher<Intent> modificarVehiculoLauncher = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,6 +125,26 @@ public class AdministrarVehiculos extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        modificarVehiculoLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK) {
+                        Intent data = result.getData();
+                        if (data != null) {
+                            tubo = data.getStringExtra("tubo");
+                            ruedas = data.getStringExtra("ruedas");
+                            aleron = data.getStringExtra("aleron");
+                            choques = data.getIntExtra("choques", 0);
+                            cv = data.getDoubleExtra("cv", 0.0);
+                            maxVe = data.getDoubleExtra("maxVe", 0.0);
+                            luces = data.getBooleanExtra("luces", false);
+                            bodykit = data.getBooleanExtra("bodykit", false);
+                            foto = data.getStringExtra("foto");
+                        }
+                    }
+                }
+        );
 
         // Obtengo el spinner de tipo de vehículo de la inetrfaz
         spinnerTipo = findViewById(R.id.spinnerTipo);
@@ -224,7 +257,7 @@ public class AdministrarVehiculos extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(AdministrarVehiculos.this, ModificacionesVehiculo.class);
-                startActivity(i);
+                modificarVehiculoLauncher.launch(i);
             }
         });
     }
