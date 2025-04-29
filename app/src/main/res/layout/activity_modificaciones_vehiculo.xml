@@ -312,7 +312,7 @@
         app:layout_constraintVertical_bias="0.976" />
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/imageViewVehiculo"
         android:layout_width="102dp"
         android:layout_height="111dp"
         app:layout_constraintBottom_toBottomOf="parent"
