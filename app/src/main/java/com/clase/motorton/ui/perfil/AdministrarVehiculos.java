@@ -280,7 +280,23 @@ public class AdministrarVehiculos extends AppCompatActivity {
         // Obtengo en una variable el uid del usuario autenticado
         String uid = auth.getCurrentUser().getUid();
         // Creo un objeto de tio vehículo e inicializo todas las variables
-        Vehiculo vehiculo = new Vehiculo(uid, matricula, marca, modeloVehi, anos, export, descrip, tipoVehiculo);
+        Vehiculo vehiculo = new Vehiculo(uid,
+                matricula,
+                marca,
+                modeloVehi,
+                anos,
+                export,
+                descrip,
+                tipoVehiculo,
+                tubo,
+                ruedas,
+                aleron,
+                null,
+                bodykit,
+                luces,
+                maxVe,
+                foto,
+                choques);
 
         // Procedo a guardar el vehículo en la colección "vehiculos"
         db.collection("vehiculos").document(matricula).set(vehiculo)
