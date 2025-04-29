@@ -1,9 +1,14 @@
 package com.clase.motorton.ui.perfil;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
@@ -13,6 +18,8 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -34,8 +41,8 @@ public class ModificacionesVehiculo extends AppCompatActivity {
     private EditText editAleron = null;
     private EditText editChoques = null;
     private ImageView fotoVehiculo = null;
-    private Switch spinnerBodyKit = null;
-    private Switch spinnerLucesLed = null;
+    private Switch switchBodyKit = null;
+    private Switch switchLucesLed = null;
 
     private boolean luces = false;
     private boolean bodykit = false;
@@ -55,6 +62,40 @@ public class ModificacionesVehiculo extends AppCompatActivity {
     private Context context = null;
     // Variable manejar todos los Toast de está actividad
     private Toast mensajeToast = null;
+
+    // Variable para manejar el código de solicitud de permisos
+    private static final int PERMISSION_REQUEST_CODE = 100;
+
+    // Lanzador de actividad para obtener el resultado de la foto hecha con la camara
+    private final ActivityResultLauncher<Intent> cameraResult =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK) { // En caso de que el resultado sea OK
+                    // Obtengo en una variable el resultado data obtenido con el Intent
+                    Intent data = result.getData();
+                    // Comprobamos que la data no sea nula
+                    if (data != null) { // En caso de no ser nulo
+                        Bitmap photo = (Bitmap) data.getExtras().get("data");
+                        // Establezco la imagen uri en el componente de ImageView
+                        fotoVehiculo.setImageBitmap(photo);
+                    }
+                }
+            });
+
+    // Lanzador de actividad para obtener el resultado de la foto escogida de galeria
+    private final ActivityResultLauncher<Intent> galleryResult =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK) { // En caso de que el resultado sea OK
+                    // Obtengo en una variable el resultado data obtenido con el Intent
+                    Intent data = result.getData();
+                    // Comprobamos que la data no sea nula
+                    if (data != null) { // En caso de no ser nulo
+                        // Obtengo en una variable de tipo Uri la data
+                        Uri imageUri = data.getData();
+                        // Establezco la imagen uri en el componente de ImageView
+                        fotoVehiculo.setImageURI(imageUri);
+                    }
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,8 +120,8 @@ public class ModificacionesVehiculo extends AppCompatActivity {
         editMaxVel = (EditText) findViewById(R.id.edittMaxVel);
         editTuboEscape = (EditText) findViewById(R.id.editTuboEscape);
         fotoVehiculo = (ImageView) findViewById(R.id.imageViewVehiculo);
-        spinnerBodyKit = (Switch) findViewById(R.id.switchBodyKit);
-        spinnerLucesLed = (Switch) findViewById(R.id.switchLuces);
+        switchBodyKit = (Switch) findViewById(R.id.switchBodyKit);
+        switchLucesLed = (Switch) findViewById(R.id.switchLuces);
 
         btnVolver.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,7 +133,7 @@ public class ModificacionesVehiculo extends AppCompatActivity {
         btnGuardarCambios.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                guardarDatosModificaciones();
             }
         });
     }
@@ -104,6 +145,8 @@ public class ModificacionesVehiculo extends AppCompatActivity {
         choques = Integer.parseInt(editChoques.getText().toString());
         cv = Double.parseDouble(editCv.getText().toString());
         maxVe = Double.parseDouble(editMaxVel.getText().toString());
+        luces = switchLucesLed.isChecked();
+        bodykit = switchBodyKit.isChecked();
 
         // Obtenemos en una variable el recurso que se ha puesto en la imageview de la imagen de perfil
         BitmapDrawable drawable = (BitmapDrawable) fotoVehiculo.getDrawable();
@@ -122,6 +165,63 @@ public class ModificacionesVehiculo extends AppCompatActivity {
             // Y guardamos en la variable antes creado la codificación en base64
             foto = Base64.encodeToString(fotoBytes, Base64.DEFAULT);
         }
+
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("tubo", tubo);
+        resultIntent.putExtra("aleron", aleron);
+        resultIntent.putExtra("ruedas", ruedas);
+        resultIntent.putExtra("choques", choques);
+        resultIntent.putExtra("cv", cv);
+        resultIntent.putExtra("maxVe", maxVe);
+        resultIntent.putExtra("luces", luces);
+        resultIntent.putExtra("bodykit", bodykit);
+        resultIntent.putExtra("foto", foto);
+
+        setResult(RESULT_OK, resultIntent);
+        finish();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+                    grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                showImagePickerDialog();
+            } else {
+                showToast("Permisos necesarios no otorgados");
+            }
+        }
+    }
+
+    /**
+     * Método en el que mostramos al usuario un
+     * dialogo para que él, eliga de donde quiere sacar
+     * la imagen para su perfil, o desde camara o desde
+     * galeria
+     */
+    private void showImagePickerDialog() {
+        // Variable en donde cargamos todas las opciones a la hora de subir la foto
+        CharSequence[] options = {"Tomar Foto", "Elegir de Galería"};
+
+        // Creo un nuevo dialogo de alerta
+        new AlertDialog.Builder(ModificacionesVehiculo.this)
+                .setTitle("Elegir Imagen") // Establecemos el título
+                .setItems(options, (dialog, which) -> {
+                    // Utilizamos un if para comprobar la opción que eligio el usuario
+                    if (which == 0) { // En caso de ser la opción 0 (Foto de la Camara)
+                        // Creamos un intent para abrir la camara dentro de nuestra app
+                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        // Al lanzar obtenemos el resultado de la camara
+                        cameraResult.launch(takePictureIntent);
+                    } else if (which == 1) { // En caso de ser la opción 1 (Foto de la Galeria)
+                        // Creamos un intent para abrir la galeria y elegir una foto de la misma
+                        Intent pickPhotoIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        // Al lanzar obtenemos el resultado de la galeri
+                        galleryResult.launch(pickPhotoIntent);
+                    }
+                })
+                .show(); // Mostramos el dialogo
     }
 
     /**
