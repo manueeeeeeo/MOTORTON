@@ -21,6 +21,8 @@ import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -134,6 +136,22 @@ public class ModificacionesVehiculo extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 guardarDatosModificaciones();
+            }
+        });
+
+        fotoVehiculo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (ContextCompat.checkSelfPermission(ModificacionesVehiculo.this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+                        ContextCompat.checkSelfPermission(ModificacionesVehiculo.this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+                    ActivityCompat.requestPermissions(ModificacionesVehiculo.this,
+                            new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.READ_EXTERNAL_STORAGE},
+                            PERMISSION_REQUEST_CODE);
+                } else { // En caso de tener los permisos concedidos
+                    // Llamamos al método para mostrar el dialogo de elegir de donde sacar la foto
+                    showImagePickerDialog();
+                }
             }
         });
     }
