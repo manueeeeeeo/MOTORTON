@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -53,6 +54,7 @@ public class AdministrarVehiculos extends AppCompatActivity {
     private Spinner spinnerModelo = null;
     // Variable para manejar el switch de si es exportado o no el vehículo
     private Switch esExportado = null;
+    private ImageView btnModi = null;
 
     // Variable para manejar el adaptador con iconos del spinner
     private SpinnerAdapter adaptador = null;
@@ -128,6 +130,7 @@ public class AdministrarVehiculos extends AppCompatActivity {
         btnContinuar = findViewById(R.id.btnProseguir);
         btnBorrar = findViewById(R.id.btnBorrarV);
         spinnerModelo = findViewById(R.id.spinnerModelo);
+        btnModi = findViewById(R.id.imagebtnModificaciones);
 
         // Obtengo el contexto
         context = this;
@@ -214,6 +217,14 @@ public class AdministrarVehiculos extends AppCompatActivity {
             public void onClick(View view) {
                 // Llamo al método para limpiar los campos
                 limpiarCampos();
+            }
+        });
+
+        btnModi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(AdministrarVehiculos.this, ModificacionesVehiculo.class);
+                startActivity(i);
             }
         });
     }
