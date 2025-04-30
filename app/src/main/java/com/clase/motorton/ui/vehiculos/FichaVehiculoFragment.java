@@ -1,9 +1,12 @@
 package com.clase.motorton.ui.vehiculos;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +47,7 @@ public class FichaVehiculoFragment extends Fragment {
     private TextView choques = null;
 
     private Toast mensajeToast = null;
+    private String fotoV = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -96,6 +100,8 @@ public class FichaVehiculoFragment extends Fragment {
                             ruedas.setText(veh.getRuedas());
                             aleron.setText(veh.getAleron());
                             cv.setText("Potencia: "+veh.getCv()+" CV");
+                            anos.setText(veh.getAnos());
+                            fotoV = veh.getFoto();
 
                             if(veh.isBodyKit()){
                                 bodyKit.setText("Lleva Body Kit");
@@ -114,6 +120,20 @@ public class FichaVehiculoFragment extends Fragment {
                             }else{
                                 exportado.setText("No Exportado");
                             }
+
+                            // Comprobamos que la foto de perfil no sea nula o esté vacía
+                            if (fotoV != null && !fotoV.isEmpty()) { // En caso de no estar vacía
+                                // Creo un bitmap de lo obtenido en la decodificación de base64 a bitmap
+                                Bitmap bitmap = convertirBase64AImagen(fotoV);
+                                if (bitmap != null) { // En caso de que el bitmap esté vacío
+                                    imagenVehiculo.setImageBitmap(bitmap);
+                                } else { // En caso de estar vacía
+                                    imagenVehiculo.setImageResource(R.drawable.icono);
+                                }
+                            } else { // En caso de que la foto sea nula o esté vacía
+                                // Establecemos en el imageview el recurso de imagen por defecto del icono de la app
+                                imagenVehiculo.setImageResource(R.drawable.icono);
+                            }
                         }
                     } else {
                         marcaYModelo.setText("Vehiculo no encontrado.");
@@ -122,6 +142,34 @@ public class FichaVehiculoFragment extends Fragment {
                 .addOnFailureListener(e -> {
                     marcaYModelo.setText("Error al cargar el vehículo.");
                 });
+    }
+
+    /**
+     * @return
+     * @param base64String
+     * Método en donde pasamos una cadena y procedemos a convertir
+     * el texto en base 64 a un bitmap legible para establecerle
+     * en un imageview
+     */
+    private Bitmap convertirBase64AImagen(String base64String) {
+        // Utilizamos un try catch para capturar y tratar las posibles excepciones
+        try {
+            // Remplazo algunos parametros para evitar errores al descifrar la imagen
+            base64String = base64String.replace("\n", "").replace("\r", "");
+
+            // Genero un conjutno de bytes en donde decodifico la cadena
+            byte[] decodedString = Base64.decode(base64String, Base64.DEFAULT);
+
+            // Retornamos la descodificación de texto a bitmap
+            return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        } catch (IllegalArgumentException e) { // En caso de que surja alguna excepción
+            // Imprimimos por consola la excepción
+            e.printStackTrace();
+            // Lanzamos un Toast indicando que ocurrió un error
+            showToast("Error al convertir imagen Base64");
+            // Retornamos nulo
+            return null;
+        }
     }
 
     /**
