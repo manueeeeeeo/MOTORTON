@@ -100,7 +100,7 @@ public class FichaVehiculoFragment extends Fragment {
                             ruedas.setText(veh.getRuedas());
                             aleron.setText(veh.getAleron());
                             cv.setText("Potencia: "+veh.getCv()+" CV");
-                            anos.setText(veh.getAnos());
+                            anos.setText(String.valueOf(veh.getAnos()));
                             fotoV = veh.getFoto();
 
                             if(veh.isBodyKit()){
