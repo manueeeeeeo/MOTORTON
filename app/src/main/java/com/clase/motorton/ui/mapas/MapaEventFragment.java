@@ -83,29 +83,41 @@ public class MapaEventFragment extends Fragment {
         MapEventsReceiver mReceive = new MapEventsReceiver() {
             @Override
             public boolean singleTapConfirmedHelper(GeoPoint p) {
-                // Comprobamos que la marca inicial sea nula
-                if (startMarker == null) {
-                    // Inicializamos el marcador
-                    startMarker = new Marker(map);
-                    // Establecemos la posición en el marcador
-                    startMarker.setPosition(p);
-                    // Establecemos el título
-                    startMarker.setTitle("Punto de inicio");
-                    // Marcamos en el mapa el marcador
-                    map.getOverlays().add(startMarker);
-                } else if (endMarker == null) { // Comprobamos que la marca final sea nula
-                    // Inicializamos el marcador
-                    endMarker = new Marker(map);
-                    // Establecemos la posición en el marcador
-                    endMarker.setPosition(p);
-                    // Establecemos el título
-                    endMarker.setTitle("Punto de fin");
-                    // Marcamos en el mapa el marcador
-                    map.getOverlays().add(endMarker);
+                if(tipoSeleccion.equals("ruta")){
+                    // Comprobamos que la marca inicial sea nula
+                    if (startMarker == null) {
+                        // Inicializamos el marcador
+                        startMarker = new Marker(map);
+                        // Establecemos la posición en el marcador
+                        startMarker.setPosition(p);
+                        // Establecemos el título
+                        startMarker.setTitle("Punto de inicio");
+                        // Marcamos en el mapa el marcador
+                        map.getOverlays().add(startMarker);
+                    } else if (endMarker == null) { // Comprobamos que la marca final sea nula
+                        // Inicializamos el marcador
+                        endMarker = new Marker(map);
+                        // Establecemos la posición en el marcador
+                        endMarker.setPosition(p);
+                        // Establecemos el título
+                        endMarker.setTitle("Punto de fin");
+                        // Marcamos en el mapa el marcador
+                        map.getOverlays().add(endMarker);
 
-                    // Llamamos al método para dibujar la línea de la ruta
-                    dibujarLineaRuta();
+                        // Llamamos al método para dibujar la línea de la ruta
+                        dibujarLineaRuta();
+                    }
+                }else{
+                    if (startMarker != null) {
+                        map.getOverlays().remove(startMarker);
+                    }
+
+                    startMarker = new Marker(map);
+                    startMarker.setPosition(p);
+                    startMarker.setTitle("Ubicación del evento");
+                    map.getOverlays().add(startMarker);
                 }
+
                 // Invalidamos el mapa
                 map.invalidate();
                 // Retornamos true
@@ -124,28 +136,30 @@ public class MapaEventFragment extends Fragment {
 
         // Establecemos la acción que sucede al pulsar el botón de confirmar la ruta
         btnConfirmarRuta.setOnClickListener(v -> {
-            // Comprobamos que los marcadores sean o no nulos
-            if (startMarker != null && endMarker != null) { // En caso de que las marcas no sean nulas
-                // Creamos un nuevo bundle
-                Bundle bundle = new Bundle();
-                // Establecemos todos los datos de las coordenadas
-                bundle.putDouble("startLat", startMarker.getPosition().getLatitude());
-                // Establecemos todos los datos de las coordenadas
-                bundle.putDouble("startLon", startMarker.getPosition().getLongitude());
-                // Establecemos todos los datos de las coordenadas
-                bundle.putDouble("endLat", endMarker.getPosition().getLatitude());
-                // Establecemos todos los datos de las coordenadas
-                bundle.putDouble("endLon", endMarker.getPosition().getLongitude());
+            Bundle bundle = new Bundle();
 
-                // Pasamos al nuevo fragmento el bundle establecido
-                getParentFragmentManager().setFragmentResult("rutaSeleccionada", bundle);
-
-                // Utilizamos la navegación para pasar a otro fragmento
-                Navigation.findNavController(view).navigate(R.id.navigation_createEvent, bundle);
-            } else { // En caso de que las marcas sean nulas
-                // Lanzamos un toast indicando al usuario que ha de tener inicio y final
-                showToast("Selecciona inicio y fin");
+            if (tipoSeleccion.equals("ruta")) {
+                if (startMarker != null && endMarker != null) {
+                    bundle.putDouble("startLat", startMarker.getPosition().getLatitude());
+                    bundle.putDouble("startLon", startMarker.getPosition().getLongitude());
+                    bundle.putDouble("endLat", endMarker.getPosition().getLatitude());
+                    bundle.putDouble("endLon", endMarker.getPosition().getLongitude());
+                } else {
+                    showToast("Selecciona inicio y fin");
+                    return;
+                }
+            } else {
+                if (startMarker != null) {
+                    bundle.putDouble("ubicacionLat", startMarker.getPosition().getLatitude());
+                    bundle.putDouble("ubicacionLon", startMarker.getPosition().getLongitude());
+                } else {
+                    showToast("Selecciona la ubicación del evento");
+                    return;
+                }
             }
+
+            getParentFragmentManager().setFragmentResult("rutaSeleccionada", bundle);
+            Navigation.findNavController(view).navigate(R.id.navigation_createEvent, bundle);
         });
 
         // Establecemos la acción que sucede al pulsar el botón de borrar la ruta
