@@ -235,36 +235,32 @@ public class CreateEventFragment extends Fragment {
             }
         });
 
-        // Obtenemos si hay datos pasados de un fragmento a otro
         getParentFragmentManager().setFragmentResultListener("rutaSeleccionada", this, (key, bundle) -> {
-            // Obtengo el dato pasado que es un double
             double startLat = bundle.getDouble("startLat", Double.NaN);
-            // Obtengo el dato pasado que es un double
             double startLon = bundle.getDouble("startLon", Double.NaN);
-            // Obtengo el dato pasado que es un double
             double endLat = bundle.getDouble("endLat", Double.NaN);
-            // Obtengo el dato pasado que es un double
             double endLon = bundle.getDouble("endLon", Double.NaN);
+            double ubicacionLat = bundle.getDouble("ubicacionLat", Double.NaN);
+            double ubicacionLon = bundle.getDouble("ubicacionLon", Double.NaN);
 
-            // Compruebo que sean números y no estén vacíos
-            if (Double.isNaN(startLat) || Double.isNaN(startLon) || Double.isNaN(endLat) || Double.isNaN(endLon)) { // En caso negativo
-                // Lanzo un toast indicando que las coordenadas de la ruta no son válidas
-                showToast("Error: coordenadas de la ruta no válidas");
-                // Retornamos para no proseguir
-                return;
+            if (!Double.isNaN(startLat) && !Double.isNaN(startLon) &&
+                    !Double.isNaN(endLat) && !Double.isNaN(endLon)) {
+                // Caso RUTA
+                this.latInicio = startLat;
+                this.lonInicio = startLon;
+                this.latFin = endLat;
+                this.lonFin = endLon;
+
+            } else if (!Double.isNaN(ubicacionLat) && !Double.isNaN(ubicacionLon)) {
+                // Caso UBICACIÓN ÚNICA
+                this.latInicio = ubicacionLat;
+                this.lonInicio = ubicacionLon;
+                this.latFin = Double.NaN;
+                this.lonFin = Double.NaN;
+
+            } else {
+                showToast("Error: No se recibieron coordenadas válidas");
             }
-
-            // Inicializo el valor de inicio de la latitud
-            this.latInicio = startLat;
-            // Inicializo el valor de inicio de la longitud
-            this.lonInicio = startLon;
-            // Inicializo el valor de final de la latidud
-            this.latFin = endLat;
-            // Inicializo el valor de final de la longitud
-            this.lonFin = endLon;
-
-            // Llamamos al método para dibujar la ruta en el mapa
-            dibujarRuta(latInicio, lonInicio, latFin, lonFin);
         });
 
         return root;
