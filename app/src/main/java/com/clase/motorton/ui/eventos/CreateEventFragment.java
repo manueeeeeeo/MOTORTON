@@ -80,6 +80,8 @@ public class CreateEventFragment extends Fragment {
     // Variable para manejar los Toast de está actividad
     private Toast mensajeToast= null;
 
+    private String tipoEvento = null;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -199,15 +201,10 @@ public class CreateEventFragment extends Fragment {
                 // Obtengo el item elegido
                 String selectedItem = parentView.getItemAtPosition(position).toString();
 
-                // Comprobamos si es una ruta o no
-                if ("Ruta Moto".equals(selectedItem) || "Ruta Coche".equals(selectedItem)) { // En caso de ser una ruta
-                    mapView.setVisibility(View.VISIBLE);
-                    btnIrRuta.setVisibility(View.VISIBLE);
-                } else { // En caso de ser otra opción
-                    // Mantenemos invisible el mapa
-                    mapView.setVisibility(View.GONE);
-                    // Mantenemos invisible el botón de ir a legir la ruta
-                    btnIrRuta.setVisibility(View.GONE);
+                if (selectedItem.contains("Ruta")) {
+                    tipoEvento = "ruta";
+                } else {
+                    tipoEvento = "otro";
                 }
             }
 
@@ -222,7 +219,13 @@ public class CreateEventFragment extends Fragment {
             public void onClick(View view) {
                 // Utilizamos un try catch para capturar y tratar todas las posibles excepciones
                 try {
-                    Navigation.findNavController(view).navigate(R.id.navigation_map_ruta);
+                    Bundle bundle = new Bundle();
+                    if(tipoEvento.equals("ruta")){
+                        bundle.putString("tipoSeleccion", "ruta");
+                    }else{
+                        bundle.putString("tipoSeleccion", "ubicacion");
+                    }
+                    Navigation.findNavController(view).navigate(R.id.navigation_map_ruta, bundle);
                 } catch (Exception e) { // En caso de que surja alguna excepción
                     // Imprimimos la excepción por consola
                     e.printStackTrace();
