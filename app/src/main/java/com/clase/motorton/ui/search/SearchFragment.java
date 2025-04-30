@@ -77,6 +77,10 @@ public class SearchFragment extends Fragment {
             public void afterTextChanged(Editable s) {}
         });
 
+        if (!lastQuery.isEmpty()) {
+            buscar(lastQuery);
+        }
+
         return root;
     }
 

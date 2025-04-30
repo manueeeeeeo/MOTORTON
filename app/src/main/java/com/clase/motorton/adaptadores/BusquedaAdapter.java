@@ -43,7 +43,7 @@ public class BusquedaAdapter extends RecyclerView.Adapter<BusquedaAdapter.ViewHo
         int icono = 0;
         if(item.getTipo().equals("perfil")){
             icono = R.drawable.icono_persona;
-        }else if(item.getTipo().equals("perfil")){
+        }else if(item.getTipo().equals("evento")){
             icono = R.drawable.icono_evento;
         }else{
             icono = R.drawable.icono_engine;
