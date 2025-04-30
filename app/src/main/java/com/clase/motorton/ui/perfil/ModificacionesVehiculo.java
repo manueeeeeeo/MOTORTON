@@ -28,6 +28,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.clase.motorton.R;
+import com.clase.motorton.modelos.FotoVehiculoTemporal;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -157,46 +158,51 @@ public class ModificacionesVehiculo extends AppCompatActivity {
     }
 
     private void guardarDatosModificaciones(){
-        tubo = editTuboEscape.getText().toString();
-        aleron = editAleron.getText().toString();
-        ruedas = editRuedas.getText().toString();
-        choques = Integer.parseInt(editChoques.getText().toString());
-        cv = Double.parseDouble(editCv.getText().toString());
-        maxVe = Double.parseDouble(editMaxVel.getText().toString());
-        luces = switchLucesLed.isChecked();
-        bodykit = switchBodyKit.isChecked();
+        try {
+            tubo = editTuboEscape.getText().toString();
+            aleron = editAleron.getText().toString();
+            ruedas = editRuedas.getText().toString();
+            choques = Integer.parseInt(editChoques.getText().toString());
+            cv = Double.parseDouble(editCv.getText().toString());
+            maxVe = Double.parseDouble(editMaxVel.getText().toString());
+            luces = switchLucesLed.isChecked();
+            bodykit = switchBodyKit.isChecked();
 
-        // Obtenemos en una variable el recurso que se ha puesto en la imageview de la imagen de perfil
-        BitmapDrawable drawable = (BitmapDrawable) fotoVehiculo.getDrawable();
-        // Obtenemos en una variable el bitmao de la imagen elegida
-        Bitmap fotoBitmap = drawable != null ? drawable.getBitmap() : null;
+            // Obtenemos en una variable el recurso que se ha puesto en la imageview de la imagen de perfil
+            BitmapDrawable drawable = (BitmapDrawable) fotoVehiculo.getDrawable();
+            // Obtenemos en una variable el bitmao de la imagen elegida
+            Bitmap fotoBitmap = drawable != null ? drawable.getBitmap() : null;
 
-        if (fotoBitmap != null) { // En caso de no ser nulo
-            // Creamos un array de bytes para comprimir la imagen
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            if (fotoBitmap != null) { // En caso de no ser nulo
+                // Creamos un array de bytes para comprimir la imagen
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-            // Procedemos a comprimmir la imagen a un 85% y además, le establecemos como un JPEG
-            fotoBitmap.compress(Bitmap.CompressFormat.JPEG, 85, baos);
+                // Procedemos a comprimmir la imagen a un 85% y además, le establecemos como un JPEG
+                fotoBitmap.compress(Bitmap.CompressFormat.JPEG, 85, baos);
 
-            // Creamos una cadena de bytes en donde almacenamos la imagen
-            byte[] fotoBytes = baos.toByteArray();
-            // Y guardamos en la variable antes creado la codificación en base64
-            foto = Base64.encodeToString(fotoBytes, Base64.DEFAULT);
+                // Creamos una cadena de bytes en donde almacenamos la imagen
+                byte[] fotoBytes = baos.toByteArray();
+                // Y guardamos en la variable antes creado la codificación en base64
+                foto = Base64.encodeToString(fotoBytes, Base64.DEFAULT);
+            }
+
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("tubo", tubo);
+            resultIntent.putExtra("aleron", aleron);
+            resultIntent.putExtra("ruedas", ruedas);
+            resultIntent.putExtra("choques", choques);
+            resultIntent.putExtra("cv", cv);
+            resultIntent.putExtra("maxVe", maxVe);
+            resultIntent.putExtra("luces", luces);
+            resultIntent.putExtra("bodykit", bodykit);
+            FotoVehiculoTemporal.setTempFotoBase64(foto);
+
+            setResult(RESULT_OK, resultIntent);
+        }catch (Exception e) {
+            showToast("Error guardando datos: " + e.getMessage());
+        } finally {
+            finish();
         }
-
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra("tubo", tubo);
-        resultIntent.putExtra("aleron", aleron);
-        resultIntent.putExtra("ruedas", ruedas);
-        resultIntent.putExtra("choques", choques);
-        resultIntent.putExtra("cv", cv);
-        resultIntent.putExtra("maxVe", maxVe);
-        resultIntent.putExtra("luces", luces);
-        resultIntent.putExtra("bodykit", bodykit);
-        resultIntent.putExtra("foto", foto);
-
-        setResult(RESULT_OK, resultIntent);
-        finish();
     }
 
     @Override

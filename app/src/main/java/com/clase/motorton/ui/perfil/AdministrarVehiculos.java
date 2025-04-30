@@ -25,6 +25,7 @@ import com.clase.motorton.R;
 import com.clase.motorton.adaptadores.SpinnerAdaptarNormal;
 import com.clase.motorton.adaptadores.SpinnerAdapter;
 import com.clase.motorton.api.ApiVehiculos;
+import com.clase.motorton.modelos.FotoVehiculoTemporal;
 import com.clase.motorton.modelos.Vehiculo;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -141,6 +142,7 @@ public class AdministrarVehiculos extends AppCompatActivity {
                             luces = data.getBooleanExtra("luces", false);
                             bodykit = data.getBooleanExtra("bodykit", false);
                             foto = data.getStringExtra("foto");
+                            foto = FotoVehiculoTemporal.getTempFotoBase64();
                         }
                     }
                 }
