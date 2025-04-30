@@ -16,6 +16,8 @@ import android.widget.Toast;
 
 import com.clase.motorton.R;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.util.GeoPoint;
@@ -24,7 +26,13 @@ import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +66,8 @@ public class MapaEventFragment extends Fragment {
         btnConfirmarRuta = view.findViewById(R.id.btnConfirmarRuta);
         btnBorrarRuta = view.findViewById(R.id.btnBorrarRuta);
         searchView = view.findViewById(R.id.searchView);
+
+        String tipoSeleccion = getArguments() != null ? getArguments().getString("tipoSeleccion", "ubicacion") : "ubicacion";
 
         // Configuramos para obtener la API de OSM
         Configuration.getInstance().setUserAgentValue(requireContext().getPackageName());
@@ -233,29 +243,61 @@ public class MapaEventFragment extends Fragment {
         }
     }
 
-    /**
-     * Método para dibujar la línea
-     * de la ruta para así poder mostrar
-     * al usuario la ruta que ha establecido
-     */
+    private void obtenerRutaConCallOSRM(GeoPoint start, GeoPoint end) {
+        new Thread(() -> {
+            try {
+                String urlString = "https://router.project-osrm.org/route/v1/driving/" +
+                        start.getLongitude() + "," + start.getLatitude() + ";" +
+                        end.getLongitude() + "," + end.getLatitude() +
+                        "?overview=full&geometries=geojson";
+
+                URL url = new URL(urlString);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+
+                InputStream inputStream = new BufferedInputStream(connection.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuilder result = new StringBuilder();
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
+                }
+
+                JSONObject json = new JSONObject(result.toString());
+                JSONArray coordinates = json.getJSONArray("routes")
+                        .getJSONObject(0)
+                        .getJSONObject("geometry")
+                        .getJSONArray("coordinates");
+
+                List<GeoPoint> geoPointsRuta = new ArrayList<>();
+                for (int i = 0; i < coordinates.length(); i++) {
+                    JSONArray coord = coordinates.getJSONArray(i);
+                    double lon = coord.getDouble(0);
+                    double lat = coord.getDouble(1);
+                    geoPointsRuta.add(new GeoPoint(lat, lon));
+                }
+
+                requireActivity().runOnUiThread(() -> {
+                    if (routeLine != null) map.getOverlayManager().remove(routeLine);
+
+                    routeLine = new Polyline();
+                    routeLine.setPoints(geoPointsRuta);
+                    map.getOverlayManager().add(routeLine);
+                    map.invalidate();
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                requireActivity().runOnUiThread(() -> showToast("Error al calcular ruta"));
+            }
+        }).start();
+    }
+
+
     private void dibujarLineaRuta() {
-        // Procedemos a comprobar si el marcador del inicio y del final no sean nulos
-        if (startMarker != null && endMarker != null) { // En caso de que no sean nulos
-            // Creamos una lista de geopuntos y la inicializamos
-            List<GeoPoint> geoPoints = new ArrayList<>();
-            // Agregamos los dos puntos
-            geoPoints.add(startMarker.getPosition());
-            geoPoints.add(endMarker.getPosition());
-
-            // Comprobamos que el polyline no sea nulo, en caso de no serlo, le eliminamos del mapa
-            if (routeLine != null) map.getOverlayManager().remove(routeLine);
-
-            // Inicializamos una nueva polyline para dibujar
-            routeLine = new Polyline();
-            // Establecemos la lista de puntos
-            routeLine.setPoints(geoPoints);
-            // Agregamos el dibujo al mapa
-            map.getOverlayManager().add(routeLine);
+        if (startMarker != null && endMarker != null) {
+            obtenerRutaConCallOSRM(startMarker.getPosition(), endMarker.getPosition());
         }
     }
 
