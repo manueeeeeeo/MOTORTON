@@ -77,6 +77,10 @@ public class SearchFragment extends Fragment {
             public void afterTextChanged(Editable s) {}
         });
 
+        if (!lastQuery.isEmpty()) {
+            buscar(lastQuery);
+        }
+
         return root;
     }
 
@@ -90,23 +94,20 @@ public class SearchFragment extends Fragment {
 
         progressBar.setVisibility(View.VISIBLE);
         resultadosMap.clear();
-        AtomicInteger consultasPendientes = new AtomicInteger(2);
+        AtomicInteger consultasPendientes = new AtomicInteger(3);
 
-        Query queryPerfiles = db.collection("perfiles")
-                .orderBy("username")
-                .startAt(texto).endAt(texto + "\uf8ff")
-                .limit(5);
+        Query queryPerfiles = db.collection("perfiles").limit(20);
 
-        Query queryEventos = db.collection("eventos")
-                .orderBy("nombre")
-                .startAt(texto).endAt(texto + "\uf8ff")
-                .limit(5);
+        Query queryEventos = db.collection("eventos").limit(20);
+
+        Query queryVehiculos = db.collection("vehiculos").limit(20);
 
         queryPerfiles.get().addOnSuccessListener(perfiles -> {
             for (DocumentSnapshot doc : perfiles.getDocuments()) {
                 String username = doc.getString("username");
                 String idPerfil = doc.getId();
-                if (username != null) {
+
+                if (username != null && username.toLowerCase().contains(texto.toLowerCase())) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         resultadosMap.putIfAbsent(username, new BusquedaItem(idPerfil, username, "perfil", null));
                     }
@@ -119,9 +120,24 @@ public class SearchFragment extends Fragment {
             for (DocumentSnapshot doc : eventos.getDocuments()) {
                 String nombreEvento = doc.getString("nombre");
                 String idEvento = doc.getString("id");
-                if (nombreEvento != null) {
+
+                if (nombreEvento != null && nombreEvento.toLowerCase().contains(texto.toLowerCase())) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         resultadosMap.putIfAbsent(nombreEvento, new BusquedaItem(idEvento, nombreEvento, "evento", null));
+                    }
+                }
+            }
+            actualizarResultados(consultasPendientes);
+        });
+
+        queryVehiculos.get().addOnSuccessListener(vehiculos -> {
+            for (DocumentSnapshot doc : vehiculos.getDocuments()) {
+                String matricula = doc.getString("matricula");
+                String idVehiculo = doc.getId();
+
+                if (matricula != null && matricula.toLowerCase().contains(texto.toLowerCase())) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        resultadosMap.putIfAbsent(matricula, new BusquedaItem(idVehiculo, matricula, "vehiculo", null));
                     }
                 }
             }

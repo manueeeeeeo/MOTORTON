@@ -7,11 +7,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -22,6 +25,7 @@ import com.clase.motorton.R;
 import com.clase.motorton.adaptadores.SpinnerAdaptarNormal;
 import com.clase.motorton.adaptadores.SpinnerAdapter;
 import com.clase.motorton.api.ApiVehiculos;
+import com.clase.motorton.modelos.FotoVehiculoTemporal;
 import com.clase.motorton.modelos.Vehiculo;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -53,6 +57,7 @@ public class AdministrarVehiculos extends AppCompatActivity {
     private Spinner spinnerModelo = null;
     // Variable para manejar el switch de si es exportado o no el vehículo
     private Switch esExportado = null;
+    private ImageView btnModi = null;
 
     // Variable para manejar el adaptador con iconos del spinner
     private SpinnerAdapter adaptador = null;
@@ -77,6 +82,15 @@ public class AdministrarVehiculos extends AppCompatActivity {
     private Toast mensajeToast = null;
     // Variable para almacenar el modelo
     private String modeloVehi = "";
+    private String tubo = null;
+    private String ruedas = null;
+    private String aleron = null;
+    private int choques = 0;
+    private double cv = 0.0;
+    private double maxVe = 0.0;
+    private boolean luces = false;
+    private boolean bodykit = false;
+    private String foto = null;
 
     // Variable para manejar la autentificación del usuario
     private FirebaseAuth auth = null;
@@ -95,6 +109,8 @@ public class AdministrarVehiculos extends AppCompatActivity {
     // Variable para guardar y manejar todos los modelos
     private List<String> modelos = new ArrayList<>();
 
+    private ActivityResultLauncher<Intent> modificarVehiculoLauncher = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,6 +126,27 @@ public class AdministrarVehiculos extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        modificarVehiculoLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK) {
+                        Intent data = result.getData();
+                        if (data != null) {
+                            tubo = data.getStringExtra("tubo");
+                            ruedas = data.getStringExtra("ruedas");
+                            aleron = data.getStringExtra("aleron");
+                            choques = data.getIntExtra("choques", 0);
+                            cv = data.getDoubleExtra("cv", 0.0);
+                            maxVe = data.getDoubleExtra("maxVe", 0.0);
+                            luces = data.getBooleanExtra("luces", false);
+                            bodykit = data.getBooleanExtra("bodykit", false);
+                            foto = data.getStringExtra("foto");
+                            foto = FotoVehiculoTemporal.getTempFotoBase64();
+                        }
+                    }
+                }
+        );
 
         // Obtengo el spinner de tipo de vehículo de la inetrfaz
         spinnerTipo = findViewById(R.id.spinnerTipo);
@@ -128,6 +165,7 @@ public class AdministrarVehiculos extends AppCompatActivity {
         btnContinuar = findViewById(R.id.btnProseguir);
         btnBorrar = findViewById(R.id.btnBorrarV);
         spinnerModelo = findViewById(R.id.spinnerModelo);
+        btnModi = findViewById(R.id.imagebtnModificaciones);
 
         // Obtengo el contexto
         context = this;
@@ -216,6 +254,14 @@ public class AdministrarVehiculos extends AppCompatActivity {
                 limpiarCampos();
             }
         });
+
+        btnModi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(AdministrarVehiculos.this, ModificacionesVehiculo.class);
+                modificarVehiculoLauncher.launch(i);
+            }
+        });
     }
 
     /**
@@ -236,7 +282,23 @@ public class AdministrarVehiculos extends AppCompatActivity {
         // Obtengo en una variable el uid del usuario autenticado
         String uid = auth.getCurrentUser().getUid();
         // Creo un objeto de tio vehículo e inicializo todas las variables
-        Vehiculo vehiculo = new Vehiculo(uid, matricula, marca, modeloVehi, anos, export, descrip, tipoVehiculo);
+        Vehiculo vehiculo = new Vehiculo(uid,
+                matricula,
+                marca,
+                modeloVehi,
+                anos,
+                export,
+                descrip,
+                tipoVehiculo,
+                tubo,
+                ruedas,
+                aleron,
+                null,
+                bodykit,
+                luces,
+                maxVe,
+                foto,
+                choques);
 
         // Procedo a guardar el vehículo en la colección "vehiculos"
         db.collection("vehiculos").document(matricula).set(vehiculo)

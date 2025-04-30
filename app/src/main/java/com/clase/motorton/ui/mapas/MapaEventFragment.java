@@ -16,6 +16,8 @@ import android.widget.Toast;
 
 import com.clase.motorton.R;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.util.GeoPoint;
@@ -24,7 +26,13 @@ import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,6 +67,8 @@ public class MapaEventFragment extends Fragment {
         btnBorrarRuta = view.findViewById(R.id.btnBorrarRuta);
         searchView = view.findViewById(R.id.searchView);
 
+        String tipoSeleccion = getArguments() != null ? getArguments().getString("tipoSeleccion", "ubicacion") : "ubicacion";
+
         // Configuramos para obtener la API de OSM
         Configuration.getInstance().setUserAgentValue(requireContext().getPackageName());
         // Establecemos como activa que se pueda controlar el mapa con multicontrol
@@ -73,29 +83,41 @@ public class MapaEventFragment extends Fragment {
         MapEventsReceiver mReceive = new MapEventsReceiver() {
             @Override
             public boolean singleTapConfirmedHelper(GeoPoint p) {
-                // Comprobamos que la marca inicial sea nula
-                if (startMarker == null) {
-                    // Inicializamos el marcador
-                    startMarker = new Marker(map);
-                    // Establecemos la posición en el marcador
-                    startMarker.setPosition(p);
-                    // Establecemos el título
-                    startMarker.setTitle("Punto de inicio");
-                    // Marcamos en el mapa el marcador
-                    map.getOverlays().add(startMarker);
-                } else if (endMarker == null) { // Comprobamos que la marca final sea nula
-                    // Inicializamos el marcador
-                    endMarker = new Marker(map);
-                    // Establecemos la posición en el marcador
-                    endMarker.setPosition(p);
-                    // Establecemos el título
-                    endMarker.setTitle("Punto de fin");
-                    // Marcamos en el mapa el marcador
-                    map.getOverlays().add(endMarker);
+                if(tipoSeleccion.equals("ruta")){
+                    // Comprobamos que la marca inicial sea nula
+                    if (startMarker == null) {
+                        // Inicializamos el marcador
+                        startMarker = new Marker(map);
+                        // Establecemos la posición en el marcador
+                        startMarker.setPosition(p);
+                        // Establecemos el título
+                        startMarker.setTitle("Punto de inicio");
+                        // Marcamos en el mapa el marcador
+                        map.getOverlays().add(startMarker);
+                    } else if (endMarker == null) { // Comprobamos que la marca final sea nula
+                        // Inicializamos el marcador
+                        endMarker = new Marker(map);
+                        // Establecemos la posición en el marcador
+                        endMarker.setPosition(p);
+                        // Establecemos el título
+                        endMarker.setTitle("Punto de fin");
+                        // Marcamos en el mapa el marcador
+                        map.getOverlays().add(endMarker);
 
-                    // Llamamos al método para dibujar la línea de la ruta
-                    dibujarLineaRuta();
+                        // Llamamos al método para dibujar la línea de la ruta
+                        dibujarLineaRuta();
+                    }
+                }else{
+                    if (startMarker != null) {
+                        map.getOverlays().remove(startMarker);
+                    }
+
+                    startMarker = new Marker(map);
+                    startMarker.setPosition(p);
+                    startMarker.setTitle("Ubicación del evento");
+                    map.getOverlays().add(startMarker);
                 }
+
                 // Invalidamos el mapa
                 map.invalidate();
                 // Retornamos true
@@ -114,28 +136,30 @@ public class MapaEventFragment extends Fragment {
 
         // Establecemos la acción que sucede al pulsar el botón de confirmar la ruta
         btnConfirmarRuta.setOnClickListener(v -> {
-            // Comprobamos que los marcadores sean o no nulos
-            if (startMarker != null && endMarker != null) { // En caso de que las marcas no sean nulas
-                // Creamos un nuevo bundle
-                Bundle bundle = new Bundle();
-                // Establecemos todos los datos de las coordenadas
-                bundle.putDouble("startLat", startMarker.getPosition().getLatitude());
-                // Establecemos todos los datos de las coordenadas
-                bundle.putDouble("startLon", startMarker.getPosition().getLongitude());
-                // Establecemos todos los datos de las coordenadas
-                bundle.putDouble("endLat", endMarker.getPosition().getLatitude());
-                // Establecemos todos los datos de las coordenadas
-                bundle.putDouble("endLon", endMarker.getPosition().getLongitude());
+            Bundle bundle = new Bundle();
 
-                // Pasamos al nuevo fragmento el bundle establecido
-                getParentFragmentManager().setFragmentResult("rutaSeleccionada", bundle);
-
-                // Utilizamos la navegación para pasar a otro fragmento
-                Navigation.findNavController(view).navigate(R.id.navigation_createEvent, bundle);
-            } else { // En caso de que las marcas sean nulas
-                // Lanzamos un toast indicando al usuario que ha de tener inicio y final
-                showToast("Selecciona inicio y fin");
+            if (tipoSeleccion.equals("ruta")) {
+                if (startMarker != null && endMarker != null) {
+                    bundle.putDouble("startLat", startMarker.getPosition().getLatitude());
+                    bundle.putDouble("startLon", startMarker.getPosition().getLongitude());
+                    bundle.putDouble("endLat", endMarker.getPosition().getLatitude());
+                    bundle.putDouble("endLon", endMarker.getPosition().getLongitude());
+                } else {
+                    showToast("Selecciona inicio y fin");
+                    return;
+                }
+            } else {
+                if (startMarker != null) {
+                    bundle.putDouble("ubicacionLat", startMarker.getPosition().getLatitude());
+                    bundle.putDouble("ubicacionLon", startMarker.getPosition().getLongitude());
+                } else {
+                    showToast("Selecciona la ubicación del evento");
+                    return;
+                }
             }
+
+            getParentFragmentManager().setFragmentResult("rutaSeleccionada", bundle);
+            Navigation.findNavController(view).navigate(R.id.navigation_createEvent, bundle);
         });
 
         // Establecemos la acción que sucede al pulsar el botón de borrar la ruta
@@ -233,29 +257,61 @@ public class MapaEventFragment extends Fragment {
         }
     }
 
-    /**
-     * Método para dibujar la línea
-     * de la ruta para así poder mostrar
-     * al usuario la ruta que ha establecido
-     */
+    private void obtenerRutaConCallOSRM(GeoPoint start, GeoPoint end) {
+        new Thread(() -> {
+            try {
+                String urlString = "https://router.project-osrm.org/route/v1/driving/" +
+                        start.getLongitude() + "," + start.getLatitude() + ";" +
+                        end.getLongitude() + "," + end.getLatitude() +
+                        "?overview=full&geometries=geojson";
+
+                URL url = new URL(urlString);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+
+                InputStream inputStream = new BufferedInputStream(connection.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuilder result = new StringBuilder();
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
+                }
+
+                JSONObject json = new JSONObject(result.toString());
+                JSONArray coordinates = json.getJSONArray("routes")
+                        .getJSONObject(0)
+                        .getJSONObject("geometry")
+                        .getJSONArray("coordinates");
+
+                List<GeoPoint> geoPointsRuta = new ArrayList<>();
+                for (int i = 0; i < coordinates.length(); i++) {
+                    JSONArray coord = coordinates.getJSONArray(i);
+                    double lon = coord.getDouble(0);
+                    double lat = coord.getDouble(1);
+                    geoPointsRuta.add(new GeoPoint(lat, lon));
+                }
+
+                requireActivity().runOnUiThread(() -> {
+                    if (routeLine != null) map.getOverlayManager().remove(routeLine);
+
+                    routeLine = new Polyline();
+                    routeLine.setPoints(geoPointsRuta);
+                    map.getOverlayManager().add(routeLine);
+                    map.invalidate();
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                requireActivity().runOnUiThread(() -> showToast("Error al calcular ruta"));
+            }
+        }).start();
+    }
+
+
     private void dibujarLineaRuta() {
-        // Procedemos a comprobar si el marcador del inicio y del final no sean nulos
-        if (startMarker != null && endMarker != null) { // En caso de que no sean nulos
-            // Creamos una lista de geopuntos y la inicializamos
-            List<GeoPoint> geoPoints = new ArrayList<>();
-            // Agregamos los dos puntos
-            geoPoints.add(startMarker.getPosition());
-            geoPoints.add(endMarker.getPosition());
-
-            // Comprobamos que el polyline no sea nulo, en caso de no serlo, le eliminamos del mapa
-            if (routeLine != null) map.getOverlayManager().remove(routeLine);
-
-            // Inicializamos una nueva polyline para dibujar
-            routeLine = new Polyline();
-            // Establecemos la lista de puntos
-            routeLine.setPoints(geoPoints);
-            // Agregamos el dibujo al mapa
-            map.getOverlayManager().add(routeLine);
+        if (startMarker != null && endMarker != null) {
+            obtenerRutaConCallOSRM(startMarker.getPosition(), endMarker.getPosition());
         }
     }
 

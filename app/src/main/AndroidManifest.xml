@@ -23,12 +23,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MOTORTON"
         tools:targetApi="31">
+        <activity
+            android:name=".ui.perfil.ModificacionesVehiculo"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
+
         <receiver android:name=".notifications.NotificacionReceiver" />
 
         <activity
             android:name=".ui.perfil.EditarPerfilActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".notifications.NotificacionDiariaWorker"

@@ -59,4 +59,10 @@
         android:name="com.clase.motorton.ui.eventos.EditarEventoFragment"
         android:label="@string/title_editar_evento"
         tools:layout="@layout/fragment_editar_evento" />
+
+    <fragment
+        android:id="@+id/navigation_info_vehiculo"
+        android:name="com.clase.motorton.ui.vehiculos.FichaVehiculoFragment"
+        android:label="@string/title_info_veh"
+        tools:layout="@layout/fragment_ficha_vehiculo" />
 </navigation>

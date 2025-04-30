@@ -80,6 +80,8 @@ public class CreateEventFragment extends Fragment {
     // Variable para manejar los Toast de está actividad
     private Toast mensajeToast= null;
 
+    private String tipoEvento = null;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -199,15 +201,10 @@ public class CreateEventFragment extends Fragment {
                 // Obtengo el item elegido
                 String selectedItem = parentView.getItemAtPosition(position).toString();
 
-                // Comprobamos si es una ruta o no
-                if ("Ruta Moto".equals(selectedItem) || "Ruta Coche".equals(selectedItem)) { // En caso de ser una ruta
-                    mapView.setVisibility(View.VISIBLE);
-                    btnIrRuta.setVisibility(View.VISIBLE);
-                } else { // En caso de ser otra opción
-                    // Mantenemos invisible el mapa
-                    mapView.setVisibility(View.GONE);
-                    // Mantenemos invisible el botón de ir a legir la ruta
-                    btnIrRuta.setVisibility(View.GONE);
+                if (selectedItem.contains("Ruta")) {
+                    tipoEvento = "ruta";
+                } else {
+                    tipoEvento = "otro";
                 }
             }
 
@@ -222,7 +219,13 @@ public class CreateEventFragment extends Fragment {
             public void onClick(View view) {
                 // Utilizamos un try catch para capturar y tratar todas las posibles excepciones
                 try {
-                    Navigation.findNavController(view).navigate(R.id.navigation_map_ruta);
+                    Bundle bundle = new Bundle();
+                    if(tipoEvento.equals("ruta")){
+                        bundle.putString("tipoSeleccion", "ruta");
+                    }else{
+                        bundle.putString("tipoSeleccion", "ubicacion");
+                    }
+                    Navigation.findNavController(view).navigate(R.id.navigation_map_ruta, bundle);
                 } catch (Exception e) { // En caso de que surja alguna excepción
                     // Imprimimos la excepción por consola
                     e.printStackTrace();
@@ -232,36 +235,32 @@ public class CreateEventFragment extends Fragment {
             }
         });
 
-        // Obtenemos si hay datos pasados de un fragmento a otro
         getParentFragmentManager().setFragmentResultListener("rutaSeleccionada", this, (key, bundle) -> {
-            // Obtengo el dato pasado que es un double
             double startLat = bundle.getDouble("startLat", Double.NaN);
-            // Obtengo el dato pasado que es un double
             double startLon = bundle.getDouble("startLon", Double.NaN);
-            // Obtengo el dato pasado que es un double
             double endLat = bundle.getDouble("endLat", Double.NaN);
-            // Obtengo el dato pasado que es un double
             double endLon = bundle.getDouble("endLon", Double.NaN);
+            double ubicacionLat = bundle.getDouble("ubicacionLat", Double.NaN);
+            double ubicacionLon = bundle.getDouble("ubicacionLon", Double.NaN);
 
-            // Compruebo que sean números y no estén vacíos
-            if (Double.isNaN(startLat) || Double.isNaN(startLon) || Double.isNaN(endLat) || Double.isNaN(endLon)) { // En caso negativo
-                // Lanzo un toast indicando que las coordenadas de la ruta no son válidas
-                showToast("Error: coordenadas de la ruta no válidas");
-                // Retornamos para no proseguir
-                return;
+            if (!Double.isNaN(startLat) && !Double.isNaN(startLon) &&
+                    !Double.isNaN(endLat) && !Double.isNaN(endLon)) {
+                // Caso RUTA
+                this.latInicio = startLat;
+                this.lonInicio = startLon;
+                this.latFin = endLat;
+                this.lonFin = endLon;
+
+            } else if (!Double.isNaN(ubicacionLat) && !Double.isNaN(ubicacionLon)) {
+                // Caso UBICACIÓN ÚNICA
+                this.latInicio = ubicacionLat;
+                this.lonInicio = ubicacionLon;
+                this.latFin = Double.NaN;
+                this.lonFin = Double.NaN;
+
+            } else {
+                showToast("Error: No se recibieron coordenadas válidas");
             }
-
-            // Inicializo el valor de inicio de la latitud
-            this.latInicio = startLat;
-            // Inicializo el valor de inicio de la longitud
-            this.lonInicio = startLon;
-            // Inicializo el valor de final de la latidud
-            this.latFin = endLat;
-            // Inicializo el valor de final de la longitud
-            this.lonFin = endLon;
-
-            // Llamamos al método para dibujar la ruta en el mapa
-            dibujarRuta(latInicio, lonInicio, latFin, lonFin);
         });
 
         return root;

@@ -163,7 +163,6 @@
                     android:text="Ir a Seleccionar Ruta"
                     android:textColor="#FFFFFF"
                     android:backgroundTint="#007BFF"
-                    android:visibility="gone"
                     android:layout_marginTop="20dp"
                     android:padding="12dp"
                     android:textSize="18sp"
