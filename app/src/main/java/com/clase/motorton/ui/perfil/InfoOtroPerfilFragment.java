@@ -44,6 +44,7 @@ public class InfoOtroPerfilFragment extends Fragment {
     private ImageView imagenPerfil = null;
     private Button btnLike = null;
     private RecyclerView recycleVehiculos = null;
+    private TextView textVievNLikes = null;
 
     private ProgressBar progressBarOtroUsuario = null;
     private View progressOverlay = null;
@@ -79,6 +80,7 @@ public class InfoOtroPerfilFragment extends Fragment {
         recycleVehiculos = (RecyclerView) root.findViewById(R.id.recyclerViewVehiculosOtroUsuario);
         progressBarOtroUsuario = root.findViewById(R.id.progressBarOtroUsuario);
         progressOverlay = root.findViewById(R.id.progressOverlay);
+        textVievNLikes = root.findViewById(R.id.textViewLikesUsuario);
 
         recycleVehiculos.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -224,6 +226,14 @@ public class InfoOtroPerfilFragment extends Fragment {
                 if (ubicacionMap != null) { // En caso de que no sea nula
                     // Establecemos en el string solo la dirección
                     direccion = (String) ubicacionMap.get("direccion");
+                }
+
+                List<String> numeroLikes = (List<String>) documentSnapshot.get("likes");
+                if(numeroLikes!=null){
+                    int cantidadLikes = numeroLikes.size();
+                    textVievNLikes.setText("Nº Likes: "+cantidadLikes);
+                }else{
+                    textVievNLikes.setText("Nº Likes: 0");
                 }
 
                 // Comprobamos que estén todos los datos
