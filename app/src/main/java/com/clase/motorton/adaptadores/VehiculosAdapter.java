@@ -1,6 +1,7 @@
 package com.clase.motorton.adaptadores;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.clase.motorton.modelos.Vehiculo;
@@ -77,6 +81,17 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
                 break;
         }
 
+        holder.fondo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Bundle bundle = new Bundle();
+                bundle.putString("matriculaVeh", vehiculo.getMatricula());
+
+                NavController navController = Navigation.findNavController(view);
+                navController.navigate(R.id.navigation_info_vehiculo, bundle);
+            }
+        });
+
         // Cuando toquemos el botón de eliminar un vehículo llamamos al método de eliminar y le pasamos la matricula del mismo
         holder.imageViewDelete.setOnClickListener(v -> eliminarVehiculo(vehiculo.getMatricula(), position));
 
@@ -144,6 +159,7 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
     public static class VehiculoViewHolder extends RecyclerView.ViewHolder {
         TextView textViewModeloYMarca, textViewDescripcion;
         ImageView imageViewTipoVehiculo, imageViewEdit, imageViewDelete;
+        ConstraintLayout fondo;
 
         public VehiculoViewHolder(View itemView) {
             super(itemView);
@@ -152,6 +168,7 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
             imageViewTipoVehiculo = itemView.findViewById(R.id.imageViewTipoVehiculo);
             imageViewEdit = itemView.findViewById(R.id.imageViewEdit);
             imageViewDelete = itemView.findViewById(R.id.imageViewDelete);
+            fondo = itemView.findViewById(R.id.fondoVeh);
         }
     }
 }
