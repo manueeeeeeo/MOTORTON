@@ -173,17 +173,19 @@ public class ModificacionesVehiculo extends AppCompatActivity {
             // Obtenemos en una variable el bitmao de la imagen elegida
             Bitmap fotoBitmap = drawable != null ? drawable.getBitmap() : null;
 
-            if (fotoBitmap != null) { // En caso de no ser nulo
-                // Creamos un array de bytes para comprimir la imagen
+            if (fotoBitmap != null) {
+                Bitmap resized = resizeBitmap(fotoBitmap, 800, 800);
+
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                resized.compress(Bitmap.CompressFormat.JPEG, 70, baos);
 
-                // Procedemos a comprimmir la imagen a un 85% y además, le establecemos como un JPEG
-                fotoBitmap.compress(Bitmap.CompressFormat.JPEG, 85, baos);
-
-                // Creamos una cadena de bytes en donde almacenamos la imagen
                 byte[] fotoBytes = baos.toByteArray();
-                // Y guardamos en la variable antes creado la codificación en base64
                 foto = Base64.encodeToString(fotoBytes, Base64.DEFAULT);
+
+                if (fotoBytes.length > 900_000) {
+                    showToast("La imagen es demasiado grande. Usa una más pequeña.");
+                    return;
+                }
             }
 
             Intent resultIntent = new Intent();
@@ -247,6 +249,24 @@ public class ModificacionesVehiculo extends AppCompatActivity {
                 })
                 .show(); // Mostramos el dialogo
     }
+
+    private Bitmap resizeBitmap(Bitmap original, int maxWidth, int maxHeight) {
+        int width = original.getWidth();
+        int height = original.getHeight();
+
+        float ratioBitmap = (float) width / (float) height;
+        float ratioMax = (float) maxWidth / (float) maxHeight;
+
+        int finalWidth = maxWidth;
+        int finalHeight = maxHeight;
+        if (ratioMax > ratioBitmap) {
+            finalWidth = (int) ((float)maxHeight * ratioBitmap);
+        } else {
+            finalHeight = (int) ((float)maxWidth / ratioBitmap);
+        }
+        return Bitmap.createScaledBitmap(original, finalWidth, finalHeight, true);
+    }
+
 
     /**
      * @param mensaje
