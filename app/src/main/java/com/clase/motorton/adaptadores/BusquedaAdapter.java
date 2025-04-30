@@ -40,7 +40,14 @@ public class BusquedaAdapter extends RecyclerView.Adapter<BusquedaAdapter.ViewHo
         BusquedaItem item = listaResultados.get(position);
         holder.nombre.setText(item.getNombre());
 
-        int icono = item.getTipo().equals("perfil") ? R.drawable.icono_persona : R.drawable.icono_evento;
+        int icono = 0;
+        if(item.getTipo().equals("perfil")){
+            icono = R.drawable.icono_persona;
+        }else if(item.getTipo().equals("perfil")){
+            icono = R.drawable.icono_evento;
+        }else{
+            icono = R.drawable.icono_engine;
+        }
         holder.icono.setImageResource(icono);
 
         holder.cardView.setOnClickListener(view -> {
@@ -49,9 +56,12 @@ public class BusquedaAdapter extends RecyclerView.Adapter<BusquedaAdapter.ViewHo
             if (item.getTipo().equals("perfil")) {
                 bundle.putString("perfilId", item.getId());
                 Navigation.findNavController(view).navigate(R.id.navigation_info_otro_perfil, bundle);
-            } else {
+            } else if(item.getTipo().equals("evento")){
                 bundle.putString("eventoId", item.getId());
                 Navigation.findNavController(view).navigate(R.id.navigation_info_evento, bundle);
+            }else{
+                bundle.putString("matriculaVeh", item.getId());
+                Navigation.findNavController(view).navigate(R.id.navigation_info_vehiculo, bundle);
             }
         });
     }
