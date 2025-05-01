@@ -132,9 +132,8 @@ public class Ajustes extends AppCompatActivity {
                             Map<String, Object> updates = new HashMap<>();
                             updates.put("logoutCount", logoutCount);
 
-                            if (logoutCount >= 2) {
+                            if (logoutCount >= 3) {
                                 updates.put("active", false);
-                                updates.put("userUID", null);
                             }
 
                             db.collection("invitationCodes").document(codigo).update(updates);

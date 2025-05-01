@@ -136,7 +136,7 @@ public class PantallaCarga extends AppCompatActivity {
                         finish();
                     }else{ // En caso de que no sea nulo
                         // Verifico si el usuario tiene perfil en la base de datos
-                        verificarPerfil(user);
+                        verificarPerfilBETA(user);
                     }
                 }
             }
@@ -187,6 +187,44 @@ public class PantallaCarga extends AppCompatActivity {
         showToast("Conectese a Internet");
         // Oculto la barra de progreso ya que no va a servir ahora para nada
         progressBar.setVisibility(View.INVISIBLE);
+    }
+
+    private void verificarPerfilBETA(FirebaseUser user) {
+        String uid = user.getUid();
+
+        db.collection("perfiles").document(uid).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    boolean tienePerfil = documentSnapshot.exists();
+
+                    db.collection("invitationCodes")
+                            .whereEqualTo("usedBy", uid)
+                            .whereEqualTo("active", true)
+                            .get()
+                            .addOnSuccessListener(queryDocumentSnapshots -> {
+                                if (!queryDocumentSnapshots.isEmpty()) {
+                                    if (tienePerfil) {
+                                        startActivity(new Intent(PantallaCarga.this, MainActivity.class));
+                                    } else {
+                                        startActivity(new Intent(PantallaCarga.this, CreacionPerfil.class));
+                                    }
+                                } else {
+                                    showToast("Acceso no autorizado. Código beta inválido.");
+                                    startActivity(new Intent(PantallaCarga.this, VersionBeta.class));
+                                }
+                                finish();
+                            })
+                            .addOnFailureListener(e -> {
+                                showToast("Error al validar acceso beta");
+                                startActivity(new Intent(PantallaCarga.this, VersionBeta.class));
+                                finish();
+                            });
+
+                })
+                .addOnFailureListener(e -> {
+                    showToast("Error al verificar perfil");
+                    startActivity(new Intent(PantallaCarga.this, VersionBeta.class));
+                    finish();
+                });
     }
 
     /**
