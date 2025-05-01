@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -29,6 +30,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.clase.motorton.R;
 import com.clase.motorton.modelos.FotoVehiculoTemporal;
+import com.clase.motorton.modelos.Vehiculo;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -126,6 +128,24 @@ public class ModificacionesVehiculo extends AppCompatActivity {
         switchBodyKit = (Switch) findViewById(R.id.switchBodyKit);
         switchLucesLed = (Switch) findViewById(R.id.switchLuces);
 
+        Vehiculo vehiculo = (Vehiculo) getIntent().getSerializableExtra("vehiculo");
+
+        if (vehiculo != null) {
+            editRuedas.setText(vehiculo.getRuedas());
+            editTuboEscape.setText(vehiculo.getTuboEscape());
+            editAleron.setText(vehiculo.getAleron());
+            editChoques.setText(String.valueOf(vehiculo.getChoques()));
+            editCv.setText(String.valueOf(vehiculo.getCv()));
+            editMaxVel.setText(String.valueOf(vehiculo.getMaxVelocidad()));
+
+            String fotoAnti = vehiculo.getFoto();
+
+            if (fotoAnti != null && !fotoAnti.isEmpty()) {
+                Bitmap decodedBitmap = convertirBase64ABitmap(fotoAnti);
+                fotoVehiculo.setImageBitmap(decodedBitmap);
+            }
+        }
+
         btnVolver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -155,6 +175,12 @@ public class ModificacionesVehiculo extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public static Bitmap convertirBase64ABitmap(String base64) {
+        if (base64 == null || base64.isEmpty()) return null;
+        byte[] decodedBytes = Base64.decode(base64, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
     }
 
     private void guardarDatosModificaciones(){
