@@ -3,6 +3,7 @@ package com.clase.motorton.ui.perfil;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -176,6 +177,15 @@ public class AdministrarVehiculos extends AppCompatActivity {
             editAnos.setText(String.valueOf(vehiculo.getAnos()));
             esExportado.setChecked(vehiculo.isExportado());
             matriculaAntigua = vehiculo.getMatricula();
+            tubo = vehiculo.getTuboEscape();
+            ruedas = vehiculo.getRuedas();
+            aleron = vehiculo.getAleron();
+            choques = vehiculo.getChoques();
+            cv = vehiculo.getCv();
+            maxVe = vehiculo.getMaxVelocidad();
+            luces = vehiculo.isLucesLed();
+            bodykit = vehiculo.isBodyKit();
+            foto = vehiculo.getFoto();
         }
 
         if (vehiculo != null) {
@@ -332,6 +342,9 @@ public class AdministrarVehiculos extends AppCompatActivity {
                                         showToast("Vehículo actualizado correctamente.");
                                         if (!matricula.equals(matriculaAntigua)) {
                                             actualizarListaVehiculosEnPerfilTrasCambio(uid, matriculaAntigua, matricula);
+                                            db.collection("vehiculos").document(matriculaAntigua).delete()
+                                                    .addOnSuccessListener(aVoi -> Log.d("Firestore", "Documento antiguo eliminado"))
+                                                    .addOnFailureListener(e -> Log.e("Firestore", "Error al eliminar el documento antiguo", e));
                                         }
                                     })
                                     .addOnFailureListener(e -> showToast("Error al actualizar: " + e.getMessage()));
