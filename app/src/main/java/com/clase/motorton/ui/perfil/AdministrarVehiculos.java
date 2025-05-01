@@ -330,7 +330,9 @@ public class AdministrarVehiculos extends AppCompatActivity {
                             db.collection("vehiculos").document(matricula).set(vehiculo)
                                     .addOnSuccessListener(aVoid -> {
                                         showToast("Vehículo actualizado correctamente.");
-                                        actualizarListaVehiculosEnPerfilTrasCambio(uid, matriculaAntigua, matricula);
+                                        if (!matricula.equals(matriculaAntigua)) {
+                                            actualizarListaVehiculosEnPerfilTrasCambio(uid, matriculaAntigua, matricula);
+                                        }
                                     })
                                     .addOnFailureListener(e -> showToast("Error al actualizar: " + e.getMessage()));
                         } else {
