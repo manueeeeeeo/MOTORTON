@@ -2,6 +2,7 @@ package com.clase.motorton.modelos;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 
 public class Evento {
     private String id;
@@ -14,6 +15,7 @@ public class Evento {
     private String organizador;
     private boolean activo;
     private Date fecha;
+    private Map<String, Object> ubicacionEvento;
 
     public Evento() {
     }
@@ -29,6 +31,21 @@ public class Evento {
         this.organizador = organizador;
         this.activo = activo;
         this.fecha = fecha;
+    }
+    public Evento(String id, String nombre, String descripcion, String ubicacion,
+                  String provincia, String tipoEvento, ArrayList<String> participantes,
+                  String organizador, boolean activo, Date fecha, Map<String, Object> ubicacionEvento) {
+        this.id = id;
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.ubicacion = ubicacion;
+        this.provincia = provincia;
+        this.tipoEvento = tipoEvento;
+        this.participantes = participantes;
+        this.organizador = organizador;
+        this.activo = activo;
+        this.fecha = fecha;
+        this.ubicacionEvento = ubicacionEvento;
     }
 
     public Date getFecha() {
