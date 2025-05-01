@@ -167,6 +167,24 @@ public class AdministrarVehiculos extends AppCompatActivity {
         spinnerModelo = findViewById(R.id.spinnerModelo);
         btnModi = findViewById(R.id.imagebtnModificaciones);
 
+        Vehiculo vehiculo = (Vehiculo) getIntent().getSerializableExtra("vehiculo");
+
+        if (vehiculo != null) {
+            editMatricula.setText(vehiculo.getMatricula());
+            editDescrip.setText(vehiculo.getDescripción());
+            editAnos.setText(String.valueOf(vehiculo.getAnos()));
+            if(vehiculo.isExportado()){
+                esExportado.isChecked();
+            }
+        }
+
+        if (vehiculo != null) {
+            btnCrear.setText("Guardar cambios");
+        } else {
+            btnCrear.setText("Agregar vehículo");
+        }
+
+
         // Obtengo el contexto
         context = this;
 
