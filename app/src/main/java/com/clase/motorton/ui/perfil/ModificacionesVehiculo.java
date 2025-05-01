@@ -144,6 +144,9 @@ public class ModificacionesVehiculo extends AppCompatActivity {
                 Bitmap decodedBitmap = convertirBase64ABitmap(fotoAnti);
                 fotoVehiculo.setImageBitmap(decodedBitmap);
             }
+
+            switchBodyKit.setChecked(vehiculo.isBodyKit());
+            switchLucesLed.setChecked(vehiculo.isLucesLed());
         }
 
         btnVolver.setOnClickListener(new View.OnClickListener() {

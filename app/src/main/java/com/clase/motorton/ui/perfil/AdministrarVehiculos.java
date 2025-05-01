@@ -91,6 +91,7 @@ public class AdministrarVehiculos extends AppCompatActivity {
     private boolean luces = false;
     private boolean bodykit = false;
     private String foto = null;
+    private String matriculaAntigua = null;
 
     // Variable para manejar la autentificación del usuario
     private FirebaseAuth auth = null;
@@ -173,9 +174,8 @@ public class AdministrarVehiculos extends AppCompatActivity {
             editMatricula.setText(vehiculo.getMatricula());
             editDescrip.setText(vehiculo.getDescripción());
             editAnos.setText(String.valueOf(vehiculo.getAnos()));
-            if(vehiculo.isExportado()){
-                esExportado.isChecked();
-            }
+            esExportado.setChecked(vehiculo.isExportado());
+            matriculaAntigua = vehiculo.getMatricula();
         }
 
         if (vehiculo != null) {
@@ -300,9 +300,8 @@ public class AdministrarVehiculos extends AppCompatActivity {
      * en la base de datos de Firestore
      */
     private void insertarVehiculo() {
-        // Obtengo en una variable el uid del usuario autenticado
         String uid = auth.getCurrentUser().getUid();
-        // Creo un objeto de tio vehículo e inicializo todas las variables
+
         Vehiculo vehiculo = new Vehiculo(uid,
                 matricula,
                 marca,
@@ -321,16 +320,33 @@ public class AdministrarVehiculos extends AppCompatActivity {
                 foto,
                 choques);
 
-        // Procedo a guardar el vehículo en la colección "vehiculos"
-        db.collection("vehiculos").document(matricula).set(vehiculo)
-                .addOnSuccessListener(aVoid -> { // En caso de que todo vaya bien
-                    // Lanzamos un toast indicando al usuario que el vehículo fue agregado
-                    showToast("Vehículo agregado exitosamente.");
-                    // Llamo al método para actualizar la lista de los vehículos en el perfil
-                    actualizarListaVehiculosEnPerfil(uid, matricula);
+        db.collection("vehiculos").document(matricula)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String uidDueno = documentSnapshot.getString("uidDueno");
+
+                        if (uid.equals(uidDueno)) {
+                            db.collection("vehiculos").document(matricula).set(vehiculo)
+                                    .addOnSuccessListener(aVoid -> {
+                                        showToast("Vehículo actualizado correctamente.");
+                                        actualizarListaVehiculosEnPerfilTrasCambio(uid, matriculaAntigua, matricula);
+                                    })
+                                    .addOnFailureListener(e -> showToast("Error al actualizar: " + e.getMessage()));
+                        } else {
+                            showToast("No puedes modificar un vehículo que no es tuyo.");
+                        }
+
+                    } else {
+                        db.collection("vehiculos").document(matricula).set(vehiculo)
+                                .addOnSuccessListener(aVoid -> {
+                                    showToast("Vehículo agregado exitosamente.");
+                                    actualizarListaVehiculosEnPerfil(uid, matricula);
+                                })
+                                .addOnFailureListener(e -> showToast("Error al agregar: " + e.getMessage()));
+                    }
                 })
-                // En caso de que algo vaya mal mostramos un toast con el error
-                .addOnFailureListener(e -> showToast("Error al agregar el vehículo: " + e.getMessage()));
+                .addOnFailureListener(e -> showToast("Error al comprobar existencia: " + e.getMessage()));
     }
 
     /**
@@ -373,6 +389,31 @@ public class AdministrarVehiculos extends AppCompatActivity {
                 })
                 // En caso de que algo falle lanzamos un toast indicando que hubo un error al obtener el perfil
                 .addOnFailureListener(e -> showToast("Error al obtener el perfil del usuario."));
+    }
+
+    private void actualizarListaVehiculosEnPerfilTrasCambio(String uid, String matriculaAntigua, String matriculaNueva) {
+        db.collection("perfiles").document(uid)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        List<String> listaVehiculos = (List<String>) documentSnapshot.get("listaVehiculos");
+                        if (listaVehiculos == null) {
+                            listaVehiculos = new ArrayList<>();
+                        }
+
+                        listaVehiculos.remove(matriculaAntigua);
+                        listaVehiculos.add(matriculaNueva);
+
+                        db.collection("perfiles").document(uid)
+                                .update("listaVehiculos", listaVehiculos)
+                                .addOnSuccessListener(aVoid -> {
+                                    showToast("Lista de vehículos actualizada correctamente.");
+                                    limpiarCampos();
+                                })
+                                .addOnFailureListener(e -> showToast("Error al actualizar lista: " + e.getMessage()));
+                    }
+                })
+                .addOnFailureListener(e -> showToast("Error al obtener perfil: " + e.getMessage()));
     }
 
     /**
