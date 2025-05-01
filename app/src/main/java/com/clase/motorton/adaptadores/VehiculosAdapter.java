@@ -1,6 +1,7 @@
 package com.clase.motorton.adaptadores;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.clase.motorton.modelos.Vehiculo;
+import com.clase.motorton.ui.perfil.AdministrarVehiculos;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -98,7 +100,9 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
         holder.imageViewEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent = new Intent(view.getContext(), AdministrarVehiculos.class);
+                intent.putExtra("vehiculo", vehiculo);
+                view.getContext().startActivity(intent);
             }
         });
     }
