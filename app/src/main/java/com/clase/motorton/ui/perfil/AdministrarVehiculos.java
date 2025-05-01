@@ -277,6 +277,9 @@ public class AdministrarVehiculos extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(AdministrarVehiculos.this, ModificacionesVehiculo.class);
+                if (vehiculo != null) {
+                    i.putExtra("vehiculo", vehiculo);
+                }
                 modificarVehiculoLauncher.launch(i);
             }
         });
