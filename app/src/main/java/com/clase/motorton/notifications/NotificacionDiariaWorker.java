@@ -1,8 +1,11 @@
 package com.clase.motorton.notifications;
 
 import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -22,6 +25,17 @@ public class NotificacionDiariaWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    "diario_channel",
+                    "Notificación Diaria",
+                    NotificationManager.IMPORTANCE_HIGH);
+            NotificationManager manager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+            if (manager != null) {
+                manager.createNotificationChannel(channel);
+            }
+        }
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), "diario_channel")
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle("Nuevos Eventos")
