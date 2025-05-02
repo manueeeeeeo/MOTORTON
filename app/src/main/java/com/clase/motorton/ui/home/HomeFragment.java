@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.clase.motorton.R;
 import com.clase.motorton.adaptadores.EventosAdapter;
+import com.clase.motorton.adaptadores.SpinnerAdaptarNormal;
 import com.clase.motorton.databinding.FragmentHomeBinding;
 import com.clase.motorton.modelos.Evento;
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,6 +39,9 @@ public class HomeFragment extends Fragment {
     private boolean isLoading = false;
     private boolean isInitialLoad = false;
     private Toast mensajeToast = null;
+    private Spinner spinnerPronvincia = null;
+    // Variable para manejar la lista de las provincias
+    private List<String> provincias = new ArrayList<>();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -46,7 +51,68 @@ public class HomeFragment extends Fragment {
 
         // Configuración del RecyclerView
         recyclerView = root.findViewById(R.id.recyclerEventos);
+        spinnerPronvincia = root.findViewById(R.id.spinnerProvincia);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // Agrego todas las provincias posibles
+        provincias.add("-- Elija una Opción --");
+        provincias.add("Álava");
+        provincias.add("Albacete");
+        provincias.add("Alicante");
+        provincias.add("Almería");
+        provincias.add("Asturias");
+        provincias.add("Ávila");
+        provincias.add("Badajoz");
+        provincias.add("Barcelona");
+        provincias.add("Burgos");
+        provincias.add("Cáceres");
+        provincias.add("Cádiz");
+        provincias.add("Cantabria");
+        provincias.add("Castellón");
+        provincias.add("Ciudad Real");
+        provincias.add("Córdoba");
+        provincias.add("La Coruña");
+        provincias.add("Cuenca");
+        provincias.add("Gerona");
+        provincias.add("Granada");
+        provincias.add("Guadalajara");
+        provincias.add("Guipúzcoa");
+        provincias.add("Huelva");
+        provincias.add("Huesca");
+        provincias.add("Islas Baleares");
+        provincias.add("Jaén");
+        provincias.add("León");
+        provincias.add("Lérida");
+        provincias.add("Lugo");
+        provincias.add("Madrid");
+        provincias.add("Málaga");
+        provincias.add("Murcia");
+        provincias.add("Navarra");
+        provincias.add("Orense");
+        provincias.add("Palencia");
+        provincias.add("Las Palmas");
+        provincias.add("Pontevedra");
+        provincias.add("La Rioja");
+        provincias.add("Salamanca");
+        provincias.add("Santa Cruz de Tenerife");
+        provincias.add("Segovia");
+        provincias.add("Sevilla");
+        provincias.add("Soria");
+        provincias.add("Tarragona");
+        provincias.add("Teruel");
+        provincias.add("Toledo");
+        provincias.add("Valencia");
+        provincias.add("Valladolid");
+        provincias.add("Vizcaya");
+        provincias.add("Zamora");
+        provincias.add("Zaragoza");
+        provincias.add("Ceuta");
+        provincias.add("Melilla");
+
+        // Inicializo el adaptador para el spinner de provincias
+        SpinnerAdaptarNormal adapter = new SpinnerAdaptarNormal(getContext(), provincias);
+        // Establezco el adaptador al spinner
+        spinnerPronvincia.setAdapter(adapter);
 
         // Inicializamos la lista y el adaptador
         String uidUsuario = FirebaseAuth.getInstance().getCurrentUser().getUid();
