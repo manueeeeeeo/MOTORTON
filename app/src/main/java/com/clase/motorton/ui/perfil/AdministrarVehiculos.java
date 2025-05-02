@@ -29,6 +29,7 @@ import com.clase.motorton.api.ApiVehiculos;
 import com.clase.motorton.modelos.FotoVehiculoTemporal;
 import com.clase.motorton.modelos.Vehiculo;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -93,6 +94,7 @@ public class AdministrarVehiculos extends AppCompatActivity {
     private boolean bodykit = false;
     private String foto = null;
     private String matriculaAntigua = null;
+    boolean esEdicion = false;
 
     // Variable para manejar la autentificación del usuario
     private FirebaseAuth auth = null;
@@ -186,6 +188,7 @@ public class AdministrarVehiculos extends AppCompatActivity {
             luces = vehiculo.isLucesLed();
             bodykit = vehiculo.isBodyKit();
             foto = vehiculo.getFoto();
+            esEdicion = true;
         }
 
         if (vehiculo != null) {
@@ -256,7 +259,7 @@ public class AdministrarVehiculos extends AppCompatActivity {
                 // Procedemos a comprobar si todos los campos están rellenos
                 if (validarCampos()) { // En caso afirmativo
                     // Llamamos al método para validar si la matricula es única y no está repetida
-                    validarMatriculaUnica(matricula);
+                    validarMatriculaUnica(matricula, matriculaAntigua, esEdicion);
                 }
             }
         });
@@ -567,6 +570,37 @@ public class AdministrarVehiculos extends AppCompatActivity {
                         }
                     } else { // En caso de que algo haya salido mal
                         // Lanzamos un Toast indicando que hubo un error al verificar la matrícula
+                        showToast("Error al verificar la matrícula.");
+                    }
+                });
+    }
+
+    private void validarMatriculaUnica(String matriculaNueva, String matriculaAntigua, boolean esEdicion) {
+        db.collection("vehiculos").document(matriculaNueva)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot doc = task.getResult();
+                        String uidActual = auth.getCurrentUser().getUid();
+
+                        if (doc != null && doc.exists()) {
+                            String uidDueno = doc.getString("uidDueno");
+
+                            if (esEdicion) {
+                                if (matriculaNueva.equals(matriculaAntigua)) {
+                                    verificarCantidadVehiculosYAgregar();
+                                } else if (uidDueno.equals(uidActual)) {
+                                    showToast("Ya tienes un vehículo con esta matrícula.");
+                                } else {
+                                    showToast("La matrícula ya está registrada por otro usuario.");
+                                }
+                            } else {
+                                showToast("La matrícula ya está registrada.");
+                            }
+                        } else {
+                            verificarCantidadVehiculosYAgregar();
+                        }
+                    } else {
                         showToast("Error al verificar la matrícula.");
                     }
                 });
