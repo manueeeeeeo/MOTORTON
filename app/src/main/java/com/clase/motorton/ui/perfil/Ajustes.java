@@ -18,6 +18,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
 
@@ -123,34 +125,42 @@ public class Ajustes extends AppCompatActivity {
 
         if (codigo != null && uid != null) {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
-            db.collection("invitationCodes").document(codigo).get()
-                    .addOnSuccessListener(doc -> {
-                        if (doc.exists()) {
-                            Long logoutCount = doc.getLong("logoutCount");
-                            logoutCount = (logoutCount == null) ? 1 : logoutCount + 1;
+            DocumentReference docRef = db.collection("invitationCodes").document(codigo);
 
-                            Map<String, Object> updates = new HashMap<>();
-                            updates.put("logoutCount", logoutCount);
+            db.runTransaction(transaction -> {
+                DocumentSnapshot snapshot = transaction.get(docRef);
 
-                            if (logoutCount >= 3) {
-                                updates.put("active", false);
-                            }
+                if (!snapshot.exists()) {
+                    try {
+                        throw new Exception("Documento no existe");
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
 
-                            db.collection("invitationCodes").document(codigo).update(updates);
-                        }
+                Long logoutCount = snapshot.getLong("logoutCount");
+                logoutCount = (logoutCount == null) ? 1 : logoutCount + 1;
 
-                        prefs.edit().remove("codigoBeta").apply();
+                transaction.update(docRef, "logoutCount", logoutCount);
 
-                        GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut();
-                        FirebaseAuth.getInstance().signOut();
+                if (logoutCount >= 3) {
+                    transaction.update(docRef, "active", false);
+                }
 
-                        Intent intent = new Intent(this, InicioSesion.class);
-                        startActivity(intent);
-                        finish();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Error al cerrar sesión: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    });
+                return logoutCount;
+            }).addOnSuccessListener(logoutCount -> {
+                prefs.edit().remove("codigoBeta").apply();
+
+                GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut();
+                FirebaseAuth.getInstance().signOut();
+
+                Intent intent = new Intent(this, InicioSesion.class);
+                startActivity(intent);
+                finish();
+            }).addOnFailureListener(e -> {
+                Toast.makeText(this, "Error al actualizar el contador: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            });
+
         } else {
             GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut();
             FirebaseAuth.getInstance().signOut();
@@ -160,7 +170,6 @@ public class Ajustes extends AppCompatActivity {
             finish();
         }
     }
-
 
     /**
      * Método en el que establecemos el destinatario,
