@@ -422,6 +422,8 @@ public class CreateEventFragment extends Fragment {
 
         Date fechaEvento = calendar.getTime();
 
+        boolean esRuta = tipoEvento.contains("ruta");
+
         // Obtengo el uid del organizador del evento
         String uidOrganizador = mAuth.getCurrentUser().getUid();
 
@@ -439,6 +441,22 @@ public class CreateEventFragment extends Fragment {
         evento.setId(eventoId);
         evento.setActivo(true);
         evento.setParticipantes(new ArrayList<>());
+
+        if (esRuta && !Double.isNaN(latInicio) && !Double.isNaN(lonInicio) &&
+                !Double.isNaN(latFin) && !Double.isNaN(lonFin)) {
+            evento.setStartLat(latInicio);
+            evento.setStartLon(lonInicio);
+            evento.setEndLat(latFin);
+            evento.setEndLon(lonFin);
+            evento.setEsRuta(true);
+        } else if (!Double.isNaN(latInicio) && !Double.isNaN(lonInicio)) {
+            evento.setUbicacionLat(latInicio);
+            evento.setUbicacionLon(lonInicio);
+            evento.setEsRuta(false);
+        } else {
+            showToast("Selecciona una ubicación o ruta válida");
+            return;
+        }
 
         // Procedemos a entrar dentro de la colección de la base de datos de eventos
         db.collection("eventos")
