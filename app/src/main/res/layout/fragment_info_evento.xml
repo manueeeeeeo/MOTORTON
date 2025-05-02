@@ -236,6 +236,13 @@
                     android:fontFamily="sans-serif" />
             </LinearLayout>
 
+            <org.osmdroid.views.MapView
+                android:id="@+id/mapViewInfo"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"/>
+
             <TextView
                 android:id="@+id/textInfoParticipantes"
                 android:layout_width="match_parent"
