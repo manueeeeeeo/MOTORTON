@@ -37,7 +37,7 @@ public class NotificacionDiariaWorker extends Worker {
         }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), "diario_channel")
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.icono)
                 .setContentTitle("Nuevos Eventos")
                 .setContentText("Existen nuevos Eventos Activos!!!")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
