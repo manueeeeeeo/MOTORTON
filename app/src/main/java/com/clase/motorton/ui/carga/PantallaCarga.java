@@ -197,7 +197,7 @@ public class PantallaCarga extends AppCompatActivity {
                     boolean tienePerfil = documentSnapshot.exists();
 
                     db.collection("invitationCodes")
-                            .whereEqualTo("usedBy", uid)
+                            .whereEqualTo("userUID", uid)
                             .whereEqualTo("active", true)
                             .get()
                             .addOnSuccessListener(queryDocumentSnapshots -> {
