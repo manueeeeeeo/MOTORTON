@@ -28,17 +28,10 @@
             android:exported="false"
             android:screenOrientation="portrait"/>
 
-        <receiver android:name=".notifications.NotificacionReceiver" />
-
         <activity
             android:name=".ui.perfil.EditarPerfilActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
-
-        <service
-            android:name=".notifications.NotificacionDiariaWorker"
-            android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <activity
             android:name=".pasajero.VersionBeta"
@@ -87,6 +80,11 @@
             android:exported="true"
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
+
+        <service
+            android:name=".notifications.NotificacionDiariaWorker"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 
 </manifest>
