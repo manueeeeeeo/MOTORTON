@@ -217,7 +217,7 @@ public class CreateEventFragment extends Fragment {
                 // Obtengo el item elegido
                 String selectedItem = parentView.getItemAtPosition(position).toString();
 
-                if (selectedItem.contains("Ruta")) {
+                if (selectedItem.contains("Ruta") || selectedItem.contains("ruta")) {
                     tipoEvento = "ruta";
                 } else {
                     tipoEvento = "otro";
@@ -241,6 +241,8 @@ public class CreateEventFragment extends Fragment {
                     }else{
                         bundle.putString("tipoSeleccion", "ubicacion");
                     }
+                    String selectedItem = spinnerTipoEvento.getSelectedItem().toString();
+                    bundle.putString("tipoEventoActual", selectedItem);
                     Navigation.findNavController(view).navigate(R.id.navigation_map_ruta, bundle);
                 } catch (Exception e) { // En caso de que surja alguna excepción
                     // Imprimimos la excepción por consola
@@ -260,6 +262,14 @@ public class CreateEventFragment extends Fragment {
             double ubicacionLon = bundle.getDouble("ubicacionLon", Double.NaN);
 
             mapView.getOverlays().clear();
+
+            if (getArguments() != null && getArguments().containsKey("tipoEventoActual")) {
+                String tipoSeleccion = getArguments().getString("tipoEventoActual");
+                int posicion = tiposEvento.indexOf(tipoSeleccion);
+                if (posicion != -1) {
+                    spinnerTipoEvento.setSelection(posicion);
+                }
+            }
 
             if (!Double.isNaN(startLat) && !Double.isNaN(startLon) &&
                     !Double.isNaN(endLat) && !Double.isNaN(endLon)) {
@@ -422,7 +432,7 @@ public class CreateEventFragment extends Fragment {
 
         Date fechaEvento = calendar.getTime();
 
-        boolean esRuta = tipoEvento.contains("ruta");
+        boolean esRuta = spinnerTipoEvento.getSelectedItem().toString().contains("Ruta");
 
         // Obtengo el uid del organizador del evento
         String uidOrganizador = mAuth.getCurrentUser().getUid();

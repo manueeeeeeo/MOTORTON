@@ -67,7 +67,7 @@ public class MapaEventFragment extends Fragment {
         btnBorrarRuta = view.findViewById(R.id.btnBorrarRuta);
         searchView = view.findViewById(R.id.searchView);
 
-        String tipoSeleccion = getArguments() != null ? getArguments().getString("tipoSeleccion", "ubicacion") : "ubicacion";
+        String tipoSeleccion = getArguments().getString("tipoSeleccion", "ubicacion");
 
         // Configuramos para obtener la API de OSM
         Configuration.getInstance().setUserAgentValue(requireContext().getPackageName());
@@ -158,8 +158,9 @@ public class MapaEventFragment extends Fragment {
                 }
             }
 
+            bundle.putString("tipoEventoActual", getArguments().getString("tipoEventoActual", "otro"));
             getParentFragmentManager().setFragmentResult("rutaSeleccionada", bundle);
-            Navigation.findNavController(view).navigate(R.id.navigation_createEvent, bundle);
+            Navigation.findNavController(v).popBackStack();
         });
 
         // Establecemos la acción que sucede al pulsar el botón de borrar la ruta
