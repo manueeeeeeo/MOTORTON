@@ -270,9 +270,7 @@ public class Registrarse extends AppCompatActivity {
                                                             DocumentReference docRef = db.collection("invitationCodes").document(codigo);
 
                                                             Map<String, Object> data = new HashMap<>();
-                                                            data.put("active", true);
                                                             data.put("userUID", uid);
-                                                            data.put("logoutCount", 0);
 
                                                             docRef.get().addOnSuccessListener(snapshot -> {
                                                                 if (snapshot.exists()) {

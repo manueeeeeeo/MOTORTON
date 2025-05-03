@@ -72,7 +72,7 @@ public class VersionBeta extends AppCompatActivity {
                         return;
                     }
 
-                    if (logoutCount != null && logoutCount >= 2) {
+                    if (logoutCount != null && logoutCount >= 3) {
                         showToast("Este código ya fue utilizado demasiado");
                         return;
                     }
