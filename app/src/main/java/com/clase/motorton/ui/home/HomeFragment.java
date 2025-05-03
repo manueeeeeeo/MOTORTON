@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -24,6 +25,7 @@ import com.clase.motorton.modelos.Evento;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +44,8 @@ public class HomeFragment extends Fragment {
     private Spinner spinnerPronvincia = null;
     // Variable para manejar la lista de las provincias
     private List<String> provincias = new ArrayList<>();
+
+    private String currentProvinciaFilter = null;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -123,7 +127,7 @@ public class HomeFragment extends Fragment {
         // Inicializamos Firestore
         db = FirebaseFirestore.getInstance();
 
-        binding.swipeRefresh.setOnRefreshListener(() -> cargarConRefresh());
+        binding.swipeRefresh.setOnRefreshListener(() -> cargarConRefresh(currentProvinciaFilter));
 
         cargarInicial();
 
@@ -132,9 +136,26 @@ public class HomeFragment extends Fragment {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
                 if (!isLoading && layoutManager != null && layoutManager.findLastVisibleItemPosition() == eventoList.size() - 1) {
-                    cargarMasEventos();
+                    cargarMasEventos(currentProvinciaFilter);
                 }
             }
+        });
+
+        spinnerPronvincia.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedProvincia = provincias.get(position);
+                if (selectedProvincia.equals("-- Elija una Opción --")) {
+                    currentProvinciaFilter = null;
+                    cargarConRefresh(null);
+                } else {
+                    currentProvinciaFilter = selectedProvincia;
+                    cargarConRefresh(selectedProvincia);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
         });
 
         return root;
@@ -149,6 +170,7 @@ public class HomeFragment extends Fragment {
 
         db.collection("eventos")
                 .limit(10)
+                .orderBy("fecha", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (!queryDocumentSnapshots.isEmpty()) {
@@ -172,16 +194,22 @@ public class HomeFragment extends Fragment {
                 });
     }
 
-    private void cargarMasEventos() {
+    private void cargarMasEventos(String provincia) {
         if (lastVisible == null) return;
-
         ProgressBar progress = binding.progressLoading;
         progress.setVisibility(View.VISIBLE);
-
         isLoading = true;
 
-        db.collection("eventos")
-                .startAfter(lastVisible)
+        Query query = db.collection("eventos")
+                .orderBy("fecha", Query.Direction.DESCENDING);
+
+        if (provincia != null && !provincia.isEmpty() && !provincia.equals("-- Elija una Opción --")) {
+            query = db.collection("eventos")
+                    .whereEqualTo("provincia", provincia)
+                    .orderBy("fecha", Query.Direction.DESCENDING);
+        }
+
+        query.startAfter(lastVisible)
                 .limit(10)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -190,10 +218,11 @@ public class HomeFragment extends Fragment {
                         lastVisible = queryDocumentSnapshots.getDocuments()
                                 .get(queryDocumentSnapshots.size() - 1);
                         eventoAdapter.notifyDataSetChanged();
-
                         if (queryDocumentSnapshots.size() < 10) {
                             showToast("No hay más eventos");
                         }
+                    } else {
+                        showToast("No hay más eventos para esta provincia");
                     }
                     progress.setVisibility(View.GONE);
                     isLoading = false;
@@ -202,19 +231,27 @@ public class HomeFragment extends Fragment {
                     progress.setVisibility(View.GONE);
                     isLoading = false;
                     Log.e("HomeFragment", "Error al cargar más eventos", e);
+                    showToast("Error al cargar más eventos");
                 });
     }
 
-    private void cargarConRefresh() {
+    private void cargarConRefresh(String provincia) {
         binding.swipeRefresh.setRefreshing(true);
         isLoading = true;
-
         eventoList.clear();
         eventoAdapter.notifyDataSetChanged();
         lastVisible = null;
 
-        db.collection("eventos")
-                .limit(10)
+        Query query = db.collection("eventos")
+                .orderBy("fecha", Query.Direction.DESCENDING);
+
+        if (provincia != null && !provincia.isEmpty() && !provincia.equals("-- Elija una Opción --")) {
+            query = db.collection("eventos")
+                    .whereEqualTo("provincia", provincia)
+                    .orderBy("fecha", Query.Direction.DESCENDING);
+        }
+
+        query.limit(10)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (!queryDocumentSnapshots.isEmpty()) {
@@ -222,6 +259,11 @@ public class HomeFragment extends Fragment {
                         lastVisible = queryDocumentSnapshots.getDocuments()
                                 .get(queryDocumentSnapshots.size() - 1);
                         eventoAdapter.notifyDataSetChanged();
+                        if (queryDocumentSnapshots.size() < 10) {
+                            showToast("No hay más eventos");
+                        }
+                    } else {
+                        showToast("No se encontraron eventos para esta provincia");
                     }
                     binding.swipeRefresh.setRefreshing(false);
                     isLoading = false;
@@ -230,6 +272,7 @@ public class HomeFragment extends Fragment {
                     binding.swipeRefresh.setRefreshing(false);
                     isLoading = false;
                     Log.e("HomeFragment", "Error al refrescar eventos", e);
+                    showToast("Error al cargar eventos");
                 });
     }
 
