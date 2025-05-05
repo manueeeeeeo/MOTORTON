@@ -22,8 +22,8 @@
             android:textStyle="bold"
             android:textColor="#FFFFFF"
             android:fontFamily="sans-serif-medium"
-            android:paddingBottom="16dp"
-            android:layout_marginTop="13dp"/>
+            android:paddingBottom="9dp"
+            android:layout_marginTop="9dp"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -31,7 +31,7 @@
             android:text="Versión 1.0.0"
             android:textColor="#D0D0D0"
             android:textSize="14sp"
-            android:paddingBottom="24dp" />
+            android:paddingBottom="15dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -84,6 +84,34 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Describe el problema y envíanoslo"
+                android:textColor="#888888"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/btnVehFav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Vehículos Favoritos"
+                android:textColor="#560084"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif-medium"
+                android:paddingBottom="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Visualizar tus vehículos favoritos."
                 android:textColor="#888888"
                 android:textSize="14sp" />
         </LinearLayout>
