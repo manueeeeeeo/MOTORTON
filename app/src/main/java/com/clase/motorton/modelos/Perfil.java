@@ -20,6 +20,7 @@ public class Perfil {
     private String descripcion;
     private int aniosConduciendo;
     private ArrayList<String> usuariosLikeYou;
+    private ArrayList<String> listaFavVeh;
 
     public Perfil() {
     }
@@ -53,6 +54,31 @@ public class Perfil {
         this.descripcion = descripcion;
         this.aniosConduciendo = aniosConduciendo;
         this.usuariosLikeYou = likes;
+    }
+
+    public Perfil(String uid, String username, String email, String nombre_completo, Map<String, Object> ubicacion, int edad, String fechaNaci, int cp, ArrayList<Vehiculo> listaVehiculos, Bitmap fotoPerfil, String descripcion, int aniosConduciendo, ArrayList<String> likes, ArrayList<String> favs) {
+        this.uid = uid;
+        this.username = username;
+        this.email = email;
+        this.nombre_completo = nombre_completo;
+        this.ubicacion = ubicacion;
+        this.edad = edad;
+        this.fechaNaci = fechaNaci;
+        this.cp = cp;
+        this.listaVehiculos = listaVehiculos;
+        this.fotoPerfil = fotoPerfil;
+        this.descripcion = descripcion;
+        this.aniosConduciendo = aniosConduciendo;
+        this.usuariosLikeYou = likes;
+        this.listaFavVeh = favs;
+    }
+
+    public ArrayList<String> getListaFavVeh() {
+        return listaFavVeh;
+    }
+
+    public void setListaFavVeh(ArrayList<String> listaFavVeh) {
+        this.listaFavVeh = listaFavVeh;
     }
 
     public ArrayList<String> getUsuariosLikeYou() {
