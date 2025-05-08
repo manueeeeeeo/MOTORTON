@@ -429,6 +429,7 @@ public class CreacionPerfil extends AppCompatActivity {
           fotoBitmap,
           descripcion,
           anosPermiso.isEmpty() ? 0 : Integer.parseInt(anosPermiso),
+          new ArrayList<>(),
           new ArrayList<>()
         );
 
