@@ -38,6 +38,7 @@ public class Ajustes extends AppCompatActivity {
     private LinearLayout btnReportar = null;
     private LinearLayout btnEliminar = null;
     private LinearLayout btnEstadisticas = null;
+    private LinearLayout btnFavs = null;
 
     // Variable para manejar todos los Toast de está actividad
     private Toast mensajeToast = null;
@@ -81,6 +82,15 @@ public class Ajustes extends AppCompatActivity {
         btnEliminar = findViewById(R.id.EliminarCuenta);
         btnReportar = findViewById(R.id.btnReportar);
         btnEstadisticas = findViewById(R.id.VerGraficas);
+        btnFavs = findViewById(R.id.btnVehFav);
+
+        btnFavs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(Ajustes.this, VehiculosFavoritos.class);
+                startActivity(i);
+            }
+        });
 
         btnEstadisticas.setOnClickListener(new View.OnClickListener() {
             @Override
