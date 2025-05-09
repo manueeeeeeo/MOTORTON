@@ -4,6 +4,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
@@ -94,6 +95,7 @@ public class MapaEventFragment extends Fragment {
                         startMarker.setTitle("Punto de inicio");
                         // Marcamos en el mapa el marcador
                         map.getOverlays().add(startMarker);
+                        startMarker.setIcon(ContextCompat.getDrawable(requireContext(), R.drawable.ic_marker_start));
                     } else if (endMarker == null) { // Comprobamos que la marca final sea nula
                         // Inicializamos el marcador
                         endMarker = new Marker(map);
@@ -103,6 +105,7 @@ public class MapaEventFragment extends Fragment {
                         endMarker.setTitle("Punto de fin");
                         // Marcamos en el mapa el marcador
                         map.getOverlays().add(endMarker);
+                        endMarker.setIcon(ContextCompat.getDrawable(requireContext(), R.drawable.ic_marker_end));
 
                         // Llamamos al método para dibujar la línea de la ruta
                         dibujarLineaRuta();
@@ -116,6 +119,7 @@ public class MapaEventFragment extends Fragment {
                     startMarker.setPosition(p);
                     startMarker.setTitle("Ubicación del evento");
                     map.getOverlays().add(startMarker);
+                    startMarker.setIcon(ContextCompat.getDrawable(requireContext(), R.drawable.ic_marker_start));
                 }
 
                 // Invalidamos el mapa
@@ -285,6 +289,19 @@ public class MapaEventFragment extends Fragment {
                         .getJSONObject("geometry")
                         .getJSONArray("coordinates");
 
+                double durationInSeconds = json
+                        .getJSONArray("routes")
+                        .getJSONObject(0)
+                        .getDouble("duration");
+
+                int durationInMinutes = (int) Math.round(durationInSeconds / 60.0);
+
+                double distanceInMeters = json
+                        .getJSONArray("routes")
+                        .getJSONObject(0)
+                        .getDouble("distance");
+                int distanceInKm = (int) Math.round(distanceInMeters / 1000.0);
+
                 List<GeoPoint> geoPointsRuta = new ArrayList<>();
                 for (int i = 0; i < coordinates.length(); i++) {
                     JSONArray coord = coordinates.getJSONArray(i);
@@ -294,6 +311,7 @@ public class MapaEventFragment extends Fragment {
                 }
 
                 requireActivity().runOnUiThread(() -> {
+                    showToast("Duración estimada: " + durationInMinutes + " min\nDistancia: " + distanceInKm + " km");
                     if (routeLine != null) map.getOverlayManager().remove(routeLine);
 
                     routeLine = new Polyline();

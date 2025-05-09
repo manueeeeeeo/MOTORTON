@@ -155,9 +155,11 @@ public class InfoOtroPerfilFragment extends Fragment {
                                     if (yaDioLike) {
                                         btnLike.setText("❤\uFE0F Dar Like");
                                         showToast("Has quitado el like");
+                                        cargarDatosPerfil(uidPerfil);
                                     } else {
                                         btnLike.setText("❤\uFE0F Quitar Like");
                                         showToast("Has dado like");
+                                        cargarDatosPerfil(uidPerfil);
                                     }
                                 })
                                 .addOnFailureListener(e -> {

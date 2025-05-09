@@ -68,13 +68,13 @@ public class CreateEventFragment extends Fragment {
     private Spinner spinnerProvincia = null;
 
     // Variable para manejar la latitud del inicio
-    private double latInicio = 0.0;
+    private double latInicio = Double.NaN;
     // Variable para manejar la latitud del final
-    private double latFin = 0.0;
+    private double latFin = Double.NaN;
     // Variable para manejar la longitud del inicio
-    private double lonInicio = 0.0;
+    private double lonInicio = Double.NaN;
     // Variable para manejar la longitud del final
-    private double lonFin = 0.0;
+    private double lonFin = Double.NaN;
     // Variable para manejar la provincia elegida
     private String provincia = null;
 
@@ -415,6 +415,18 @@ public class CreateEventFragment extends Fragment {
         String ubicacion = editTextUbicacion.getText().toString().trim();
         String provincia = spinnerProvincia.getSelectedItem().toString();
         String tipoEvento = spinnerTipoEvento.getSelectedItem().toString();
+
+        if(nombre.isEmpty() || descripcion.isEmpty() ||ubicacion.isEmpty() ||provincia.isEmpty() ||tipoEvento.isEmpty() ||
+                nombre == null || descripcion == null ||ubicacion == null ||provincia == null ||tipoEvento == null){
+            showToast("Existen campos vacíos, rellenelos. Por favor!!!");
+            return;
+        }
+
+        if (Double.isNaN(latInicio) && Double.isNaN(lonInicio) &&
+                Double.isNaN(latFin) && Double.isNaN(lonFin)) {
+            showToast("Selecciona una ubicación o ruta válida");
+            return;
+        }
 
         // Obtengo del seleccionador de fecha todos los datos necesarios
         int dia = datePickerFecha.getDayOfMonth();

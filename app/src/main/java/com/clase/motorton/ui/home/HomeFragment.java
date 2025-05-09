@@ -129,7 +129,7 @@ public class HomeFragment extends Fragment {
 
         binding.swipeRefresh.setOnRefreshListener(() -> cargarConRefresh(currentProvinciaFilter));
 
-        cargarInicial();
+        //cargarInicial();
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
