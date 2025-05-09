@@ -105,6 +105,17 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
                 view.getContext().startActivity(intent);
             }
         });
+
+        holder.imageViewFavorito.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+    }
+
+    private void agregarListFavVeh(String matricula, String uid){
+        
     }
 
     /**
@@ -162,7 +173,7 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
 
     public static class VehiculoViewHolder extends RecyclerView.ViewHolder {
         TextView textViewModeloYMarca, textViewDescripcion;
-        ImageView imageViewTipoVehiculo, imageViewEdit, imageViewDelete;
+        ImageView imageViewTipoVehiculo, imageViewEdit, imageViewDelete, imageViewFavorito;
         ConstraintLayout fondo;
 
         public VehiculoViewHolder(View itemView) {
@@ -173,6 +184,7 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
             imageViewEdit = itemView.findViewById(R.id.imageViewEdit);
             imageViewDelete = itemView.findViewById(R.id.imageViewDelete);
             fondo = itemView.findViewById(R.id.fondoVeh);
+            imageViewFavorito = itemView.findViewById(R.id.imageViewFavorito);
         }
     }
 }
