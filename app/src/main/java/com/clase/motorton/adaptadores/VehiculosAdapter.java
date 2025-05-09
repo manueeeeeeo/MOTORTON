@@ -85,6 +85,26 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
                 break;
         }
 
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("perfiles").document(uidUser)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        List<String> favoritos = (List<String>) documentSnapshot.get("listaFavVeh");
+
+                        if (favoritos != null && favoritos.contains(vehiculo.getMatricula())) {
+                            holder.imageViewFavorito.setImageResource(R.drawable.con_estrella);
+                        } else {
+                            holder.imageViewFavorito.setImageResource(R.drawable.sin_estrella);
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // En caso de error al obtener el perfil
+                    holder.imageViewFavorito.setImageResource(R.drawable.sin_estrella); // fallback
+                });
+
+
         holder.fondo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
