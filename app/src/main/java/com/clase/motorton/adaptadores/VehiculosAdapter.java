@@ -24,6 +24,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.clase.motorton.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.VehiculoViewHolder> {
 
@@ -31,6 +32,7 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
     private final ArrayList<Vehiculo> vehiculosList;
     // Variable para manejar el contexto
     private final Context context;
+    private Toast mensajeToast = null;
 
     /**
      * @param context
@@ -109,13 +111,55 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
         holder.imageViewFavorito.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                agregarListFavVeh(vehiculo.getMatricula(), uidUser, holder.imageViewFavorito);
             }
         });
     }
 
-    private void agregarListFavVeh(String matricula, String uid){
-        
+    private void agregarListFavVeh(String matricula, String uid, ImageView imageViewFavorito){
+        // Obtenemos la instancia de la base de datos de firestore
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("perfiles").document(uid)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        List<String> favoritos = (List<String>) documentSnapshot.get("listaFavVeh");
+
+                        if (favoritos == null) {
+                            favoritos = new ArrayList<>();
+                        }
+
+                        boolean yaEnFavoritos = favoritos.contains(matricula);
+
+                        if (yaEnFavoritos) {
+                            favoritos.remove(matricula);
+                        } else {
+                            favoritos.add(matricula);
+                        }
+
+                        db.collection("perfiles").document(uid)
+                                .update("listaFavVeh", favoritos)
+                                .addOnSuccessListener(aVoid -> {
+                                    if (yaEnFavoritos) {
+                                        imageViewFavorito.setImageResource(R.drawable.sin_estrella);
+                                        showToast("Has quitado el vehículo de favoritos");
+                                    } else {
+                                        imageViewFavorito.setImageResource(R.drawable.con_estrella);
+                                        showToast("Has agregado el vehículo a favoritos");
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    showToast("Error al actualizar la lista de favoritos");
+                                });
+                    } else {
+                        showToast("Perfil no encontrado");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    showToast("Error al obtener el perfil");
+                })
+                .addOnCompleteListener(task -> {
+                });
     }
 
     /**
@@ -164,6 +208,25 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
                         // Lanzamos un toast indicando que ocurrio un error al conectar con la bd
                         Toast.makeText(context, "Error al conectar con la base de datos", Toast.LENGTH_SHORT).show()
                 );
+    }
+
+    /**
+     * @param mensaje
+     * Método para ir matando los Toast y mostrar todos en el mismo para evitar
+     * colas de Toasts y que se ralentice el dispositivo
+     */
+    public void showToast(String mensaje){
+        if (this != null){
+            // Comprobamos si existe algun toast cargado en el toast de la variable global
+            if (mensajeToast != null) { // En caso de que si que exista
+                mensajeToast.cancel(); // Le cancelamos, es decir le "matamos"
+            }
+
+            // Creamos un nuevo Toast con el mensaje que nos dan de argumento en el método
+            mensajeToast = Toast.makeText(context, mensaje, Toast.LENGTH_SHORT);
+            // Mostramos dicho Toast
+            mensajeToast.show();
+        }
     }
 
     @Override
