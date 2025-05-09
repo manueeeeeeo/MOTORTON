@@ -23,12 +23,22 @@ import com.clase.motorton.modelos.Evento;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -58,13 +68,13 @@ public class CreateEventFragment extends Fragment {
     private Spinner spinnerProvincia = null;
 
     // Variable para manejar la latitud del inicio
-    private double latInicio = 0.0;
+    private double latInicio = Double.NaN;
     // Variable para manejar la latitud del final
-    private double latFin = 0.0;
+    private double latFin = Double.NaN;
     // Variable para manejar la longitud del inicio
-    private double lonInicio = 0.0;
+    private double lonInicio = Double.NaN;
     // Variable para manejar la longitud del final
-    private double lonFin = 0.0;
+    private double lonFin = Double.NaN;
     // Variable para manejar la provincia elegida
     private String provincia = null;
 
@@ -81,6 +91,8 @@ public class CreateEventFragment extends Fragment {
     private Toast mensajeToast= null;
 
     private String tipoEvento = null;
+    // Variable para manejar la línea de la ruta
+    private Polyline routeLine = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -91,6 +103,8 @@ public class CreateEventFragment extends Fragment {
         // Inicializamos Firebase
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+
+        Configuration.getInstance().setUserAgentValue(requireContext().getPackageName());
 
         // Obtenemos referencias a los elementos de la interfaz
         editTextNombreEvento = root.findViewById(R.id.editTextNombreEvento);
@@ -103,9 +117,11 @@ public class CreateEventFragment extends Fragment {
         btnIrRuta = root.findViewById(R.id.buttonIrRuta);
         spinnerProvincia = root.findViewById(R.id.spinnerProvincia);
 
-        mapView.setTileSource(TileSourceFactory.MAPNIK);  // Usar Mapnik para el fondo del mapa
-        mapView.setBuiltInZoomControls(true);  // Activar controles de zoom
+        mapView.setTileSource(TileSourceFactory.MAPNIK);
+        mapView.setBuiltInZoomControls(true);
         mapView.setMultiTouchControls(true);
+        mapView.getController().setZoom(15.0);
+        mapView.getController().setCenter(new GeoPoint(40.4168, -3.7038));
 
         // Agrego todos los tipos de eventos posibles
         tiposEvento.add("Quedada Motos");
@@ -201,7 +217,7 @@ public class CreateEventFragment extends Fragment {
                 // Obtengo el item elegido
                 String selectedItem = parentView.getItemAtPosition(position).toString();
 
-                if (selectedItem.contains("Ruta")) {
+                if (selectedItem.contains("Ruta") || selectedItem.contains("ruta")) {
                     tipoEvento = "ruta";
                 } else {
                     tipoEvento = "otro";
@@ -225,6 +241,8 @@ public class CreateEventFragment extends Fragment {
                     }else{
                         bundle.putString("tipoSeleccion", "ubicacion");
                     }
+                    String selectedItem = spinnerTipoEvento.getSelectedItem().toString();
+                    bundle.putString("tipoEventoActual", selectedItem);
                     Navigation.findNavController(view).navigate(R.id.navigation_map_ruta, bundle);
                 } catch (Exception e) { // En caso de que surja alguna excepción
                     // Imprimimos la excepción por consola
@@ -243,6 +261,16 @@ public class CreateEventFragment extends Fragment {
             double ubicacionLat = bundle.getDouble("ubicacionLat", Double.NaN);
             double ubicacionLon = bundle.getDouble("ubicacionLon", Double.NaN);
 
+            mapView.getOverlays().clear();
+
+            if (getArguments() != null && getArguments().containsKey("tipoEventoActual")) {
+                String tipoSeleccion = getArguments().getString("tipoEventoActual");
+                int posicion = tiposEvento.indexOf(tipoSeleccion);
+                if (posicion != -1) {
+                    spinnerTipoEvento.setSelection(posicion);
+                }
+            }
+
             if (!Double.isNaN(startLat) && !Double.isNaN(startLon) &&
                     !Double.isNaN(endLat) && !Double.isNaN(endLon)) {
                 // Caso RUTA
@@ -250,60 +278,101 @@ public class CreateEventFragment extends Fragment {
                 this.lonInicio = startLon;
                 this.latFin = endLat;
                 this.lonFin = endLon;
-
+                dibujarMarcadoresRuta(startLat, startLon, endLat, endLon);
+                dibujarRuta(startLat, startLon, endLat, endLon);
             } else if (!Double.isNaN(ubicacionLat) && !Double.isNaN(ubicacionLon)) {
                 // Caso UBICACIÓN ÚNICA
                 this.latInicio = ubicacionLat;
                 this.lonInicio = ubicacionLon;
                 this.latFin = Double.NaN;
                 this.lonFin = Double.NaN;
-
+                dibujarMarcadorUnico(ubicacionLat, ubicacionLon);
             } else {
                 showToast("Error: No se recibieron coordenadas válidas");
             }
+
+            mapView.invalidate();
         });
 
         return root;
     }
 
-    /**
-     * @param latFin
-     * @param latInicio
-     * @param lonFin
-     * @param lonInicio
-     * Método en el que procedemos a dibujar una línea de ruta
-     * entre dos puntos en un mapa, basandonos en las coodernadas
-     * de inicio y las de fin
-     */
+    private void dibujarMarcadoresRuta(double startLat, double startLon, double endLat, double endLon) {
+        Marker startMarker = new Marker(mapView);
+        startMarker.setPosition(new GeoPoint(startLat, startLon));
+        startMarker.setTitle("Inicio");
+        mapView.getOverlays().add(startMarker);
+
+        Marker endMarker = new Marker(mapView);
+        endMarker.setPosition(new GeoPoint(endLat, endLon));
+        endMarker.setTitle("Fin");
+        mapView.getOverlays().add(endMarker);
+    }
+
+    private void dibujarMarcadorUnico(double lat, double lon) {
+        Marker marker = new Marker(mapView);
+        marker.setPosition(new GeoPoint(lat, lon));
+        marker.setTitle("Ubicación del evento");
+        mapView.getOverlays().add(marker);
+
+        mapView.getController().setCenter(new GeoPoint(lat, lon));
+        mapView.getController().setZoom(15.0);
+    }
+
     private void dibujarRuta(double latInicio, double lonInicio, double latFin, double lonFin) {
-        // Creamos un geopunto que es el de inicio basandonos en las coordenadas de inicio
-        GeoPoint puntoInicio = new GeoPoint(latInicio, lonInicio);
-        // Creamos un geopunto que es el de final basandonos en las coordenadas de final
-        GeoPoint puntoFin = new GeoPoint(latFin, lonFin);
+        new Thread(() -> {
+            try {
+                String urlString = "https://router.project-osrm.org/route/v1/driving/" +
+                        lonInicio + "," + latInicio + ";" +
+                        lonFin + "," + latFin +
+                        "?overview=full&geometries=geojson";
 
-        // Hacemos una lista de geopunto para guardar los creados anteriormente
-        List<GeoPoint> puntosRuta = new ArrayList<>();
-        // Agregamos todos los puntos
-        puntosRuta.add(puntoInicio);
-        puntosRuta.add(puntoFin);
+                URL url = new URL(urlString);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
 
-        // Creamos un polyline para ir dibujando las líneas
-        Polyline polyline = new Polyline();
-        // Establecemos los puntos
-        polyline.setPoints(puntosRuta);
-        // Establecemos el color
-        polyline.setColor(Color.BLUE);
-        // Establecemos el ancho
-        polyline.setWidth(5);
+                InputStream inputStream = new BufferedInputStream(connection.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuilder result = new StringBuilder();
+                String line;
 
-        // Agregamos al mapa el objeto creado
-        mapView.getOverlays().add(polyline);
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
+                }
 
-        // Obtenemos el boundingbox basandonos en el calculo que devuelve el metodo que hemos creado
-        BoundingBox boundingBox = calculateBoundingBox(puntosRuta);
+                JSONObject json = new JSONObject(result.toString());
+                JSONArray coordinates = json.getJSONArray("routes")
+                        .getJSONObject(0)
+                        .getJSONObject("geometry")
+                        .getJSONArray("coordinates");
 
-        // Establecemos que se pueda hacer zoom hacía la zona
-        mapView.zoomToBoundingBox(boundingBox, true);
+                List<GeoPoint> geoPointsRuta = new ArrayList<>();
+                for (int i = 0; i < coordinates.length(); i++) {
+                    JSONArray coord = coordinates.getJSONArray(i);
+                    double lon = coord.getDouble(0);
+                    double lat = coord.getDouble(1);
+                    geoPointsRuta.add(new GeoPoint(lat, lon));
+                }
+
+                requireActivity().runOnUiThread(() -> {
+                    if (routeLine != null) mapView.getOverlays().remove(routeLine);
+
+                    routeLine = new Polyline();
+                    routeLine.setPoints(geoPointsRuta);
+                    routeLine.setColor(Color.BLUE);
+                    routeLine.setWidth(5);
+                    mapView.getOverlays().add(routeLine);
+
+                    BoundingBox boundingBox = calculateBoundingBox(geoPointsRuta);
+                    mapView.zoomToBoundingBox(boundingBox, true);
+                    mapView.invalidate();
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                requireActivity().runOnUiThread(() -> showToast("Error al cargar la ruta"));
+            }
+        }).start();
     }
 
     /**
@@ -347,6 +416,18 @@ public class CreateEventFragment extends Fragment {
         String provincia = spinnerProvincia.getSelectedItem().toString();
         String tipoEvento = spinnerTipoEvento.getSelectedItem().toString();
 
+        if(nombre.isEmpty() || descripcion.isEmpty() ||ubicacion.isEmpty() ||provincia.isEmpty() ||tipoEvento.isEmpty() ||
+                nombre == null || descripcion == null ||ubicacion == null ||provincia == null ||tipoEvento == null){
+            showToast("Existen campos vacíos, rellenelos. Por favor!!!");
+            return;
+        }
+
+        if (Double.isNaN(latInicio) && Double.isNaN(lonInicio) &&
+                Double.isNaN(latFin) && Double.isNaN(lonFin)) {
+            showToast("Selecciona una ubicación o ruta válida");
+            return;
+        }
+
         // Obtengo del seleccionador de fecha todos los datos necesarios
         int dia = datePickerFecha.getDayOfMonth();
         int mes = datePickerFecha.getMonth();
@@ -362,6 +443,8 @@ public class CreateEventFragment extends Fragment {
         calendar.set(Calendar.MILLISECOND, 0);
 
         Date fechaEvento = calendar.getTime();
+
+        boolean esRuta = spinnerTipoEvento.getSelectedItem().toString().contains("Ruta");
 
         // Obtengo el uid del organizador del evento
         String uidOrganizador = mAuth.getCurrentUser().getUid();
@@ -380,6 +463,22 @@ public class CreateEventFragment extends Fragment {
         evento.setId(eventoId);
         evento.setActivo(true);
         evento.setParticipantes(new ArrayList<>());
+
+        if (esRuta && !Double.isNaN(latInicio) && !Double.isNaN(lonInicio) &&
+                !Double.isNaN(latFin) && !Double.isNaN(lonFin)) {
+            evento.setStartLat(latInicio);
+            evento.setStartLon(lonInicio);
+            evento.setEndLat(latFin);
+            evento.setEndLon(lonFin);
+            evento.setEsRuta(true);
+        } else if (!Double.isNaN(latInicio) && !Double.isNaN(lonInicio)) {
+            evento.setUbicacionLat(latInicio);
+            evento.setUbicacionLon(lonInicio);
+            evento.setEsRuta(false);
+        } else {
+            showToast("Selecciona una ubicación o ruta válida");
+            return;
+        }
 
         // Procedemos a entrar dentro de la colección de la base de datos de eventos
         db.collection("eventos")

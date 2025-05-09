@@ -1,6 +1,7 @@
 package com.clase.motorton.adaptadores;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,12 +17,14 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.clase.motorton.modelos.Vehiculo;
+import com.clase.motorton.ui.perfil.AdministrarVehiculos;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.clase.motorton.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.VehiculoViewHolder> {
 
@@ -29,6 +32,7 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
     private final ArrayList<Vehiculo> vehiculosList;
     // Variable para manejar el contexto
     private final Context context;
+    private Toast mensajeToast = null;
 
     /**
      * @param context
@@ -81,6 +85,26 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
                 break;
         }
 
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("perfiles").document(uidUser)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        List<String> favoritos = (List<String>) documentSnapshot.get("listaFavVeh");
+
+                        if (favoritos != null && favoritos.contains(vehiculo.getMatricula())) {
+                            holder.imageViewFavorito.setImageResource(R.drawable.con_estrella);
+                        } else {
+                            holder.imageViewFavorito.setImageResource(R.drawable.sin_estrella);
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // En caso de error al obtener el perfil
+                    holder.imageViewFavorito.setImageResource(R.drawable.sin_estrella); // fallback
+                });
+
+
         holder.fondo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -98,9 +122,64 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
         holder.imageViewEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent = new Intent(view.getContext(), AdministrarVehiculos.class);
+                intent.putExtra("vehiculo", vehiculo);
+                view.getContext().startActivity(intent);
             }
         });
+
+        holder.imageViewFavorito.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                agregarListFavVeh(vehiculo.getMatricula(), uidUser, holder.imageViewFavorito);
+            }
+        });
+    }
+
+    private void agregarListFavVeh(String matricula, String uid, ImageView imageViewFavorito){
+        // Obtenemos la instancia de la base de datos de firestore
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("perfiles").document(uid)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        List<String> favoritos = (List<String>) documentSnapshot.get("listaFavVeh");
+
+                        if (favoritos == null) {
+                            favoritos = new ArrayList<>();
+                        }
+
+                        boolean yaEnFavoritos = favoritos.contains(matricula);
+
+                        if (yaEnFavoritos) {
+                            favoritos.remove(matricula);
+                        } else {
+                            favoritos.add(matricula);
+                        }
+
+                        db.collection("perfiles").document(uid)
+                                .update("listaFavVeh", favoritos)
+                                .addOnSuccessListener(aVoid -> {
+                                    if (yaEnFavoritos) {
+                                        imageViewFavorito.setImageResource(R.drawable.sin_estrella);
+                                        showToast("Has quitado el vehículo de favoritos");
+                                    } else {
+                                        imageViewFavorito.setImageResource(R.drawable.con_estrella);
+                                        showToast("Has agregado el vehículo a favoritos");
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    showToast("Error al actualizar la lista de favoritos");
+                                });
+                    } else {
+                        showToast("Perfil no encontrado");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    showToast("Error al obtener el perfil");
+                })
+                .addOnCompleteListener(task -> {
+                });
     }
 
     /**
@@ -151,6 +230,25 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
                 );
     }
 
+    /**
+     * @param mensaje
+     * Método para ir matando los Toast y mostrar todos en el mismo para evitar
+     * colas de Toasts y que se ralentice el dispositivo
+     */
+    public void showToast(String mensaje){
+        if (this != null){
+            // Comprobamos si existe algun toast cargado en el toast de la variable global
+            if (mensajeToast != null) { // En caso de que si que exista
+                mensajeToast.cancel(); // Le cancelamos, es decir le "matamos"
+            }
+
+            // Creamos un nuevo Toast con el mensaje que nos dan de argumento en el método
+            mensajeToast = Toast.makeText(context, mensaje, Toast.LENGTH_SHORT);
+            // Mostramos dicho Toast
+            mensajeToast.show();
+        }
+    }
+
     @Override
     public int getItemCount() {
         return vehiculosList != null ? vehiculosList.size() : 0;
@@ -158,7 +256,7 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
 
     public static class VehiculoViewHolder extends RecyclerView.ViewHolder {
         TextView textViewModeloYMarca, textViewDescripcion;
-        ImageView imageViewTipoVehiculo, imageViewEdit, imageViewDelete;
+        ImageView imageViewTipoVehiculo, imageViewEdit, imageViewDelete, imageViewFavorito;
         ConstraintLayout fondo;
 
         public VehiculoViewHolder(View itemView) {
@@ -169,6 +267,7 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
             imageViewEdit = itemView.findViewById(R.id.imageViewEdit);
             imageViewDelete = itemView.findViewById(R.id.imageViewDelete);
             fondo = itemView.findViewById(R.id.fondoVeh);
+            imageViewFavorito = itemView.findViewById(R.id.imageViewFavorito);
         }
     }
 }

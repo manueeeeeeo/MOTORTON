@@ -2,8 +2,12 @@ package com.clase.motorton.ui.perfil;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,6 +32,7 @@ import com.clase.motorton.api.ApiVehiculos;
 import com.clase.motorton.modelos.FotoVehiculoTemporal;
 import com.clase.motorton.modelos.Vehiculo;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -91,6 +96,8 @@ public class AdministrarVehiculos extends AppCompatActivity {
     private boolean luces = false;
     private boolean bodykit = false;
     private String foto = null;
+    private String matriculaAntigua = null;
+    boolean esEdicion = false;
 
     // Variable para manejar la autentificación del usuario
     private FirebaseAuth auth = null;
@@ -126,6 +133,24 @@ public class AdministrarVehiculos extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            getWindow().setDecorFitsSystemWindows(false);
+            WindowInsetsController controller = getWindow().getInsetsController();
+            if (controller != null) {
+                controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
+                controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            }
+        } else {
+            View decorView = getWindow().getDecorView();
+            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+            decorView.setSystemUiVisibility(uiOptions);
+        }
 
         modificarVehiculoLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -166,6 +191,33 @@ public class AdministrarVehiculos extends AppCompatActivity {
         btnBorrar = findViewById(R.id.btnBorrarV);
         spinnerModelo = findViewById(R.id.spinnerModelo);
         btnModi = findViewById(R.id.imagebtnModificaciones);
+
+        Vehiculo vehiculo = (Vehiculo) getIntent().getSerializableExtra("vehiculo");
+
+        if (vehiculo != null) {
+            editMatricula.setText(vehiculo.getMatricula());
+            editDescrip.setText(vehiculo.getDescripción());
+            editAnos.setText(String.valueOf(vehiculo.getAnos()));
+            esExportado.setChecked(vehiculo.isExportado());
+            matriculaAntigua = vehiculo.getMatricula();
+            tubo = vehiculo.getTuboEscape();
+            ruedas = vehiculo.getRuedas();
+            aleron = vehiculo.getAleron();
+            choques = vehiculo.getChoques();
+            cv = vehiculo.getCv();
+            maxVe = vehiculo.getMaxVelocidad();
+            luces = vehiculo.isLucesLed();
+            bodykit = vehiculo.isBodyKit();
+            foto = vehiculo.getFoto();
+            esEdicion = true;
+        }
+
+        if (vehiculo != null) {
+            btnCrear.setText("Guardar cambios");
+        } else {
+            btnCrear.setText("Agregar vehículo");
+        }
+
 
         // Obtengo el contexto
         context = this;
@@ -228,7 +280,7 @@ public class AdministrarVehiculos extends AppCompatActivity {
                 // Procedemos a comprobar si todos los campos están rellenos
                 if (validarCampos()) { // En caso afirmativo
                     // Llamamos al método para validar si la matricula es única y no está repetida
-                    validarMatriculaUnica(matricula);
+                    validarMatriculaUnica(matricula, matriculaAntigua, esEdicion);
                 }
             }
         });
@@ -259,6 +311,9 @@ public class AdministrarVehiculos extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(AdministrarVehiculos.this, ModificacionesVehiculo.class);
+                if (vehiculo != null) {
+                    i.putExtra("vehiculo", vehiculo);
+                }
                 modificarVehiculoLauncher.launch(i);
             }
         });
@@ -279,9 +334,14 @@ public class AdministrarVehiculos extends AppCompatActivity {
      * en la base de datos de Firestore
      */
     private void insertarVehiculo() {
-        // Obtengo en una variable el uid del usuario autenticado
         String uid = auth.getCurrentUser().getUid();
-        // Creo un objeto de tio vehículo e inicializo todas las variables
+
+        if(matricula == null || marca == null || modeloVehi == null || descrip == null ||
+            editAnos.getText().toString() == null){
+            showToast("Rellene los campos obligatorios");
+            return;
+        }
+
         Vehiculo vehiculo = new Vehiculo(uid,
                 matricula,
                 marca,
@@ -300,16 +360,38 @@ public class AdministrarVehiculos extends AppCompatActivity {
                 foto,
                 choques);
 
-        // Procedo a guardar el vehículo en la colección "vehiculos"
-        db.collection("vehiculos").document(matricula).set(vehiculo)
-                .addOnSuccessListener(aVoid -> { // En caso de que todo vaya bien
-                    // Lanzamos un toast indicando al usuario que el vehículo fue agregado
-                    showToast("Vehículo agregado exitosamente.");
-                    // Llamo al método para actualizar la lista de los vehículos en el perfil
-                    actualizarListaVehiculosEnPerfil(uid, matricula);
+        db.collection("vehiculos").document(matricula)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String uidDueno = documentSnapshot.getString("uidDueno");
+
+                        if (uid.equals(uidDueno)) {
+                            db.collection("vehiculos").document(matricula).set(vehiculo)
+                                    .addOnSuccessListener(aVoid -> {
+                                        showToast("Vehículo actualizado correctamente.");
+                                        if (!matricula.equals(matriculaAntigua)) {
+                                            actualizarListaVehiculosEnPerfilTrasCambio(uid, matriculaAntigua, matricula);
+                                            db.collection("vehiculos").document(matriculaAntigua).delete()
+                                                    .addOnSuccessListener(aVoi -> Log.d("Firestore", "Documento antiguo eliminado"))
+                                                    .addOnFailureListener(e -> Log.e("Firestore", "Error al eliminar el documento antiguo", e));
+                                        }
+                                    })
+                                    .addOnFailureListener(e -> showToast("Error al actualizar: " + e.getMessage()));
+                        } else {
+                            showToast("No puedes modificar un vehículo que no es tuyo.");
+                        }
+
+                    } else {
+                        db.collection("vehiculos").document(matricula).set(vehiculo)
+                                .addOnSuccessListener(aVoid -> {
+                                    showToast("Vehículo agregado exitosamente.");
+                                    actualizarListaVehiculosEnPerfil(uid, matricula);
+                                })
+                                .addOnFailureListener(e -> showToast("Error al agregar: " + e.getMessage()));
+                    }
                 })
-                // En caso de que algo vaya mal mostramos un toast con el error
-                .addOnFailureListener(e -> showToast("Error al agregar el vehículo: " + e.getMessage()));
+                .addOnFailureListener(e -> showToast("Error al comprobar existencia: " + e.getMessage()));
     }
 
     /**
@@ -352,6 +434,31 @@ public class AdministrarVehiculos extends AppCompatActivity {
                 })
                 // En caso de que algo falle lanzamos un toast indicando que hubo un error al obtener el perfil
                 .addOnFailureListener(e -> showToast("Error al obtener el perfil del usuario."));
+    }
+
+    private void actualizarListaVehiculosEnPerfilTrasCambio(String uid, String matriculaAntigua, String matriculaNueva) {
+        db.collection("perfiles").document(uid)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        List<String> listaVehiculos = (List<String>) documentSnapshot.get("listaVehiculos");
+                        if (listaVehiculos == null) {
+                            listaVehiculos = new ArrayList<>();
+                        }
+
+                        listaVehiculos.remove(matriculaAntigua);
+                        listaVehiculos.add(matriculaNueva);
+
+                        db.collection("perfiles").document(uid)
+                                .update("listaVehiculos", listaVehiculos)
+                                .addOnSuccessListener(aVoid -> {
+                                    showToast("Lista de vehículos actualizada correctamente.");
+                                    limpiarCampos();
+                                })
+                                .addOnFailureListener(e -> showToast("Error al actualizar lista: " + e.getMessage()));
+                    }
+                })
+                .addOnFailureListener(e -> showToast("Error al obtener perfil: " + e.getMessage()));
     }
 
     /**
@@ -490,6 +597,37 @@ public class AdministrarVehiculos extends AppCompatActivity {
                         }
                     } else { // En caso de que algo haya salido mal
                         // Lanzamos un Toast indicando que hubo un error al verificar la matrícula
+                        showToast("Error al verificar la matrícula.");
+                    }
+                });
+    }
+
+    private void validarMatriculaUnica(String matriculaNueva, String matriculaAntigua, boolean esEdicion) {
+        db.collection("vehiculos").document(matriculaNueva)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot doc = task.getResult();
+                        String uidActual = auth.getCurrentUser().getUid();
+
+                        if (doc != null && doc.exists()) {
+                            String uidDueno = doc.getString("uidDueno");
+
+                            if (esEdicion) {
+                                if (matriculaNueva.equals(matriculaAntigua)) {
+                                    verificarCantidadVehiculosYAgregar();
+                                } else if (uidDueno.equals(uidActual)) {
+                                    showToast("Ya tienes un vehículo con esta matrícula.");
+                                } else {
+                                    showToast("La matrícula ya está registrada por otro usuario.");
+                                }
+                            } else {
+                                showToast("La matrícula ya está registrada.");
+                            }
+                        } else {
+                            verificarCantidadVehiculosYAgregar();
+                        }
+                    } else {
                         showToast("Error al verificar la matrícula.");
                     }
                 });

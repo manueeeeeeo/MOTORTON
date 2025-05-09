@@ -4,10 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,6 +52,24 @@ public class PantallaCarga extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            getWindow().setDecorFitsSystemWindows(false);
+            WindowInsetsController controller = getWindow().getInsetsController();
+            if (controller != null) {
+                controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
+                controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            }
+        } else {
+            View decorView = getWindow().getDecorView();
+            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+            decorView.setSystemUiVisibility(uiOptions);
+        }
 
         // Inicializo la variable de autentificación
         auth = FirebaseAuth.getInstance();
@@ -136,7 +157,7 @@ public class PantallaCarga extends AppCompatActivity {
                         finish();
                     }else{ // En caso de que no sea nulo
                         // Verifico si el usuario tiene perfil en la base de datos
-                        verificarPerfil(user);
+                        verificarPerfilBETA(user);
                     }
                 }
             }
@@ -187,6 +208,44 @@ public class PantallaCarga extends AppCompatActivity {
         showToast("Conectese a Internet");
         // Oculto la barra de progreso ya que no va a servir ahora para nada
         progressBar.setVisibility(View.INVISIBLE);
+    }
+
+    private void verificarPerfilBETA(FirebaseUser user) {
+        String uid = user.getUid();
+
+        db.collection("perfiles").document(uid).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    boolean tienePerfil = documentSnapshot.exists();
+
+                    db.collection("invitationCodes")
+                            .whereEqualTo("userUID", uid)
+                            .whereEqualTo("active", true)
+                            .get()
+                            .addOnSuccessListener(queryDocumentSnapshots -> {
+                                if (!queryDocumentSnapshots.isEmpty()) {
+                                    if (tienePerfil) {
+                                        startActivity(new Intent(PantallaCarga.this, MainActivity.class));
+                                    } else {
+                                        startActivity(new Intent(PantallaCarga.this, CreacionPerfil.class));
+                                    }
+                                } else {
+                                    showToast("Acceso no autorizado. Código beta inválido.");
+                                    startActivity(new Intent(PantallaCarga.this, VersionBeta.class));
+                                }
+                                finish();
+                            })
+                            .addOnFailureListener(e -> {
+                                showToast("Error al validar acceso beta");
+                                startActivity(new Intent(PantallaCarga.this, VersionBeta.class));
+                                finish();
+                            });
+
+                })
+                .addOnFailureListener(e -> {
+                    showToast("Error al verificar perfil");
+                    startActivity(new Intent(PantallaCarga.this, VersionBeta.class));
+                    finish();
+                });
     }
 
     /**

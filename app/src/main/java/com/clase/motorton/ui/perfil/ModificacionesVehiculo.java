@@ -5,12 +5,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
 import android.view.View;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -29,6 +33,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.clase.motorton.R;
 import com.clase.motorton.modelos.FotoVehiculoTemporal;
+import com.clase.motorton.modelos.Vehiculo;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -111,6 +116,24 @@ public class ModificacionesVehiculo extends AppCompatActivity {
             return insets;
         });
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            getWindow().setDecorFitsSystemWindows(false);
+            WindowInsetsController controller = getWindow().getInsetsController();
+            if (controller != null) {
+                controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
+                controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            }
+        } else {
+            View decorView = getWindow().getDecorView();
+            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+            decorView.setSystemUiVisibility(uiOptions);
+        }
+
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
@@ -125,6 +148,27 @@ public class ModificacionesVehiculo extends AppCompatActivity {
         fotoVehiculo = (ImageView) findViewById(R.id.imageViewVehiculo);
         switchBodyKit = (Switch) findViewById(R.id.switchBodyKit);
         switchLucesLed = (Switch) findViewById(R.id.switchLuces);
+
+        Vehiculo vehiculo = (Vehiculo) getIntent().getSerializableExtra("vehiculo");
+
+        if (vehiculo != null) {
+            editRuedas.setText(vehiculo.getRuedas());
+            editTuboEscape.setText(vehiculo.getTuboEscape());
+            editAleron.setText(vehiculo.getAleron());
+            editChoques.setText(String.valueOf(vehiculo.getChoques()));
+            editCv.setText(String.valueOf(vehiculo.getCv()));
+            editMaxVel.setText(String.valueOf(vehiculo.getMaxVelocidad()));
+
+            String fotoAnti = vehiculo.getFoto();
+
+            if (fotoAnti != null && !fotoAnti.isEmpty()) {
+                Bitmap decodedBitmap = convertirBase64ABitmap(fotoAnti);
+                fotoVehiculo.setImageBitmap(decodedBitmap);
+            }
+
+            switchBodyKit.setChecked(vehiculo.isBodyKit());
+            switchLucesLed.setChecked(vehiculo.isLucesLed());
+        }
 
         btnVolver.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -155,6 +199,12 @@ public class ModificacionesVehiculo extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public static Bitmap convertirBase64ABitmap(String base64) {
+        if (base64 == null || base64.isEmpty()) return null;
+        byte[] decodedBytes = Base64.decode(base64, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
     }
 
     private void guardarDatosModificaciones(){

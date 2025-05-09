@@ -1,6 +1,8 @@
 package com.clase.motorton.modelos;
 
-public class Vehiculo {
+import java.io.Serializable;
+
+public class Vehiculo implements Serializable {
     private String uidDueno;
     private String matricula;
     private String marca;

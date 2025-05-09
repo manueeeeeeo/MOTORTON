@@ -14,6 +14,13 @@ public class Evento {
     private String organizador;
     private boolean activo;
     private Date fecha;
+    private double ubicacionLat;
+    private double ubicacionLon;
+    private double startLat;
+    private double startLon;
+    private double endLat;
+    private double endLon;
+    private boolean esRuta;
 
     public Evento() {
     }
@@ -29,6 +36,62 @@ public class Evento {
         this.organizador = organizador;
         this.activo = activo;
         this.fecha = fecha;
+    }
+
+    public double getUbicacionLat() {
+        return ubicacionLat;
+    }
+
+    public void setUbicacionLat(double ubicacionLat) {
+        this.ubicacionLat = ubicacionLat;
+    }
+
+    public double getUbicacionLon() {
+        return ubicacionLon;
+    }
+
+    public void setUbicacionLon(double ubicacionLon) {
+        this.ubicacionLon = ubicacionLon;
+    }
+
+    public double getStartLat() {
+        return startLat;
+    }
+
+    public void setStartLat(double startLat) {
+        this.startLat = startLat;
+    }
+
+    public double getStartLon() {
+        return startLon;
+    }
+
+    public void setStartLon(double startLon) {
+        this.startLon = startLon;
+    }
+
+    public double getEndLat() {
+        return endLat;
+    }
+
+    public void setEndLat(double endLat) {
+        this.endLat = endLat;
+    }
+
+    public double getEndLon() {
+        return endLon;
+    }
+
+    public void setEndLon(double endLon) {
+        this.endLon = endLon;
+    }
+
+    public boolean isEsRuta() {
+        return esRuta;
+    }
+
+    public void setEsRuta(boolean esRuta) {
+        this.esRuta = esRuta;
     }
 
     public Date getFecha() {

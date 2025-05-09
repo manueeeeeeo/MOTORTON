@@ -1,16 +1,16 @@
 package com.clase.motorton;
 
-import static com.clase.motorton.notifications.FirebaseNotificationDaily.suscribirAnotificacionDiaria;
 
 import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.clase.motorton.notifications.FirebaseNotificationDaily;
-import com.clase.motorton.notifications.NotificacionReceiver;
+import com.clase.motorton.notifications.NotificacionDiariaWorker;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -47,38 +47,53 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupWithNavController(binding.navView, navController);
 
+        crearCanalNotificacion();
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_CODE_NOTIFICATION);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                        REQUEST_CODE_NOTIFICATION);
             }
         }
 
-        programarNotificacionDiaria();
-
-        FirebaseNotificationDaily.suscribirAnotificacionDiaria(this);
+        programarNotificacionConWorkManager();
     }
 
-    private void programarNotificacionDiaria() {
+    private void crearCanalNotificacion() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Notificación Diaria";
+            String description = "Canal para notificaciones diarias";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel("diario_channel", name, importance);
+            channel.setDescription(description);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    private void programarNotificacionConWorkManager() {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 19);
-        calendar.set(Calendar.MINUTE, 15);
+        calendar.set(Calendar.HOUR_OF_DAY, 22);
+        calendar.set(Calendar.MINUTE, 10);
         calendar.set(Calendar.SECOND, 0);
 
-        if (calendar.before(Calendar.getInstance())) {
+        if (Calendar.getInstance().after(calendar)) {
             calendar.add(Calendar.DAY_OF_YEAR, 1);
         }
 
-        android.app.AlarmManager alarmManager = (android.app.AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, NotificacionReceiver.class);
-        android.app.PendingIntent pendingIntent = android.app.PendingIntent.getBroadcast(this, 0, intent, android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE);
+        long initialDelay = calendar.getTimeInMillis() - System.currentTimeMillis();
 
-        if (alarmManager != null) {
-            alarmManager.setRepeating(
-                    android.app.AlarmManager.RTC_WAKEUP,
-                    calendar.getTimeInMillis(),
-                    android.app.AlarmManager.INTERVAL_DAY,
-                    pendingIntent
-            );
-        }
+        PeriodicWorkRequest workRequest = new PeriodicWorkRequest.Builder(
+                NotificacionDiariaWorker.class,
+                24, TimeUnit.HOURS)
+                .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
+                .build();
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+                "NotificacionDiaria",
+                ExistingPeriodicWorkPolicy.REPLACE,
+                workRequest);
     }
 }

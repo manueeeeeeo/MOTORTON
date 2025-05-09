@@ -160,7 +160,12 @@ public class EditarEventoFragment extends Fragment {
         Map<String, Object> cambios = new HashMap<>();
 
         if (!descripAnti.equals(editTextDescripcion.getText().toString())) {
-            cambios.put("descripcion", editTextDescripcion.getText().toString());
+            if(editTextDescripcion.getText().toString() != null || !editTextDescripcion.getText().toString().isEmpty()){
+                cambios.put("descripcion", editTextDescripcion.getText().toString());
+            }else{
+                showToast("No puede dejar la descripción vacía");
+                return;
+            }
         }
 
         Calendar calendar = Calendar.getInstance();
