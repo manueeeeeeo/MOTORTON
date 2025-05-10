@@ -73,4 +73,5 @@ dependencies {
     implementation ("com.itextpdf:layout:7.2.3")
     implementation("com.google.firebase:firebase-messaging:23.1.2")
     implementation ("com.google.android.material:material:1.11.0")
+    implementation ("io.realm:realm-android-library:10.15.1")
 }
