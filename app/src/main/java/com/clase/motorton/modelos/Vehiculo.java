@@ -38,7 +38,7 @@ public class Vehiculo implements Serializable {
 
     public Vehiculo(String uidDueno, String matricula, String marca, String modelo, int anos, boolean exportado,
                     String descripción, String tipoVehiculo, String tubo, String ruedas, String aleron, String dbkiller,
-                    boolean bodyKt, boolean lucesL, double maxVel, String foto, int creash) {
+                    boolean bodyKt, boolean lucesL, double maxVel, String foto, int creash, double cv) {
         this.uidDueno = uidDueno;
         this.matricula = matricula;
         this.marca = marca;
@@ -56,6 +56,7 @@ public class Vehiculo implements Serializable {
         this.maxVelocidad = maxVel;
         this.foto = foto;
         this.choques = creash;
+        this.cv = cv;
     }
 
     public int getChoques() {

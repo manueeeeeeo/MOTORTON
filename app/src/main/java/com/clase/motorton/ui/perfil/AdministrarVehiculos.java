@@ -358,7 +358,8 @@ public class AdministrarVehiculos extends AppCompatActivity {
                 luces,
                 maxVe,
                 foto,
-                choques);
+                choques,
+                cv);
 
         db.collection("vehiculos").document(matricula)
                 .get()
