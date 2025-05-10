@@ -45,9 +45,11 @@ public class FichaVehiculoFragment extends Fragment {
     private TextView maxV = null;
     private TextView exportado = null;
     private TextView choques = null;
+    private ImageView vehFav = null;
 
     private Toast mensajeToast = null;
     private String fotoV = null;
+    private String uidUser = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,7 +80,18 @@ public class FichaVehiculoFragment extends Fragment {
             cargarDatosVehiculo(matri);
         }
 
+        vehFav.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
         return root;
+    }
+
+    private void AgregarVehiculoFav(){
+
     }
 
     public void cargarDatosVehiculo(String matriculaVe){
@@ -134,6 +147,24 @@ public class FichaVehiculoFragment extends Fragment {
                                 // Establecemos en el imageview el recurso de imagen por defecto del icono de la app
                                 imagenVehiculo.setImageResource(R.drawable.icono);
                             }
+
+                            db.collection("perfiles").document(uidUser)
+                                    .get()
+                                    .addOnSuccessListener(documentSnapshot -> {
+                                        if (documentSnapshot.exists()) {
+                                            List<String> favoritos = (List<String>) documentSnapshot.get("listaFavVeh");
+
+                                            if (favoritos != null && favoritos.contains(veh.getMatricula())) {
+                                                vehFav.setImageResource(R.drawable.con_estrella);
+                                            } else {
+                                                vehFav.setImageResource(R.drawable.sin_estrella);
+                                            }
+                                        }
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        // En caso de error al obtener el perfil
+                                        vehFav.setImageResource(R.drawable.sin_estrella);
+                                    });
                         }
                     } else {
                         marcaYModelo.setText("Vehiculo no encontrado.");
