@@ -29,6 +29,14 @@
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.MediumComponent"
                 android:elevation="4dp"/>
 
+            <ImageView
+                android:id="@+id/estrellaFavorito"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="8dp"
+                android:src="@drawable/sin_estrella"/>
+
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

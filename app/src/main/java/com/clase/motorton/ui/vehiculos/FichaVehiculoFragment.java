@@ -78,6 +78,7 @@ public class FichaVehiculoFragment extends Fragment {
         maxV = (TextView) root.findViewById(R.id.txtMaxv);
         cv = (TextView) root.findViewById(R.id.txtCv);
         imagenVehiculo = (ImageView) root.findViewById(R.id.fotoVehiculo);
+        vehFav = (ImageView) root.findViewById(R.id.estrellaFavorito);
 
         if (getArguments() != null && getArguments().containsKey("matriculaVeh")) {
             String matri = getArguments().getString("matriculaVeh");
