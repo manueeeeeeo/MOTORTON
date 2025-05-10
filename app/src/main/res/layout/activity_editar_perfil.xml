@@ -8,6 +8,16 @@
     android:background="@drawable/gradient_background"
     tools:context=".ui.perfil.EditarPerfilActivity">
 
+    <ImageView
+        android:id="@+id/ola_fondo"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/ola_vector"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <ScrollView
         android:id="@+id/scroll_view"
         android:layout_width="match_parent"
@@ -26,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:text="Editar Perfil"
                 android:textAlignment="center"
-                android:textColor="#141524"
+                android:textColor="#FFFFFF"
                 android:textSize="30sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="20dp"
@@ -37,8 +47,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nombre Completo"
-                android:textColor="#141524"
-                android:textSize="14sp"/>
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"/>
 
             <EditText
                 android:id="@+id/full_name_input"
@@ -60,8 +70,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Años Conduciendo"
-                android:textColor="#141524"
-                android:textSize="14sp"/>
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"/>
 
             <EditText
                 android:id="@+id/years_driving_input"
@@ -83,8 +93,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Ubicación"
-                android:textColor="#141524"
-                android:textSize="14sp"/>
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"/>
 
             <Button
                 android:id="@+id/btnElegirUbicacion"
@@ -103,8 +113,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Código Postal"
-                android:textColor="#141524"
-                android:textSize="14sp"/>
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"/>
 
             <EditText
                 android:id="@+id/zipcode_input"
@@ -126,8 +136,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Descripción"
-                android:textColor="#141524"
-                android:textSize="14sp"/>
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"/>
 
             <EditText
                 android:id="@+id/description_input"
@@ -149,8 +159,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nombre de Usuario"
-                android:textColor="#141524"
-                android:textSize="14sp"/>
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"/>
 
             <EditText
                 android:id="@+id/username_input"
@@ -171,8 +181,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Imagen de perfil"
-                android:textColor="#141524"
-                android:textSize="14sp"/>
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"/>
 
             <ImageView
                 android:id="@+id/imagenPerfil"

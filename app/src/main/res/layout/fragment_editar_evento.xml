@@ -27,7 +27,7 @@
                     android:layout_height="wrap_content"
                     android:text="Actualizar Evento"
                     android:textSize="35dp"
-                    android:textColor="#141524"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
                     android:layout_marginBottom="7dp"/>
 
@@ -37,7 +37,7 @@
                     android:layout_height="wrap_content"
                     android:text="Descripción del Evento"
                     android:textSize="18sp"
-                    android:textColor="#141524"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="8dp" />
@@ -78,7 +78,7 @@
                     android:layout_height="wrap_content"
                     android:text="Fecha del Evento"
                     android:textSize="18sp"
-                    android:textColor="#141524"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="8dp" />

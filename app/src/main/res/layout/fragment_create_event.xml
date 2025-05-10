@@ -29,7 +29,7 @@
                     android:layout_height="wrap_content"
                     android:text="Crear Evento"
                     android:textSize="35dp"
-                    android:textColor="#141524"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
                     android:layout_marginBottom="7dp"/>
 
@@ -39,7 +39,7 @@
                     android:layout_height="wrap_content"
                     android:text="Nombre del Evento"
                     android:textSize="18sp"
-                    android:textColor="#141524"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp" />
 
@@ -63,7 +63,7 @@
                     android:layout_height="wrap_content"
                     android:text="Descripción del Evento"
                     android:textSize="18sp"
-                    android:textColor="#141524"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="8dp" />
@@ -91,7 +91,7 @@
                     android:layout_height="wrap_content"
                     android:text="Ubicación del Evento"
                     android:textSize="18sp"
-                    android:textColor="#141524"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="8dp" />
@@ -116,7 +116,7 @@
                     android:layout_height="wrap_content"
                     android:text="Provincia"
                     android:textSize="18sp"
-                    android:textColor="#141524"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="8dp" />
@@ -136,7 +136,7 @@
                     android:layout_height="wrap_content"
                     android:text="Tipo de Evento"
                     android:textSize="18sp"
-                    android:textColor="#141524"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="8dp" />
@@ -150,6 +150,17 @@
                     android:popupBackground="#0a0c3e"
                     android:backgroundTint="#0a0c3e"/>
 
+                <TextView
+                    android:id="@+id/textViewMapa"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Mapa"
+                    android:textSize="18sp"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp" />
+
                 <org.osmdroid.views.MapView
                     android:id="@+id/map"
                     android:layout_width="match_parent"
@@ -159,9 +170,9 @@
                     android:id="@+id/buttonIrRuta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Ir a Seleccionar Ruta"
+                    android:text="Seleccionar Ruta"
                     android:textColor="#FFFFFF"
-                    android:backgroundTint="#007BFF"
+                    android:backgroundTint="#2c2c4c"
                     android:layout_marginTop="20dp"
                     android:padding="12dp"
                     android:textSize="18sp"
@@ -173,7 +184,7 @@
                     android:layout_height="wrap_content"
                     android:text="Fecha del Evento"
                     android:textSize="18sp"
-                    android:textColor="#141524"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="8dp" />
