@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -50,6 +51,7 @@ public class FichaVehiculoFragment extends Fragment {
     private Toast mensajeToast = null;
     private String fotoV = null;
     private String uidUser = null;
+    private String matriculaVeh = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,6 +61,8 @@ public class FichaVehiculoFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
+
+        uidUser = auth.getUid();
 
         marcaYModelo = (TextView) root.findViewById(R.id.txtModelo);
         descripcion = (TextView) root.findViewById(R.id.txtDescripcion);
@@ -77,21 +81,63 @@ public class FichaVehiculoFragment extends Fragment {
 
         if (getArguments() != null && getArguments().containsKey("matriculaVeh")) {
             String matri = getArguments().getString("matriculaVeh");
+            matriculaVeh = matri;
             cargarDatosVehiculo(matri);
         }
 
         vehFav.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                AgregarVehiculoFav(uidUser, matriculaVeh);
             }
         });
 
         return root;
     }
 
-    private void AgregarVehiculoFav(){
+    private void AgregarVehiculoFav(String uid, String matricula){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("perfiles").document(uid)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        List<String> favoritos = (List<String>) documentSnapshot.get("listaFavVeh");
 
+                        if (favoritos == null) {
+                            favoritos = new ArrayList<>();
+                        }
+
+                        boolean yaEnFavoritos = favoritos.contains(matricula);
+
+                        if (yaEnFavoritos) {
+                            favoritos.remove(matricula);
+                        } else {
+                            favoritos.add(matricula);
+                        }
+
+                        db.collection("perfiles").document(uid)
+                                .update("listaFavVeh", favoritos)
+                                .addOnSuccessListener(aVoid -> {
+                                    if (yaEnFavoritos) {
+                                        vehFav.setImageResource(R.drawable.sin_estrella);
+                                        showToast("Has quitado el vehículo de favoritos");
+                                    } else {
+                                        vehFav.setImageResource(R.drawable.con_estrella);
+                                        showToast("Has agregado el vehículo a favoritos");
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    showToast("Error al actualizar la lista de favoritos");
+                                });
+                    } else {
+                        showToast("Perfil no encontrado");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    showToast("Error al obtener el perfil");
+                })
+                .addOnCompleteListener(task -> {
+                });
     }
 
     public void cargarDatosVehiculo(String matriculaVe){
