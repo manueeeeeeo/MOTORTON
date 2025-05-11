@@ -310,9 +310,6 @@ public class MapaEventFragment extends Fragment {
                         .getDouble("distance");
                 int distanceInKm = (int) Math.round(distanceInMeters / 1000.0);
 
-                tiempoRuta = (double) durationInMinutes;
-                distanciaRuta = (double) distanceInKm;
-
                 List<GeoPoint> geoPointsRuta = new ArrayList<>();
                 for (int i = 0; i < coordinates.length(); i++) {
                     JSONArray coord = coordinates.getJSONArray(i);
@@ -322,6 +319,8 @@ public class MapaEventFragment extends Fragment {
                 }
 
                 requireActivity().runOnUiThread(() -> {
+                    tiempoRuta = (double) durationInMinutes;
+                    distanciaRuta = (double) distanceInKm;
                     showToast("Duración estimada: " + durationInMinutes + " min\nDistancia: " + distanceInKm + " km");
                     if (routeLine != null) map.getOverlayManager().remove(routeLine);
 
