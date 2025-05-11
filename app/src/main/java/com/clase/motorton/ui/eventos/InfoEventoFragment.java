@@ -42,7 +42,8 @@ import java.util.Locale;
 
 public class InfoEventoFragment extends Fragment {
     private TextView textNombre = null, textDescripcion = null, textUbicacion = null, textProvincia = null,
-            textTipoEvento = null, textOrganizador = null, textFecha = null, textActivo = null, textParticipantes1 = null;
+            textTipoEvento = null, textOrganizador = null, textFecha = null, textActivo = null, textParticipantes1 = null,
+            textDistanciaRuta = null, textTiempoRuta = null;
 
     private MapView mapView = null;
     private Polyline routeLine = null;
