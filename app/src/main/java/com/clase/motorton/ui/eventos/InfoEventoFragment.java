@@ -78,6 +78,8 @@ public class InfoEventoFragment extends Fragment {
         textParticipantes1 = view.findViewById(R.id.textParticipantes);
         recyclerViewParticipantes = view.findViewById(R.id.recyclerViewParticipantes);
         mapView = view.findViewById(R.id.mapViewInfo);
+        textDistanciaRuta = view.findViewById(R.id.textDistancia);
+        textTiempoRuta = view.findViewById(R.id.textTiempo);
 
         Configuration.getInstance().setUserAgentValue(requireContext().getPackageName());
         mapView.setTileSource(TileSourceFactory.MAPNIK);
@@ -119,6 +121,18 @@ public class InfoEventoFragment extends Fragment {
                             textFecha.setText("Fecha: " + fechaFormateada);
 
                             textActivo.setText("Estado: " + (evento.isActivo() ? "Activo" : "Inactivo"));
+
+                            if(!Double.isNaN(evento.getTiempoRuta()) && evento.getTiempoRuta() != 0.0 &&
+                                    !Double.isNaN(evento.getDistanciaRuta()) && evento.getDistanciaRuta() != 0.0){
+                                textDistanciaRuta.setVisibility(View.VISIBLE);
+                                textTiempoRuta.setVisibility(View.VISIBLE);
+                            }else{
+                                textDistanciaRuta.setVisibility(View.GONE);
+                                textTiempoRuta.setVisibility(View.GONE);
+                            }
+
+                            textDistanciaRuta.setText("Distancia: "+evento.getDistanciaRuta()+" KM");
+                            textTiempoRuta.setText("Tiempo: "+evento.getTiempoRuta()+" Horas");
 
                             List<String> participantes = evento.getParticipantes();
                             if (participantes != null) {
