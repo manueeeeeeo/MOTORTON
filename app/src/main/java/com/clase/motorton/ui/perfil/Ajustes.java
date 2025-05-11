@@ -298,14 +298,12 @@ public class Ajustes extends AppCompatActivity {
         // Obtenemos en una variable la fecha actual con un formato especial
         String fechaHoraActual = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         // Generamos el uid del documento en donde juntamos el uid y la fecha y hora actuales
-        String idDocumento = uid + "_" + fechaHoraActual;
+        String idDocumento = "borrado_" + fechaHoraActual;
 
         // Creamos un mapa para poder darle keys y valores
         Map<String, Object> datosBorrado = new HashMap<>();
         // Establecemos la fecha de borrado
         datosBorrado.put("fechaHoraBorrado", new Date());
-        // Establecemos el uid del usuario
-        datosBorrado.put("uidUsuario", uid);
         // Establecemos el motivo de borrar la cuenta
         datosBorrado.put("motivo", motivo);
 
