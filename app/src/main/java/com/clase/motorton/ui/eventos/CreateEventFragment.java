@@ -75,6 +75,8 @@ public class CreateEventFragment extends Fragment {
     private double lonInicio = Double.NaN;
     // Variable para manejar la longitud del final
     private double lonFin = Double.NaN;
+    private double distancia = Double.NaN;
+    private double tiempo = Double.NaN;
     // Variable para manejar la provincia elegida
     private String provincia = null;
 
@@ -261,6 +263,9 @@ public class CreateEventFragment extends Fragment {
             double ubicacionLat = bundle.getDouble("ubicacionLat", Double.NaN);
             double ubicacionLon = bundle.getDouble("ubicacionLon", Double.NaN);
 
+            double tiem = bundle.getDouble("tiempoRuta", Double.NaN);
+            double dista = bundle.getDouble("distanciaRuta", Double.NaN);
+
             mapView.getOverlays().clear();
 
             if (getArguments() != null && getArguments().containsKey("tipoEventoActual")) {
@@ -269,6 +274,14 @@ public class CreateEventFragment extends Fragment {
                 if (posicion != -1) {
                     spinnerTipoEvento.setSelection(posicion);
                 }
+            }
+
+            if(!Double.isNaN(tiem) && !Double.isNaN(dista)){
+                tiempo = tiem;
+                distancia = dista;
+            }else{
+                tiempo = 0.0;
+                distancia = 0.0;
             }
 
             if (!Double.isNaN(startLat) && !Double.isNaN(startLon) &&
@@ -463,6 +476,8 @@ public class CreateEventFragment extends Fragment {
         evento.setId(eventoId);
         evento.setActivo(true);
         evento.setParticipantes(new ArrayList<>());
+        evento.setDistanciaRuta(distancia);
+        evento.setTiempoRuta(tiempo);
 
         if (esRuta && !Double.isNaN(latInicio) && !Double.isNaN(lonInicio) &&
                 !Double.isNaN(latFin) && !Double.isNaN(lonFin)) {

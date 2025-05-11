@@ -52,6 +52,8 @@ public class MapaEventFragment extends Fragment {
     private Button btnBorrarRuta = null;
     // Variable para controlar el buscador
     private SearchView searchView = null;
+    private double distanciaRuta = Double.NaN;
+    private double tiempoRuta = Double.NaN;
 
     // Variable para controlar todos los Toast de la actividad
     private Toast mensajeToast = null;
@@ -151,6 +153,12 @@ public class MapaEventFragment extends Fragment {
                 } else {
                     showToast("Selecciona inicio y fin");
                     return;
+                }
+                if(!Double.isNaN(distanciaRuta) && !Double.isNaN(tiempoRuta)){
+                    bundle.putDouble("distanciaRuta", distanciaRuta);
+                    bundle.putDouble("tiempoRuta", tiempoRuta);
+                }else{
+                    showToast("Ocurrió un error a la hora de guardar la distancia y el tiempo!!!");
                 }
             } else {
                 if (startMarker != null) {
@@ -301,6 +309,9 @@ public class MapaEventFragment extends Fragment {
                         .getJSONObject(0)
                         .getDouble("distance");
                 int distanceInKm = (int) Math.round(distanceInMeters / 1000.0);
+
+                tiempoRuta = (double) durationInMinutes;
+                distanciaRuta = (double) distanceInKm;
 
                 List<GeoPoint> geoPointsRuta = new ArrayList<>();
                 for (int i = 0; i < coordinates.length(); i++) {
