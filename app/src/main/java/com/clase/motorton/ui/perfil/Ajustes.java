@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
@@ -20,6 +21,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -336,6 +338,17 @@ public class Ajustes extends AppCompatActivity {
                 }
 
                 perfilesRef.document(uid).delete().addOnSuccessListener(aVoid -> {
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    if (user != null) {
+                        user.delete().addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Log.d("EliminarCuenta", "Cuenta de Firebase Authentication eliminada.");
+                            } else {
+                                Log.e("EliminarCuenta", "Error al eliminar cuenta de Firebase Auth", task.getException());
+                            }
+                        });
+                    }
+
                     // Lanzo un toast indicando al usuario que la cuenta se eliminará
                     showToast("Cuenta eliminada correctamente");
                     // Cierro la sesión en el usuario de Google por si acaso
