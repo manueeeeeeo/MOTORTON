@@ -252,6 +252,14 @@ public class PantallaCarga extends AppCompatActivity {
                 });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (internetController != null) {
+            internetController.detenerMonitoreo();
+        }
+    }
+
     /**
      * @param mensaje
      * Método para ir matando los Toast y mostrar todos en el mismo para evitar
