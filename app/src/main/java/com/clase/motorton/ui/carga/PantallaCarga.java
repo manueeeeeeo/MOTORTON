@@ -24,6 +24,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.clase.motorton.MainActivity;
 import com.clase.motorton.R;
 import com.clase.motorton.pasajero.VersionBeta;
+import com.clase.motorton.servicios.InternetController;
 import com.clase.motorton.ui.perfil.CreacionPerfil;
 import com.clase.motorton.ui.perfil.InicioSesion;
 import com.google.firebase.auth.FirebaseAuth;
@@ -41,6 +42,7 @@ public class PantallaCarga extends AppCompatActivity {
     private FirebaseAuth auth = null;
     // Variable para manejar la base de datos de la aplicación
     private FirebaseFirestore db = null;
+    private InternetController internetController = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,13 +77,15 @@ public class PantallaCarga extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         // Inicializo la variable de la base de datos
         db = FirebaseFirestore.getInstance();
+        // Inicializo el controlador de internet
+        internetController = new InternetController(this);
 
         // Incializo y obtengo de la interfaz los dos elementos que voy a utilizar
         welcomeText = findViewById(R.id.welcome_text);
         progressBar = findViewById(R.id.progress_bar);
 
         // Procedo a comprobar si el usuario tiene acceso a internet
-        if (comprobarInternet()) { // En caso de tener acceso a internet
+        if (internetController.tieneConexion()) { // En caso de tener acceso a internet
             // Llamo al método para simular la carga y hacer las comprobaciones pertinentes
             simularCarga();
         } else { // En caso de que no tenga acceso a internet
