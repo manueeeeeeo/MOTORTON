@@ -109,7 +109,7 @@ public class InfoEventoFragment extends Fragment {
 
                         if (evento != null) {
                             textNombre.setText(evento.getNombre());
-                            textDescripcion.setText(evento.getDescripcion());
+                            textDescripcion.setText("Descripción: "+evento.getDescripcion());
                             textUbicacion.setText("Ubicación: " + evento.getUbicacion());
                             textProvincia.setText("Provincia: " + evento.getProvincia());
                             textTipoEvento.setText("Tipo: " + evento.getTipoEvento());
@@ -132,7 +132,7 @@ public class InfoEventoFragment extends Fragment {
                             }
 
                             textDistanciaRuta.setText("Distancia: "+evento.getDistanciaRuta()+" KM");
-                            textTiempoRuta.setText("Tiempo: "+evento.getTiempoRuta()+" Horas");
+                            textTiempoRuta.setText("Tiempo: "+evento.getTiempoRuta()+" minutos");
 
                             List<String> participantes = evento.getParticipantes();
                             if (participantes != null) {
