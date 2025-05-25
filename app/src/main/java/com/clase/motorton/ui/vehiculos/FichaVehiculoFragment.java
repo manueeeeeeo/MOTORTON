@@ -17,6 +17,8 @@ import android.widget.Toast;
 import com.clase.motorton.R;
 import com.clase.motorton.modelos.Evento;
 import com.clase.motorton.modelos.Vehiculo;
+import com.clase.motorton.servicios.InternetController;
+import com.clase.motorton.ui.perfil.Ajustes;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -53,6 +55,8 @@ public class FichaVehiculoFragment extends Fragment {
     private String uidUser = null;
     private String matriculaVeh = null;
 
+    private InternetController internetController = null;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -61,6 +65,12 @@ public class FichaVehiculoFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
+        // Inicializo el controlador de internet
+        internetController = new InternetController(getContext());
+
+        if(!internetController.tieneConexion()){
+            showToast("No tienes acceso a internet, conectese a una red!!");
+        }
 
         uidUser = auth.getUid();
 

@@ -231,10 +231,10 @@ public class AdministrarVehiculos extends AppCompatActivity {
         context = AdministrarVehiculos.this;
 
         // Llamo al método para llamar a las marcas desde la API indicando primeramente el tipo de motos
-        //cargarMarcasDesdeAPI("motos");
+        cargarMarcasDesdeAPI("motos");
         //marcas = mongodb.ObtenerMarcas("motos");
 
-        executor.execute(() -> {
+        /*executor.execute(() -> {
             try {
                 marcas = mongodb.ObtenerMarcas("motos");
 
@@ -246,7 +246,7 @@ public class AdministrarVehiculos extends AppCompatActivity {
                 Log.e("BDMongo", "Error cargando marcas: " + e.getMessage(), e);
                 showToast("Error: "+ e.getMessage());
             }
-        });
+        });*/
 
         // Establecemos la configuración de acciones del spinner de tipo de vehículo
         spinnerTipo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -258,7 +258,7 @@ public class AdministrarVehiculos extends AppCompatActivity {
                 String tipoApi = tipoSeleccionado.equalsIgnoreCase("Motos") ? "motos" : "coches";
 
                 // Llamo al método para cargar las marcas de ese tipo de vehículo
-                //cargarMarcasDesdeAPI(tipoApi);
+                cargarMarcasDesdeAPI(tipoApi);
             }
 
             @Override

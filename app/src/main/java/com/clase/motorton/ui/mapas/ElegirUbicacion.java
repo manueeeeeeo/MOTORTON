@@ -16,6 +16,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.clase.motorton.R;
+import com.clase.motorton.servicios.InternetController;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -42,6 +43,8 @@ public class ElegirUbicacion extends AppCompatActivity {
     private TextInputEditText editBuscar = null;
     // Variable para manejar todos los Toast de está pantalla
     private Toast mensajeToast = null;
+
+    private InternetController internetController = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +78,12 @@ public class ElegirUbicacion extends AppCompatActivity {
         BoundingBox spainBounds = new BoundingBox(43.79, 4.33, 27.63, -9.30);
         mapView.setScrollableAreaLimitDouble(spainBounds);
 
+        // Inicializo el controlador de internet
+        internetController = new InternetController(ElegirUbicacion.this);
+
+        if(!internetController.tieneConexion()){
+            showToast("No tienes acceso a internet, conectese a una red!!");
+        }
 
         mapView.setTileSource(TileSourceFactory.MAPNIK);
         // Habilitamos los multicontroles de toques
@@ -240,6 +249,14 @@ public class ElegirUbicacion extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mapView.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (internetController != null) {
+            internetController.detenerMonitoreo();
+        }
     }
 
     @Override

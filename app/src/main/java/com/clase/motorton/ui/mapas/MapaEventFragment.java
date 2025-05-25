@@ -16,6 +16,7 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.clase.motorton.R;
+import com.clase.motorton.servicios.InternetController;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -58,6 +59,8 @@ public class MapaEventFragment extends Fragment {
     // Variable para controlar todos los Toast de la actividad
     private Toast mensajeToast = null;
 
+    private InternetController internetController = null;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -69,6 +72,13 @@ public class MapaEventFragment extends Fragment {
         btnConfirmarRuta = view.findViewById(R.id.btnConfirmarRuta);
         btnBorrarRuta = view.findViewById(R.id.btnBorrarRuta);
         searchView = view.findViewById(R.id.searchView);
+
+        // Inicializo el controlador de internet
+        internetController = new InternetController(getContext());
+
+        if(!internetController.tieneConexion()){
+            showToast("No tienes acceso a internet, conectese a una red!!");
+        }
 
         String tipoSeleccion = getArguments().getString("tipoSeleccion", "ubicacion");
 

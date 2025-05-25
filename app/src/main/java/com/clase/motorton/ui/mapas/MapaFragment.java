@@ -13,8 +13,10 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.clase.motorton.R;
+import com.clase.motorton.servicios.InternetController;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -29,12 +31,22 @@ public class MapaFragment extends Fragment {
     private Map<String, Integer> eventosPorProvincia = null;
     private Map<String, float[]> coordsRelativas = null;
 
+    private InternetController internetController = null;
+    private Toast mensajeToast = null;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_mapa, container, false);
 
         db = FirebaseFirestore.getInstance();
+
+        // Inicializo el controlador de internet
+        internetController = new InternetController(getContext());
+
+        if(!internetController.tieneConexion()){
+            showToast("No tienes acceso a internet, conectese a una red!!");
+        }
 
         mapaContainer = view.findViewById(R.id.mapaContainer);
 
@@ -183,6 +195,25 @@ public class MapaFragment extends Fragment {
         }
 
         return Color.rgb(r, g, 0);
+    }
+
+    /**
+     * @param mensaje
+     * Método para ir matando los Toast y mostrar todos en el mismo para evitar
+     * colas de Toasts y que se ralentice el dispositivo
+     */
+    public void showToast(String mensaje){
+        if (this != null){
+            // Comprobamos si existe algun toast cargado en el toast de la variable global
+            if (mensajeToast != null) { // En caso de que si que exista
+                mensajeToast.cancel(); // Le cancelamos, es decir le "matamos"
+            }
+
+            // Creamos un nuevo Toast con el mensaje que nos dan de argumento en el método
+            mensajeToast = Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT);
+            // Mostramos dicho Toast
+            mensajeToast.show();
+        }
     }
 
     private int getContrastingTextColor(int backgroundColor) {

@@ -17,6 +17,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.clase.motorton.R;
+import com.clase.motorton.servicios.InternetController;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -50,6 +51,8 @@ public class Ajustes extends AppCompatActivity {
     // Variable para manejar la base de datos en esta actividad
     private FirebaseFirestore db = null;
 
+    private InternetController internetController = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +81,8 @@ public class Ajustes extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         // Inicializo la base de datos de firebase
         db = FirebaseFirestore.getInstance();
+        // Inicializo el controlador de internet
+        internetController = new InternetController(Ajustes.this);
 
         // Obtengo todos los pelementos visuales de la interfaz
         btnCerrar = findViewById(R.id.CerrarSesion);
@@ -106,8 +111,12 @@ public class Ajustes extends AppCompatActivity {
         btnEliminar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Llamo al método para mostrar el dialogo de confirmación y el motivo de borrado
-                mostrarDialogoConfirmacion();
+                if(internetController.tieneConexion()){
+                    // Llamo al método para mostrar el dialogo de confirmación y el motivo de borrado
+                    mostrarDialogoConfirmacion();
+                }else{
+                    showToast("No tienes acceso a internet, conectese a una red!!");
+                }
             }
         });
 
@@ -124,10 +133,24 @@ public class Ajustes extends AppCompatActivity {
         btnCerrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(internetController.tieneConexion()){
+                    // Llamo al método para cerrar la sesión
+                    cerrarSesion();
+                }else{
+                    showToast("No tienes acceso a internet, conectese a una red!!");
+                }
                 // Llamo al método para cerrar la sesión
                 cerrarSesion();
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (internetController != null) {
+            internetController.detenerMonitoreo();
+        }
     }
 
     /**

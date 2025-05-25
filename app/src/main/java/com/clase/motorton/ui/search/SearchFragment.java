@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -21,6 +22,7 @@ import com.clase.motorton.R;
 import com.clase.motorton.adaptadores.BusquedaAdapter;
 import com.clase.motorton.databinding.FragmentDashboardBinding;
 import com.clase.motorton.modelos.BusquedaItem;
+import com.clase.motorton.servicios.InternetController;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -43,6 +45,10 @@ public class SearchFragment extends Fragment {
     private String lastQuery = "";
     private Map<String, BusquedaItem> resultadosMap = new HashMap<>();
 
+    private Toast mensajeToast = null;
+
+    private InternetController internetController = null;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
@@ -59,6 +65,13 @@ public class SearchFragment extends Fragment {
         searchInput = root.findViewById(R.id.editBuscar);
         progressBar = root.findViewById(R.id.progressBuscar);
         db = FirebaseFirestore.getInstance();
+
+        // Inicializo el controlador de internet
+        internetController = new InternetController(getContext());
+
+        if(!internetController.tieneConexion()){
+            showToast("No tienes acceso a internet, conectese a una red!!");
+        }
 
         searchInput.addTextChangedListener(new TextWatcher() {
             @Override
@@ -151,6 +164,25 @@ public class SearchFragment extends Fragment {
             resultadosList.addAll(resultadosMap.values());
             busquedaAdapter.notifyDataSetChanged();
             progressBar.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * @param mensaje
+     * Método para ir matando los Toast y mostrar todos en el mismo para evitar
+     * colas de Toasts y que se ralentice el dispositivo
+     */
+    public void showToast(String mensaje){
+        if (this != null){
+            // Comprobamos si existe algun toast cargado en el toast de la variable global
+            if (mensajeToast != null) { // En caso de que si que exista
+                mensajeToast.cancel(); // Le cancelamos, es decir le "matamos"
+            }
+
+            // Creamos un nuevo Toast con el mensaje que nos dan de argumento en el método
+            mensajeToast = Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT);
+            // Mostramos dicho Toast
+            mensajeToast.show();
         }
     }
 

@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.clase.motorton.R;
 import com.clase.motorton.adaptadores.SpinnerAdaptarNormal;
 import com.clase.motorton.cifrado.CifradoDeDatos;
+import com.clase.motorton.servicios.InternetController;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -65,6 +66,8 @@ public class EditarEventoFragment extends Fragment {
     private Date fechaEvento = null;
     private String documentoEventoID = null;
 
+    private InternetController internetController = null;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -74,6 +77,13 @@ public class EditarEventoFragment extends Fragment {
         // Inicializamos Firebase
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+
+        // Inicializo el controlador de internet
+        internetController = new InternetController(getContext());
+
+        if(!internetController.tieneConexion()){
+            showToast("No tienes acceso a internet, conectese a una red!!");
+        }
 
         // Obtenemos referencias a los elementos de la interfaz
         editTextDescripcion = (EditText) view.findViewById(R.id.editTextDescripcion);
@@ -88,8 +98,12 @@ public class EditarEventoFragment extends Fragment {
         buttonCrearEvento.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Llamo al método para crear el evento
-                actualizarEvento();
+                if(internetController.tieneConexion()){
+                    // Llamo al método para crear el evento
+                    actualizarEvento();
+                }else{
+                    showToast("No tienes acceso a internet, conectese a una red!!");
+                }
             }
         });
 
