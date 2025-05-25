@@ -24,9 +24,13 @@
         android:theme="@style/Theme.MOTORTON"
         tools:targetApi="31">
         <activity
-            android:name=".ui.perfil.VehiculosFavoritos"
+            android:name=".ui.vehiculos.VerInfoVehiculoFavorito"
             android:exported="false"
             android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.perfil.VehiculosFavoritos"
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.perfil.ModificacionesVehiculo"
             android:exported="false"
