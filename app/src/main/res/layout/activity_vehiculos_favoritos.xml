@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Vehículos Favoritos"
-            android:textColor="@android:color/white"
+            android:textColor="#000000"
             android:textSize="22sp"
             android:textStyle="bold"
             app:layout_constraintTop_toTopOf="parent"

@@ -48,13 +48,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="16dp"
+                    android:background="#000000">
 
                     <TextView
                         android:text="Marca y Modelo"
                         android:textSize="16sp"
                         android:textStyle="bold"
-                        android:textColor="@color/black"
+                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
 
@@ -63,14 +64,14 @@
                         android:text="Toyota Supra MK5"
                         android:textSize="20sp"
                         android:textStyle="bold"
-                        android:textColor="@color/black"
+                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
 
                     <TextView
                         android:text="Matrícula"
                         android:textSize="14sp"
-                        android:textColor="@color/black"
+                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"/>
@@ -79,14 +80,14 @@
                         android:id="@+id/txtMatricula"
                         android:text="ABC-1234"
                         android:textSize="16sp"
-                        android:textColor="@color/black"
+                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
 
                     <TextView
                         android:text="Años"
                         android:textSize="14sp"
-                        android:textColor="@color/black"
+                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"/>
@@ -95,7 +96,7 @@
                         android:id="@+id/txtAnos"
                         android:text="2021"
                         android:textSize="16sp"
-                        android:textColor="@color/black"
+                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
                 </LinearLayout>
@@ -113,13 +114,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="16dp"
+                    android:background="#000000">
 
                     <TextView
                         android:text="Tubo de Escape"
                         android:textSize="16sp"
                         android:textStyle="bold"
-                        android:textColor="@color/black"
+                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
 
@@ -127,7 +129,7 @@
                         android:id="@+id/txtTubo"
                         android:text="Akrapović"
                         android:textSize="16sp"
-                        android:textColor="@color/black"
+                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
                 </LinearLayout>
@@ -145,13 +147,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="16dp"
+                    android:background="#000000">
 
                     <TextView
                         android:text="Ruedas"
                         android:textSize="16sp"
                         android:textStyle="bold"
-                        android:textColor="@color/black"
+                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
 
@@ -159,7 +162,7 @@
                         android:id="@+id/txtRuedas"
                         android:text="BBS Forjadas"
                         android:textSize="16sp"
-                        android:textColor="@color/black"
+                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
                 </LinearLayout>
@@ -177,13 +180,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="16dp"
+                    android:background="#000000">
 
                     <TextView
                         android:text="Alerón"
                         android:textSize="16sp"
                         android:textStyle="bold"
-                        android:textColor="@color/black"
+                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
 
@@ -191,7 +195,7 @@
                         android:id="@+id/txtAleron"
                         android:text="Carbono"
                         android:textSize="16sp"
-                        android:textColor="@color/black"
+                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
                 </LinearLayout>
@@ -209,13 +213,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="16dp"
+                    android:background="#000000">
 
                     <TextView
                         android:text="Características"
                         android:textSize="16sp"
                         android:textStyle="bold"
-                        android:textColor="@color/black"
+                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
 
@@ -223,7 +228,7 @@
                         android:id="@+id/txtBodyKit"
                         android:text="Body Kit: Sí"
                         android:textSize="14sp"
-                        android:textColor="@color/black"
+                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"/>
@@ -232,7 +237,7 @@
                         android:id="@+id/txtLucesLed"
                         android:text="Luces LED: No"
                         android:textSize="14sp"
-                        android:textColor="@color/black"
+                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"/>
@@ -241,7 +246,7 @@
                         android:id="@+id/txtChoques"
                         android:text="Choques: 2"
                         android:textSize="14sp"
-                        android:textColor="@color/black"
+                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"/>
@@ -250,7 +255,7 @@
                         android:id="@+id/txtExportado"
                         android:text="¿Exportado?: Sí"
                         android:textSize="14sp"
-                        android:textColor="@color/black"
+                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"/>
@@ -259,7 +264,7 @@
                         android:id="@+id/txtCv"
                         android:text="CV: 15"
                         android:textSize="14sp"
-                        android:textColor="@color/black"
+                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"/>
@@ -268,7 +273,7 @@
                         android:id="@+id/txtMaxv"
                         android:text="Maxima Velocidad: 150 km/h"
                         android:textSize="14sp"
-                        android:textColor="@color/black"
+                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"/>
@@ -288,13 +293,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="16dp"
+                    android:background="#000000">
 
                     <TextView
                         android:text="Descripción"
                         android:textSize="16sp"
                         android:textStyle="bold"
-                        android:textColor="@color/black"
+                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
 
@@ -302,7 +308,7 @@
                         android:id="@+id/txtDescripcion"
                         android:text="Vehículo tuning al 100%, con motor modificado y estética personalizada."
                         android:textSize="14sp"
-                        android:textColor="@color/black"
+                        android:textColor="#FFFFFF"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"/>

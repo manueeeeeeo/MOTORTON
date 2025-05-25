@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_marginBottom="10dp"
-            android:background="#4D5896"
+            android:background="#8D8D8D"
             android:queryHint="Buscar dirección o municipio"
             android:iconifiedByDefault="false" />
 

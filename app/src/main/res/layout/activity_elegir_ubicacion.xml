@@ -29,7 +29,7 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/inputBusqueda"
-            android:textColor="#FFFFFF"
+            android:textColor="#000000"
             android:textColorHint="#9F9F9F"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
