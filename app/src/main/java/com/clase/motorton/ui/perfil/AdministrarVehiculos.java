@@ -119,9 +119,6 @@ public class AdministrarVehiculos extends AppCompatActivity {
     // Variable para guardar y manejar todos los modelos
     private List<String> modelos = new ArrayList<>();
 
-    private BDMongo mongodb = null;
-    ExecutorService executor = null;
-
     private ActivityResultLauncher<Intent> modificarVehiculoLauncher = null;
 
     @Override
@@ -133,8 +130,6 @@ public class AdministrarVehiculos extends AppCompatActivity {
         // Inicialización de Firebase
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-        mongodb = new BDMongo();
-        executor = Executors.newSingleThreadExecutor();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -232,21 +227,6 @@ public class AdministrarVehiculos extends AppCompatActivity {
 
         // Llamo al método para llamar a las marcas desde la API indicando primeramente el tipo de motos
         cargarMarcasDesdeAPI("motos");
-        //marcas = mongodb.ObtenerMarcas("motos");
-
-        /*executor.execute(() -> {
-            try {
-                marcas = mongodb.ObtenerMarcas("motos");
-
-                runOnUiThread(() -> {
-                    adaptador2 = new SpinnerAdaptarNormal(AdministrarVehiculos.this, marcas);
-                    spinnerMarca.setAdapter(adaptador2);
-                });
-            } catch (Exception e) {
-                Log.e("BDMongo", "Error cargando marcas: " + e.getMessage(), e);
-                showToast("Error: "+ e.getMessage());
-            }
-        });*/
 
         // Establecemos la configuración de acciones del spinner de tipo de vehículo
         spinnerTipo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
