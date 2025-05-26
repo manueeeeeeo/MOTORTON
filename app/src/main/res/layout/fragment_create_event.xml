@@ -126,9 +126,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:backgroundTint="#0a0c3e"
-                    android:popupBackground="#0a0c3e"
-                    android:textColor="#FFFFFF"/>
+                    android:backgroundTint="#929292"
+                    android:popupBackground="#929292"
+                    android:textColor="#000000"/>
 
                 <TextView
                     android:id="@+id/textViewTipoEvento"
@@ -146,9 +146,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:textColor="#FFFFFF"
-                    android:popupBackground="#0a0c3e"
-                    android:backgroundTint="#0a0c3e"/>
+                    android:textColor="#000000"
+                    android:popupBackground="#929292"
+                    android:backgroundTint="#929292"/>
 
                 <TextView
                     android:id="@+id/textViewMapa"
@@ -189,12 +189,17 @@
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="8dp" />
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#929292">
                 <DatePicker
                     android:id="@+id/datePickerFecha"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
                     android:layout_gravity="center"/>
+            </LinearLayout>
 
                 <Button
                     android:id="@+id/buttonCrearEvento"
