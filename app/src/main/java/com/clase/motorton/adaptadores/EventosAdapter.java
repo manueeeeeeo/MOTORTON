@@ -22,8 +22,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class EventosAdapter extends RecyclerView.Adapter<EventosAdapter.ViewHolder> {
     // Variable para manejar la lista de los eventos
@@ -62,7 +65,14 @@ public class EventosAdapter extends RecyclerView.Adapter<EventosAdapter.ViewHold
         // Establezco en los textview los diferentes datos del evento
         holder.nombre.setText(evento.getNombre());
         holder.tipoEvento.setText("Tipo: " + evento.getTipoEvento());
-        holder.fecha.setText("Fecha: " + evento.getFecha());
+
+        Date fechaEvento = evento.getFecha();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String fechaFormateada = sdf.format(fechaEvento);
+
+        holder.fecha.setText("Fecha: " + fechaFormateada);
+
+        //holder.fecha.setText("Fecha: " + evento.getFecha());
 
         // Inicializamos la instancia de la base de datos
         FirebaseFirestore db = FirebaseFirestore.getInstance();
