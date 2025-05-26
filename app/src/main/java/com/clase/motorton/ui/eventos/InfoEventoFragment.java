@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class InfoEventoFragment extends Fragment {
-    private TextView textNombre = null, textDescripcion = null, textUbicacion = null, textProvincia = null,
+    private TextView textNombre = null, textDescripcion = null, textProvincia = null,
             textTipoEvento = null, textOrganizador = null, textFecha = null, textActivo = null, textParticipantes1 = null,
             textDistanciaRuta = null, textTiempoRuta = null;
 
@@ -73,7 +73,6 @@ public class InfoEventoFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         textNombre = view.findViewById(R.id.textNombre);
         textDescripcion = view.findViewById(R.id.textDescripcion);
-        textUbicacion = view.findViewById(R.id.textUbicacion);
         textProvincia = view.findViewById(R.id.textProvincia);
         textTipoEvento = view.findViewById(R.id.textTipoEvento);
         textOrganizador = view.findViewById(R.id.textOrganizador);
@@ -121,7 +120,6 @@ public class InfoEventoFragment extends Fragment {
                         if (evento != null) {
                             textNombre.setText(evento.getNombre());
                             textDescripcion.setText("Descripción: "+evento.getDescripcion());
-                            textUbicacion.setText("Ubicación: " + evento.getUbicacion());
                             textProvincia.setText("Provincia: " + evento.getProvincia());
                             textTipoEvento.setText("Tipo: " + evento.getTipoEvento());
 
