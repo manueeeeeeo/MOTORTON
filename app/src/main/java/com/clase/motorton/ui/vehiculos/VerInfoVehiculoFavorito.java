@@ -3,36 +3,37 @@ package com.clase.motorton.ui.vehiculos;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.util.Base64;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import android.content.Intent;
+
 import com.clase.motorton.R;
-import com.clase.motorton.modelos.Evento;
 import com.clase.motorton.modelos.Vehiculo;
 import com.clase.motorton.servicios.InternetController;
-import com.clase.motorton.ui.perfil.Ajustes;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
-public class FichaVehiculoFragment extends Fragment {
+public class VerInfoVehiculoFavorito extends AppCompatActivity {
     // Variable para manejar la base de datos de firestore
     private FirebaseFirestore db = null;
 
     // Variable para manejar la autentificación del usuario
     private FirebaseAuth auth = null;
+
+    private InternetController internetController = null;
+    private Toast mensajeToast = null;
 
     private ImageView imagenVehiculo = null;
     private TextView marcaYModelo = null;
@@ -50,23 +51,20 @@ public class FichaVehiculoFragment extends Fragment {
     private TextView choques = null;
     private ImageView vehFav = null;
 
-    private Toast mensajeToast = null;
     private String fotoV = null;
     private String uidUser = null;
     private String matriculaVeh = null;
 
-    private InternetController internetController = null;
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.fragment_ficha_vehiculo, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_ver_info_vehiculo_favorito);
 
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         // Inicializo el controlador de internet
-        internetController = new InternetController(getContext());
+        internetController = new InternetController(VerInfoVehiculoFavorito.this);
 
         if(!internetController.tieneConexion()){
             showToast("No tienes acceso a internet, conectese a una red!!");
@@ -74,24 +72,25 @@ public class FichaVehiculoFragment extends Fragment {
 
         uidUser = auth.getUid();
 
-        marcaYModelo = (TextView) root.findViewById(R.id.txtModelo);
-        descripcion = (TextView) root.findViewById(R.id.txtDescripcion);
-        tuboEscape = (TextView) root.findViewById(R.id.txtTubo);
-        ruedas = (TextView) root.findViewById(R.id.txtRuedas);
-        aleron = (TextView) root.findViewById(R.id.txtAleron);
-        anos = (TextView) root.findViewById(R.id.txtAnos);
-        matricula = (TextView) root.findViewById(R.id.txtMatricula);
-        bodyKit = (TextView) root.findViewById(R.id.txtBodyKit);
-        lucesLd = (TextView) root.findViewById(R.id.txtLucesLed);
-        choques = (TextView) root.findViewById(R.id.txtChoques);
-        exportado = (TextView) root.findViewById(R.id.txtExportado);
-        maxV = (TextView) root.findViewById(R.id.txtMaxv);
-        cv = (TextView) root.findViewById(R.id.txtCv);
-        imagenVehiculo = (ImageView) root.findViewById(R.id.fotoVehiculo);
-        vehFav = (ImageView) root.findViewById(R.id.estrellaFavorito);
+        marcaYModelo = (TextView) findViewById(R.id.txtModelo);
+        descripcion = (TextView) findViewById(R.id.txtDescripcion);
+        tuboEscape = (TextView) findViewById(R.id.txtTubo);
+        ruedas = (TextView) findViewById(R.id.txtRuedas);
+        aleron = (TextView) findViewById(R.id.txtAleron);
+        anos = (TextView) findViewById(R.id.txtAnos);
+        matricula = (TextView) findViewById(R.id.txtMatricula);
+        bodyKit = (TextView) findViewById(R.id.txtBodyKit);
+        lucesLd = (TextView) findViewById(R.id.txtLucesLed);
+        choques = (TextView) findViewById(R.id.txtChoques);
+        exportado = (TextView) findViewById(R.id.txtExportado);
+        maxV = (TextView) findViewById(R.id.txtMaxv);
+        cv = (TextView) findViewById(R.id.txtCv);
+        imagenVehiculo = (ImageView) findViewById(R.id.fotoVehiculo);
+        vehFav = (ImageView) findViewById(R.id.estrellaFavorito);
 
-        if (getArguments() != null && getArguments().containsKey("matriculaVeh")) {
-            String matri = getArguments().getString("matriculaVeh");
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra("matriculaVeh")) {
+            String matri = intent.getStringExtra("matriculaVeh");
             matriculaVeh = matri;
             cargarDatosVehiculo(matri);
         }
@@ -102,8 +101,6 @@ public class FichaVehiculoFragment extends Fragment {
                 AgregarVehiculoFav(uidUser, matriculaVeh);
             }
         });
-
-        return root;
     }
 
     private void AgregarVehiculoFav(String uid, String matricula){
@@ -273,7 +270,7 @@ public class FichaVehiculoFragment extends Fragment {
             }
 
             // Creamos un nuevo Toast con el mensaje que nos dan de argumento en el método
-            mensajeToast = Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT);
+            mensajeToast = Toast.makeText(VerInfoVehiculoFavorito.this, mensaje, Toast.LENGTH_SHORT);
             // Mostramos dicho Toast
             mensajeToast.show();
         }

@@ -16,6 +16,7 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.clase.motorton.R;
+import com.clase.motorton.servicios.InternetController;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -52,9 +53,13 @@ public class MapaEventFragment extends Fragment {
     private Button btnBorrarRuta = null;
     // Variable para controlar el buscador
     private SearchView searchView = null;
+    private double distanciaRuta = Double.NaN;
+    private double tiempoRuta = Double.NaN;
 
     // Variable para controlar todos los Toast de la actividad
     private Toast mensajeToast = null;
+
+    private InternetController internetController = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,6 +72,13 @@ public class MapaEventFragment extends Fragment {
         btnConfirmarRuta = view.findViewById(R.id.btnConfirmarRuta);
         btnBorrarRuta = view.findViewById(R.id.btnBorrarRuta);
         searchView = view.findViewById(R.id.searchView);
+
+        // Inicializo el controlador de internet
+        internetController = new InternetController(getContext());
+
+        if(!internetController.tieneConexion()){
+            showToast("No tienes acceso a internet, conectese a una red!!");
+        }
 
         String tipoSeleccion = getArguments().getString("tipoSeleccion", "ubicacion");
 
@@ -151,6 +163,12 @@ public class MapaEventFragment extends Fragment {
                 } else {
                     showToast("Selecciona inicio y fin");
                     return;
+                }
+                if(!Double.isNaN(distanciaRuta) && !Double.isNaN(tiempoRuta)){
+                    bundle.putDouble("distanciaRuta", distanciaRuta);
+                    bundle.putDouble("tiempoRuta", tiempoRuta);
+                }else{
+                    showToast("Ocurrió un error a la hora de guardar la distancia y el tiempo!!!");
                 }
             } else {
                 if (startMarker != null) {
@@ -311,6 +329,8 @@ public class MapaEventFragment extends Fragment {
                 }
 
                 requireActivity().runOnUiThread(() -> {
+                    tiempoRuta = (double) durationInMinutes;
+                    distanciaRuta = (double) distanceInKm;
                     showToast("Duración estimada: " + durationInMinutes + " min\nDistancia: " + distanceInKm + " km");
                     if (routeLine != null) map.getOverlayManager().remove(routeLine);
 

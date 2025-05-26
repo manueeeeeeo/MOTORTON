@@ -2,49 +2,50 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    card_view:cardCornerRadius="8dp"
-    card_view:cardElevation="4dp">
+    android:layout_margin="12dp"
+    card_view:cardCornerRadius="16dp"
+    card_view:cardElevation="6dp"
+    android:foreground="?attr/selectableItemBackground">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:background="#5c5c7c">
+        android:background="#000000"
+        android:padding="16dp">
 
         <ImageView
             android:id="@+id/imagenEvento"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:scaleType="centerCrop"
             android:src="@drawable/evento"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:clipToOutline="true"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            card_view:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tituloEvento"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Título del Evento"
-            android:textSize="18sp"
+            android:text="Nombre del Evento"
+            android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="#FFFFFF"
             app:layout_constraintStart_toEndOf="@id/imagenEvento"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toTopOf="@id/imagenEvento"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="12dp" />
 
         <TextView
             android:id="@+id/tipoEvento"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Tipo de Evento (Conferencia, Fiesta, etc.)"
+            android:text="Conferencia • Presencial"
             android:textSize="14sp"
-            android:textColor="#FFFFFF"
-            app:layout_constraintStart_toEndOf="@id/imagenEvento"
+            android:textColor="#B9B9B9"
+            app:layout_constraintStart_toStartOf="@id/tituloEvento"
             app:layout_constraintTop_toBottomOf="@id/tituloEvento"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -52,58 +53,55 @@
             android:id="@+id/fechaEvento"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Fecha: 2023-12-31"
+            android:text="📅 31 de diciembre de 2023"
             android:textSize="14sp"
-            android:textColor="#FFFFFF"
-            app:layout_constraintStart_toEndOf="@id/imagenEvento"
+            android:textColor="#B9B9B9"
+            app:layout_constraintStart_toStartOf="@id/tituloEvento"
             app:layout_constraintTop_toBottomOf="@id/tipoEvento"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:layout_gravity="center"
-            style="?android:attr/progressBarStyleSmall"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <Button
-            android:id="@+id/botonApuntarse"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Apuntarse"
-            android:backgroundTint="#2c2c4c"
-            android:textColor="#FFFFFF"
-            android:layout_marginTop="26dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/botonVerMas"
-            app:layout_constraintTop_toBottomOf="@id/fechaEvento" />
-
-        <Button
-            android:id="@+id/botonVerMas"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Ver Más"
-            android:backgroundTint="#FFC107"
-            android:textColor="#FFFFFF"
-            android:layout_marginTop="26dp"
-            android:layout_marginStart="8dp"
-            app:layout_constraintStart_toEndOf="@id/botonApuntarse"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/fechaEvento" />
-
         <LinearLayout
-            android:id="@+id/layoutBotonesAccion"
-            android:layout_width="match_parent"
+            android:id="@+id/layoutBotones"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:layout_marginTop="12dp"
             android:gravity="end"
+            app:layout_constraintTop_toBottomOf="@id/imagenEvento"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <Button
+                android:id="@+id/botonApuntarse"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Apuntarse"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:backgroundTint="#3F51B5" />
+
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/botonVerMas"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Ver más"
+                android:textAllCaps="false"
+                android:textColor="#333333"
+                android:backgroundTint="#FFC107" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/botonApuntarse"
+            app:layout_constraintTop_toBottomOf="@id/layoutBotones"
             app:layout_constraintEnd_toEndOf="parent">
 
             <ImageView
@@ -112,10 +110,8 @@
                 android:layout_height="24dp"
                 android:src="@drawable/icono_edit"
                 android:contentDescription="Editar evento"
-                android:clickable="true"
-                android:focusable="true"
-                app:tint="#ccd4cc"
-                android:layout_marginEnd="12dp"/>
+                android:layout_marginEnd="12dp"
+                card_view:tint="#00ACFF" />
 
             <ImageView
                 android:id="@+id/imageViewEliminarEvento"
@@ -123,8 +119,7 @@
                 android:layout_height="24dp"
                 android:src="@drawable/icono_dle"
                 android:contentDescription="Eliminar evento"
-                android:clickable="true"
-                android:focusable="true"/>
+                card_view:tint="#EF5350" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

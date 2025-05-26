@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
@@ -16,10 +17,12 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.clase.motorton.R;
+import com.clase.motorton.servicios.InternetController;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -47,6 +50,8 @@ public class Ajustes extends AppCompatActivity {
     private FirebaseAuth mAuth = null;
     // Variable para manejar la base de datos en esta actividad
     private FirebaseFirestore db = null;
+
+    private InternetController internetController = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +81,8 @@ public class Ajustes extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         // Inicializo la base de datos de firebase
         db = FirebaseFirestore.getInstance();
+        // Inicializo el controlador de internet
+        internetController = new InternetController(Ajustes.this);
 
         // Obtengo todos los pelementos visuales de la interfaz
         btnCerrar = findViewById(R.id.CerrarSesion);
@@ -104,8 +111,12 @@ public class Ajustes extends AppCompatActivity {
         btnEliminar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Llamo al método para mostrar el dialogo de confirmación y el motivo de borrado
-                mostrarDialogoConfirmacion();
+                if(internetController.tieneConexion()){
+                    // Llamo al método para mostrar el dialogo de confirmación y el motivo de borrado
+                    mostrarDialogoConfirmacion();
+                }else{
+                    showToast("No tienes acceso a internet, conectese a una red!!");
+                }
             }
         });
 
@@ -122,10 +133,24 @@ public class Ajustes extends AppCompatActivity {
         btnCerrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(internetController.tieneConexion()){
+                    // Llamo al método para cerrar la sesión
+                    cerrarSesion();
+                }else{
+                    showToast("No tienes acceso a internet, conectese a una red!!");
+                }
                 // Llamo al método para cerrar la sesión
                 cerrarSesion();
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (internetController != null) {
+            internetController.detenerMonitoreo();
+        }
     }
 
     /**
@@ -296,14 +321,12 @@ public class Ajustes extends AppCompatActivity {
         // Obtenemos en una variable la fecha actual con un formato especial
         String fechaHoraActual = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         // Generamos el uid del documento en donde juntamos el uid y la fecha y hora actuales
-        String idDocumento = uid + "_" + fechaHoraActual;
+        String idDocumento = "borrado_" + fechaHoraActual;
 
         // Creamos un mapa para poder darle keys y valores
         Map<String, Object> datosBorrado = new HashMap<>();
         // Establecemos la fecha de borrado
         datosBorrado.put("fechaHoraBorrado", new Date());
-        // Establecemos el uid del usuario
-        datosBorrado.put("uidUsuario", uid);
         // Establecemos el motivo de borrar la cuenta
         datosBorrado.put("motivo", motivo);
 
@@ -336,6 +359,17 @@ public class Ajustes extends AppCompatActivity {
                 }
 
                 perfilesRef.document(uid).delete().addOnSuccessListener(aVoid -> {
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    if (user != null) {
+                        user.delete().addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Log.d("EliminarCuenta", "Cuenta de Firebase Authentication eliminada.");
+                            } else {
+                                Log.e("EliminarCuenta", "Error al eliminar cuenta de Firebase Auth", task.getException());
+                            }
+                        });
+                    }
+
                     // Lanzo un toast indicando al usuario que la cuenta se eliminará
                     showToast("Cuenta eliminada correctamente");
                     // Cierro la sesión en el usuario de Google por si acaso

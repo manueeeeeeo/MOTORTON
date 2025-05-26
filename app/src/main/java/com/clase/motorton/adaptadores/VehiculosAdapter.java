@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.clase.motorton.modelos.Vehiculo;
 import com.clase.motorton.ui.perfil.AdministrarVehiculos;
+import com.clase.motorton.ui.vehiculos.VerInfoVehiculoFavorito;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -33,6 +34,7 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
     // Variable para manejar el contexto
     private final Context context;
     private Toast mensajeToast = null;
+    private List<String> listaFavoritos = new ArrayList<>();
 
     /**
      * @param context
@@ -92,12 +94,19 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
                     if (documentSnapshot.exists()) {
                         List<String> favoritos = (List<String>) documentSnapshot.get("listaFavVeh");
 
+                        if (favoritos != null) {
+                            listaFavoritos = favoritos;
+                        } else {
+                            listaFavoritos = new ArrayList<>();
+                        }
+
                         if (favoritos != null && favoritos.contains(vehiculo.getMatricula())) {
                             holder.imageViewFavorito.setImageResource(R.drawable.con_estrella);
                         } else {
                             holder.imageViewFavorito.setImageResource(R.drawable.sin_estrella);
                         }
                     }
+
                 })
                 .addOnFailureListener(e -> {
                     // En caso de error al obtener el perfil
@@ -108,13 +117,22 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
         holder.fondo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Bundle bundle = new Bundle();
-                bundle.putString("matriculaVeh", vehiculo.getMatricula());
+                String matricula = vehiculo.getMatricula();
 
-                NavController navController = Navigation.findNavController(view);
-                navController.navigate(R.id.navigation_info_vehiculo, bundle);
+                if (listaFavoritos.contains(matricula)) {
+                    Intent intent = new Intent(view.getContext(), VerInfoVehiculoFavorito.class);
+                    intent.putExtra("matriculaVeh", matricula);
+                    view.getContext().startActivity(intent);
+                } else {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("matriculaVeh", matricula);
+
+                    NavController navController = Navigation.findNavController(view);
+                    navController.navigate(R.id.navigation_info_vehiculo, bundle);
+                }
             }
         });
+
 
         // Cuando toquemos el botón de eliminar un vehículo llamamos al método de eliminar y le pasamos la matricula del mismo
         holder.imageViewDelete.setOnClickListener(v -> eliminarVehiculo(vehiculo.getMatricula(), position));

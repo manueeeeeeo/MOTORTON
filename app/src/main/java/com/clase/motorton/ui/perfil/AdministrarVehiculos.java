@@ -29,6 +29,7 @@ import com.clase.motorton.R;
 import com.clase.motorton.adaptadores.SpinnerAdaptarNormal;
 import com.clase.motorton.adaptadores.SpinnerAdapter;
 import com.clase.motorton.api.ApiVehiculos;
+import com.clase.motorton.bd.BDMongo;
 import com.clase.motorton.modelos.FotoVehiculoTemporal;
 import com.clase.motorton.modelos.Vehiculo;
 import com.google.firebase.auth.FirebaseAuth;
@@ -40,6 +41,8 @@ import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class AdministrarVehiculos extends AppCompatActivity {
     // Variable para manejar el botón de crear
@@ -220,14 +223,10 @@ public class AdministrarVehiculos extends AppCompatActivity {
 
 
         // Obtengo el contexto
-        context = this;
+        context = AdministrarVehiculos.this;
 
         // Llamo al método para llamar a las marcas desde la API indicando primeramente el tipo de motos
         cargarMarcasDesdeAPI("motos");
-        // Configuro el adapter para el spinner de marcas, que es uno normal
-        adaptador2 = new SpinnerAdaptarNormal(this, marcas);
-        // Le establezco el adaptador al spinner de marcas
-        spinnerMarca.setAdapter(adaptador2);
 
         // Establecemos la configuración de acciones del spinner de tipo de vehículo
         spinnerTipo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -358,7 +357,8 @@ public class AdministrarVehiculos extends AppCompatActivity {
                 luces,
                 maxVe,
                 foto,
-                choques);
+                choques,
+                cv);
 
         db.collection("vehiculos").document(matricula)
                 .get()

@@ -21,6 +21,8 @@ public class Evento {
     private double endLat;
     private double endLon;
     private boolean esRuta;
+    private double tiempoRuta;
+    private double distanciaRuta;
 
     public Evento() {
     }
@@ -36,6 +38,22 @@ public class Evento {
         this.organizador = organizador;
         this.activo = activo;
         this.fecha = fecha;
+    }
+
+    public double getTiempoRuta() {
+        return tiempoRuta;
+    }
+
+    public void setTiempoRuta(double tiempoRuta) {
+        this.tiempoRuta = tiempoRuta;
+    }
+
+    public double getDistanciaRuta() {
+        return distanciaRuta;
+    }
+
+    public void setDistanciaRuta(double distanciaRuta) {
+        this.distanciaRuta = distanciaRuta;
     }
 
     public double getUbicacionLat() {

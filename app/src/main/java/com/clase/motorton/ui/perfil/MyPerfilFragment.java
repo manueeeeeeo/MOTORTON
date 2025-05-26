@@ -63,6 +63,9 @@ public class MyPerfilFragment extends Fragment {
     private VehiculosAdapter vehiculosAdapter = null;
     // Variable para manejar la lista de vehículos del usuario
     private ArrayList<Vehiculo> listaVehiculos = new ArrayList<>();
+    private TextView textMisVeh = null;
+    private TextView textEventoCreados = null;
+    private TextView textEventosParticipo = null;
 
     // Variable para controlar el cifrado de datos
     private CifradoDeDatos cifrar = null;
@@ -103,6 +106,15 @@ public class MyPerfilFragment extends Fragment {
         btnEventosCreados = root.findViewById(R.id.buttonEventosCreados);
         btnEventosParticipas = root.findViewById(R.id.buttonEventosActivos);
         textVievNLikes = root.findViewById(R.id.textViewLikes);
+        textMisVeh = root.findViewById(R.id.textMisCoches);
+        textEventoCreados = root.findViewById(R.id.textEventosCreados);
+        textEventosParticipo = root.findViewById(R.id.textEventosActivos);
+
+        textMisVeh.setVisibility(View.GONE);
+        textEventoCreados.setVisibility(View.GONE);
+        textEventosParticipo.setVisibility(View.GONE);
+
+        textMisVeh.setVisibility(View.VISIBLE);
 
         // Inicializo el cifrador de datos
         cifrar = new CifradoDeDatos();
@@ -142,6 +154,12 @@ public class MyPerfilFragment extends Fragment {
         btnCoches.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                textMisVeh.setVisibility(View.GONE);
+                textEventoCreados.setVisibility(View.GONE);
+                textEventosParticipo.setVisibility(View.GONE);
+
+                textMisVeh.setVisibility(View.VISIBLE);
+
                 recyclerViewVehiculos.setLayoutManager(new GridLayoutManager(getContext(), 2));
                 cargarVehiculos(mAuth.getCurrentUser().getUid());
             }
@@ -151,6 +169,12 @@ public class MyPerfilFragment extends Fragment {
         btnEventosParticipas.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                textMisVeh.setVisibility(View.GONE);
+                textEventoCreados.setVisibility(View.GONE);
+                textEventosParticipo.setVisibility(View.GONE);
+
+                textEventosParticipo.setVisibility(View.VISIBLE);
+
                 cargarEventosParticipas(mAuth.getCurrentUser().getUid());
             }
         });
@@ -159,6 +183,12 @@ public class MyPerfilFragment extends Fragment {
         btnEventosCreados.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                textMisVeh.setVisibility(View.GONE);
+                textEventoCreados.setVisibility(View.GONE);
+                textEventosParticipo.setVisibility(View.GONE);
+
+                textEventoCreados.setVisibility(View.VISIBLE);
+
                 recyclerViewVehiculos.setLayoutManager(new LinearLayoutManager(getContext()));
                 cargarEventosCreados(mAuth.getCurrentUser().getUid());
             }

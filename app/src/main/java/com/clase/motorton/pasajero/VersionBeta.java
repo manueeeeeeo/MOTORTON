@@ -25,7 +25,6 @@ public class VersionBeta extends AppCompatActivity {
     private FirebaseFirestore db = null;
     private Button btnAcceder = null;
     private EditText editCodigo = null;
-    private String codigo = null;
     private Toast mensajeToast = null;
 
     @Override

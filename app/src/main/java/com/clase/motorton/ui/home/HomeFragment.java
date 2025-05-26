@@ -22,6 +22,7 @@ import com.clase.motorton.adaptadores.EventosAdapter;
 import com.clase.motorton.adaptadores.SpinnerAdaptarNormal;
 import com.clase.motorton.databinding.FragmentHomeBinding;
 import com.clase.motorton.modelos.Evento;
+import com.clase.motorton.servicios.InternetController;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -47,6 +48,8 @@ public class HomeFragment extends Fragment {
 
     private String currentProvinciaFilter = null;
 
+    private InternetController internetController = null;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
@@ -57,6 +60,13 @@ public class HomeFragment extends Fragment {
         recyclerView = root.findViewById(R.id.recyclerEventos);
         spinnerPronvincia = root.findViewById(R.id.spinnerProvincia);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // Inicializo el controlador de internet
+        internetController = new InternetController(getContext());
+
+        if(!internetController.tieneConexion()){
+            showToast("No tienes acceso a internet, conectese a una red!!");
+        }
 
         // Agrego todas las provincias posibles
         provincias.add("-- Elija una Opción --");

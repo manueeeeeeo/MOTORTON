@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp"
-            android:background="#0a0c3e">
+            android:background="#000000">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -157,37 +157,85 @@
         android:orientation="horizontal"
         android:paddingVertical="8dp">
 
-        <ImageButton
-            android:id="@+id/buttonMisCoches"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:contentDescription="Mis Coches"
-            android:src="@drawable/ic_coche"
-            app:tint="#2c2c4c" />
+            android:orientation="vertical"
+            android:gravity="center">
 
-        <ImageButton
-            android:id="@+id/buttonEventosCreados"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:contentDescription="Eventos Creados"
-            android:src="@drawable/icono_evento_creado"
-            tools:ignore="UseAppTint"
-            app:tint="#2c2c4c"/>
+            <ImageButton
+                android:id="@+id/buttonMisCoches"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="Mis Coches"
+                android:src="@drawable/ic_coche"
+                app:tint="#2c2c4c" />
 
-        <ImageButton
-            android:id="@+id/buttonEventosActivos"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            <TextView
+                android:id="@+id/textMisCoches"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mis Vehículos"
+                android:textColor="#2c2c4c"
+                android:visibility="gone"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:contentDescription="Eventos Apuntados"
-            android:src="@drawable/icono_evento"
-            app:tint="#2c2c4c"/>
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/buttonEventosCreados"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="Eventos Creados"
+                android:src="@drawable/icono_evento_creado"
+                app:tint="#2c2c4c"/>
+
+            <TextView
+                android:id="@+id/textEventosCreados"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Eventos Creados"
+                android:textColor="#2c2c4c"
+                android:visibility="gone"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/buttonEventosActivos"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="Eventos Apuntados"
+                android:src="@drawable/icono_evento"
+                app:tint="#2c2c4c"/>
+
+            <TextView
+                android:id="@+id/textEventosActivos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Eventos Apuntados"
+                android:textColor="#2c2c4c"
+                android:visibility="gone"
+                android:textSize="12sp" />
+        </LinearLayout>
     </LinearLayout>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewVehiculos"

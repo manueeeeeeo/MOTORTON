@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.clase.motorton.R;
 import com.clase.motorton.adaptadores.ParticipanteAdapter;
 import com.clase.motorton.modelos.Evento;
+import com.clase.motorton.servicios.InternetController;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.json.JSONArray;
@@ -42,7 +43,8 @@ import java.util.Locale;
 
 public class InfoEventoFragment extends Fragment {
     private TextView textNombre = null, textDescripcion = null, textUbicacion = null, textProvincia = null,
-            textTipoEvento = null, textOrganizador = null, textFecha = null, textActivo = null, textParticipantes1 = null;
+            textTipoEvento = null, textOrganizador = null, textFecha = null, textActivo = null, textParticipantes1 = null,
+            textDistanciaRuta = null, textTiempoRuta = null;
 
     private MapView mapView = null;
     private Polyline routeLine = null;
@@ -58,6 +60,9 @@ public class InfoEventoFragment extends Fragment {
     private Double endLat = null;
     private Double endLon = null;
     private boolean esRuta = false;
+
+    private InternetController internetController = null;
+    private Toast mensajeToast = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -77,6 +82,8 @@ public class InfoEventoFragment extends Fragment {
         textParticipantes1 = view.findViewById(R.id.textParticipantes);
         recyclerViewParticipantes = view.findViewById(R.id.recyclerViewParticipantes);
         mapView = view.findViewById(R.id.mapViewInfo);
+        textDistanciaRuta = view.findViewById(R.id.textDistancia);
+        textTiempoRuta = view.findViewById(R.id.textTiempo);
 
         Configuration.getInstance().setUserAgentValue(requireContext().getPackageName());
         mapView.setTileSource(TileSourceFactory.MAPNIK);
@@ -87,6 +94,13 @@ public class InfoEventoFragment extends Fragment {
         recyclerViewParticipantes.setLayoutManager(new LinearLayoutManager(getContext()));
         participanteAdapter = new ParticipanteAdapter(participantesList);
         recyclerViewParticipantes.setAdapter(participanteAdapter);
+
+        // Inicializo el controlador de internet
+        internetController = new InternetController(getContext());
+
+        if(!internetController.tieneConexion()){
+            showToast("No tienes acceso a internet, conectese a una red!!");
+        }
 
         if (getArguments() != null && getArguments().containsKey("eventoId")) {
             String eventoId = getArguments().getString("eventoId");
@@ -106,7 +120,7 @@ public class InfoEventoFragment extends Fragment {
 
                         if (evento != null) {
                             textNombre.setText(evento.getNombre());
-                            textDescripcion.setText(evento.getDescripcion());
+                            textDescripcion.setText("Descripción: "+evento.getDescripcion());
                             textUbicacion.setText("Ubicación: " + evento.getUbicacion());
                             textProvincia.setText("Provincia: " + evento.getProvincia());
                             textTipoEvento.setText("Tipo: " + evento.getTipoEvento());
@@ -118,6 +132,18 @@ public class InfoEventoFragment extends Fragment {
                             textFecha.setText("Fecha: " + fechaFormateada);
 
                             textActivo.setText("Estado: " + (evento.isActivo() ? "Activo" : "Inactivo"));
+
+                            if(!Double.isNaN(evento.getTiempoRuta()) && evento.getTiempoRuta() != 0.0 &&
+                                    !Double.isNaN(evento.getDistanciaRuta()) && evento.getDistanciaRuta() != 0.0){
+                                textDistanciaRuta.setVisibility(View.VISIBLE);
+                                textTiempoRuta.setVisibility(View.VISIBLE);
+                            }else{
+                                textDistanciaRuta.setVisibility(View.GONE);
+                                textTiempoRuta.setVisibility(View.GONE);
+                            }
+
+                            textDistanciaRuta.setText("Distancia: "+evento.getDistanciaRuta()+" KM");
+                            textTiempoRuta.setText("Tiempo: "+evento.getTiempoRuta()+" minutos");
 
                             List<String> participantes = evento.getParticipantes();
                             if (participantes != null) {
@@ -274,6 +300,25 @@ public class InfoEventoFragment extends Fragment {
                 .addOnFailureListener(e -> {
                     textOrganizador.setText("Error al cargar el organizador.");
                 });
+    }
+
+    /**
+     * @param mensaje
+     * Método para ir matando los Toast y mostrar todos en el mismo para evitar
+     * colas de Toasts y que se ralentice el dispositivo
+     */
+    public void showToast(String mensaje){
+        if (this != null){
+            // Comprobamos si existe algun toast cargado en el toast de la variable global
+            if (mensajeToast != null) { // En caso de que si que exista
+                mensajeToast.cancel(); // Le cancelamos, es decir le "matamos"
+            }
+
+            // Creamos un nuevo Toast con el mensaje que nos dan de argumento en el método
+            mensajeToast = Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT);
+            // Mostramos dicho Toast
+            mensajeToast.show();
+        }
     }
 
     @Override
