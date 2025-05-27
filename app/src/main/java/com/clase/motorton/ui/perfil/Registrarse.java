@@ -264,6 +264,17 @@ public class Registrarse extends AppCompatActivity {
                             if (user != null) {
                                 // Obtenemos en una variable el uid del usuario
                                 String uid = user.getUid();
+                                user.sendEmailVerification()
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    showToast("Correo de verificación enviado correctamente");
+                                                } else {
+                                                    showToast("Error al enviar el corrreo de verificación!!");
+                                                }
+                                            }
+                                        });
                                 // Verificamos si el usuario ya existe en Firestore
                                 db.collection("perfiles").document(uid).get()
                                         // Una vez completado
