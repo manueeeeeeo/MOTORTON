@@ -277,6 +277,18 @@ public class EditarPerfilActivity extends AppCompatActivity {
                         String fotoBase64 = documentSnapshot.getString("fotoPerfil");
                         fotoPerfilAnterior = fotoBase64;
 
+                        String nombreCompletoDescifrado = "";
+                        String emailDescifrado = "";
+
+                        try {
+                            if (nombreCompleto != null)
+                                nombreCompletoDescifrado = CifradoDeDatos.descifrar(nombreCompleto);
+                            if (emailCifrado != null)
+                                emailDescifrado = CifradoDeDatos.descifrar(emailCifrado);
+                        } catch (Exception e) {
+                            showToast("Error al descifrar datos personales.");
+                        }
+
                         editUsername.setText(username1 != null ? username1 : "");
                         editCP.setText(String.valueOf(cp));
                         editDescrip.setText(descripcion1 != null ? descripcion1 : "");
@@ -306,8 +318,8 @@ public class EditarPerfilActivity extends AppCompatActivity {
                         perfilActual = new Perfil(
                                 uid,
                                 username1,
-                                emailCifrado,
-                                nombreCompleto,
+                                emailDescifrado,
+                                nombreCompletoDescifrado,
                                 ubicacion,
                                 0,
                                 fechaNaci,
@@ -377,9 +389,6 @@ public class EditarPerfilActivity extends AppCompatActivity {
         if (!nuevoUsername.equals(perfilActual.getUsername())) {
             cambios.put("username", nuevoUsername);
         }
-        if (!nuevoNombreCompleto.equals(perfilActual.getNombre_completo())) {
-            cambios.put("nombre_completo", nuevoNombreCompleto);
-        }
         if (nuevoCP != perfilActual.getCp()) {
             cambios.put("cp", nuevoCP);
         }
@@ -394,6 +403,15 @@ public class EditarPerfilActivity extends AppCompatActivity {
         }
         if (!ubicacionesSonIguales(perfilActual.getUbicacion(), ubicacionSeleccionada)) {
             cambios.put("ubicacion", ubicacionSeleccionada);
+        }
+        if (!nuevoNombreCompleto.equals(perfilActual.getNombre_completo())) {
+            try {
+                String nombreCifrado = CifradoDeDatos.cifrar(nuevoNombreCompleto);
+                cambios.put("nombre_completo", nombreCifrado);
+            } catch (Exception e) {
+                showToast("Error al cifrar el nombre.");
+                return;
+            }
         }
 
         if (cambios.isEmpty()) {
