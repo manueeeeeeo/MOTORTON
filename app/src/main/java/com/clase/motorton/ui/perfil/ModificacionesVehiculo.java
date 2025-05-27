@@ -187,14 +187,30 @@ public class ModificacionesVehiculo extends AppCompatActivity {
         fotoVehiculo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (ContextCompat.checkSelfPermission(ModificacionesVehiculo.this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
-                        ContextCompat.checkSelfPermission(ModificacionesVehiculo.this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                boolean cameraPermission = ContextCompat.checkSelfPermission(ModificacionesVehiculo.this, android.Manifest.permission.CAMERA)
+                        == PackageManager.PERMISSION_GRANTED;
 
-                    ActivityCompat.requestPermissions(ModificacionesVehiculo.this,
-                            new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.READ_EXTERNAL_STORAGE},
-                            PERMISSION_REQUEST_CODE);
-                } else { // En caso de tener los permisos concedidos
-                    // Llamamos al método para mostrar el dialogo de elegir de donde sacar la foto
+                boolean storagePermission;
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    storagePermission = ContextCompat.checkSelfPermission(ModificacionesVehiculo.this, android.Manifest.permission.READ_MEDIA_IMAGES)
+                            == PackageManager.PERMISSION_GRANTED;
+                } else {
+                    storagePermission = ContextCompat.checkSelfPermission(ModificacionesVehiculo.this, android.Manifest.permission.READ_EXTERNAL_STORAGE)
+                            == PackageManager.PERMISSION_GRANTED;
+                }
+
+                if (!cameraPermission || !storagePermission) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        ActivityCompat.requestPermissions(ModificacionesVehiculo.this,
+                                new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.READ_MEDIA_IMAGES},
+                                PERMISSION_REQUEST_CODE);
+                    } else {
+                        ActivityCompat.requestPermissions(ModificacionesVehiculo.this,
+                                new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.READ_EXTERNAL_STORAGE},
+                                PERMISSION_REQUEST_CODE);
+                    }
+                } else {
                     showImagePickerDialog();
                 }
             }
@@ -261,8 +277,16 @@ public class ModificacionesVehiculo extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
-                    grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+            boolean allGranted = true;
+
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    allGranted = false;
+                    break;
+                }
+            }
+
+            if (allGranted) {
                 showImagePickerDialog();
             } else {
                 showToast("Permisos necesarios no otorgados");
