@@ -451,6 +451,11 @@ public class InicioSesion extends AppCompatActivity {
                                 // Guardamos en una variable el uid del usuario
                                 String uid = user.getUid();
 
+                                if (user != null && !user.isEmailVerified()) {
+                                    showToast("Debes verificar tu correo electrónico antes de continuar. Ve a tu correo.");
+                                    return;
+                                }
+
                                 // Verificamos si el perfil está creado en Firestore
                                 db.collection("perfiles").document(uid).get()
                                         .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
