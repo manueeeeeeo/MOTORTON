@@ -11,12 +11,15 @@ import android.view.WindowInsetsController;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.work.WorkManager;
 
 import com.clase.motorton.R;
+import com.clase.motorton.notifications.NotificationUtils;
 import com.clase.motorton.servicios.InternetController;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -30,6 +33,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +46,7 @@ public class Ajustes extends AppCompatActivity {
     private LinearLayout btnEliminar = null;
     private LinearLayout btnEstadisticas = null;
     private LinearLayout btnFavs = null;
+    private Switch switchNotis = null;
 
     // Variable para manejar todos los Toast de está actividad
     private Toast mensajeToast = null;
@@ -52,6 +57,11 @@ public class Ajustes extends AppCompatActivity {
     private FirebaseFirestore db = null;
 
     private InternetController internetController = null;
+
+    private SharedPreferences prefs = null;
+
+    private static final String PREFS_NAME = "MotortonPrefs";
+    private static final String NOTIS_KEY = "notificaciones_activadas";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +93,8 @@ public class Ajustes extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         // Inicializo el controlador de internet
         internetController = new InternetController(Ajustes.this);
+        // Inicializamos las preferencias del usuario
+        prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
         // Obtengo todos los pelementos visuales de la interfaz
         btnCerrar = findViewById(R.id.CerrarSesion);
@@ -90,6 +102,10 @@ public class Ajustes extends AppCompatActivity {
         btnReportar = findViewById(R.id.btnReportar);
         btnEstadisticas = findViewById(R.id.VerGraficas);
         btnFavs = findViewById(R.id.btnVehFav);
+        switchNotis = findViewById(R.id.switchNotis);
+
+        boolean notisActivadas = prefs.getBoolean(NOTIS_KEY, true);
+        switchNotis.setChecked(notisActivadas);
 
         btnFavs.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,6 +157,17 @@ public class Ajustes extends AppCompatActivity {
                 }
                 // Llamo al método para cerrar la sesión
                 cerrarSesion();
+            }
+        });
+
+        switchNotis.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            prefs.edit().putBoolean(NOTIS_KEY, isChecked).apply();
+            if (isChecked) {
+                NotificationUtils.programarNotificacionDiaria(this);
+                showToast("Notificaciones Activadas!!");
+            } else {
+                NotificationUtils.cancelarNotificacionDiaria(this);
+                showToast("Notificaciones Desactivadas!!");
             }
         });
     }
