@@ -6,11 +6,13 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 
 import com.clase.motorton.notifications.NotificacionDiariaWorker;
+import com.clase.motorton.notifications.NotificationUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -58,7 +60,12 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        programarNotificacionConWorkManager();
+        SharedPreferences prefs = getSharedPreferences("MotortonPrefs", MODE_PRIVATE);
+        boolean notisActivadas = prefs.getBoolean("notificaciones_activadas", true);
+
+        if (notisActivadas) {
+            NotificationUtils.programarNotificacionDiaria(this);
+        }
     }
 
     private void crearCanalNotificacion() {
@@ -71,29 +78,5 @@ public class MainActivity extends AppCompatActivity {
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
-    }
-
-    private void programarNotificacionConWorkManager() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 22);
-        calendar.set(Calendar.MINUTE, 10);
-        calendar.set(Calendar.SECOND, 0);
-
-        if (Calendar.getInstance().after(calendar)) {
-            calendar.add(Calendar.DAY_OF_YEAR, 1);
-        }
-
-        long initialDelay = calendar.getTimeInMillis() - System.currentTimeMillis();
-
-        PeriodicWorkRequest workRequest = new PeriodicWorkRequest.Builder(
-                NotificacionDiariaWorker.class,
-                24, TimeUnit.HOURS)
-                .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
-                .build();
-
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-                "NotificacionDiaria",
-                ExistingPeriodicWorkPolicy.REPLACE,
-                workRequest);
     }
 }
