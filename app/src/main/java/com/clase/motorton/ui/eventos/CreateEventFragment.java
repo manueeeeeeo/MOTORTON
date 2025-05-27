@@ -54,7 +54,7 @@ public class CreateEventFragment extends Fragment {
     private FirebaseFirestore db = null;
 
     // Variable para manejar todos los editText del fragmento
-    private EditText editTextNombreEvento = null, editTextDescripcion = null, editTextUbicacion = null;
+    private EditText editTextNombreEvento = null, editTextDescripcion = null;
     // Variable para manejar el spinner del tipo de evento
     private Spinner spinnerTipoEvento = null;
     // Variable para manejar el selector de fecha
@@ -117,7 +117,6 @@ public class CreateEventFragment extends Fragment {
         // Obtenemos referencias a los elementos de la interfaz
         editTextNombreEvento = root.findViewById(R.id.editTextNombreEvento);
         editTextDescripcion = root.findViewById(R.id.editTextDescripcion);
-        editTextUbicacion = root.findViewById(R.id.editTextUbicacion);
         spinnerTipoEvento = root.findViewById(R.id.spinnerTipoEvento);
         datePickerFecha = root.findViewById(R.id.datePickerFecha);
         buttonCrearEvento = root.findViewById(R.id.buttonCrearEvento);
@@ -436,12 +435,11 @@ public class CreateEventFragment extends Fragment {
         // Obtenemos todos los datos de los spinners y de los editText
         String nombre = editTextNombreEvento.getText().toString().trim();
         String descripcion = editTextDescripcion.getText().toString().trim();
-        String ubicacion = editTextUbicacion.getText().toString().trim();
         String provincia = spinnerProvincia.getSelectedItem().toString();
         String tipoEvento = spinnerTipoEvento.getSelectedItem().toString();
 
-        if(nombre.isEmpty() || descripcion.isEmpty() ||ubicacion.isEmpty() ||provincia.isEmpty() ||tipoEvento.isEmpty() ||
-                nombre == null || descripcion == null ||ubicacion == null ||provincia == null ||tipoEvento == null){
+        if(nombre.isEmpty() || descripcion.isEmpty() ||provincia.isEmpty() ||tipoEvento.isEmpty() ||
+                nombre == null || descripcion == null  ||provincia == null ||tipoEvento == null){
             showToast("Existen campos vacíos, rellenelos. Por favor!!!");
             return;
         }
@@ -478,7 +476,6 @@ public class CreateEventFragment extends Fragment {
         // Establezco todos los parametros que componen al evento
         evento.setNombre(nombre);
         evento.setDescripcion(descripcion);
-        evento.setUbicacion(ubicacion);
         evento.setProvincia(provincia);
         evento.setTipoEvento(tipoEvento);
         evento.setFecha(fechaEvento);
@@ -529,7 +526,6 @@ public class CreateEventFragment extends Fragment {
     private void limpiarFormulario() {
         editTextNombreEvento.setText("");
         editTextDescripcion.setText("");
-        editTextUbicacion.setText("");
         datePickerFecha.updateDate(Calendar.getInstance().get(Calendar.YEAR),
                 Calendar.getInstance().get(Calendar.MONTH),
                 Calendar.getInstance().get(Calendar.DAY_OF_MONTH));

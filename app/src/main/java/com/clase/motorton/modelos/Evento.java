@@ -7,7 +7,6 @@ public class Evento {
     private String id;
     private String nombre;
     private String descripcion;
-    private String ubicacion;
     private String provincia;
     private String tipoEvento;
     private ArrayList<String> participantes;
@@ -27,11 +26,10 @@ public class Evento {
     public Evento() {
     }
 
-    public Evento(String id, String nombre, String descripcion, String ubicacion, String provincia, String tipoEvento, ArrayList<String> participantes, String organizador, boolean activo, Date fecha) {
+    public Evento(String id, String nombre, String descripcion, String provincia, String tipoEvento, ArrayList<String> participantes, String organizador, boolean activo, Date fecha) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
-        this.ubicacion = ubicacion;
         this.provincia = provincia;
         this.tipoEvento = tipoEvento;
         this.participantes = participantes;
@@ -142,14 +140,6 @@ public class Evento {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
-    }
-
-    public String getUbicacion() {
-        return ubicacion;
-    }
-
-    public void setUbicacion(String ubicacion) {
-        this.ubicacion = ubicacion;
     }
 
     public String getProvincia() {

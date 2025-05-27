@@ -86,31 +86,6 @@
                     android:background="@drawable/rounded_editext" />
 
                 <TextView
-                    android:id="@+id/textViewUbicacion"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Ubicación del Evento"
-                    android:textSize="18sp"
-                    android:textColor="#000000"
-                    android:textStyle="bold"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="8dp" />
-
-                <EditText
-                    android:id="@+id/editTextUbicacion"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Ingrese la ubicación"
-                    android:textColor="#000000"
-                    android:textSize="19dp"
-                    android:textColorHint="#727272"
-                    android:inputType="textCapWords"
-                    android:layout_marginBottom="16dp"
-                    android:padding="12dp"
-                    android:maxLength="120"
-                    android:background="@drawable/rounded_editext" />
-
-                <TextView
                     android:id="@+id/textViewProvincia"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
