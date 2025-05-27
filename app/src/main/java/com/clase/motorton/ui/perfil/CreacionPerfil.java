@@ -448,17 +448,14 @@ public class CreacionPerfil extends AppCompatActivity {
 
         // Creo una variable de tipo texto donde almacenar la foto en base64
         String fotoPerfilBase64 = null;
-        // Procedemos a comprobar si el bitmap es nulo
-        if (fotoBitmap != null) { // En caso de no ser nulo
-            // Creamos un array de bytes para comprimir la imagen
+        Bitmap fotoReducida = null;
+
+        if (fotoBitmap != null) {
+            fotoReducida = resizeBitmap(fotoBitmap, 800, 800);
+
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-            // Procedemos a comprimmir la imagen a un 85% y además, le establecemos como un JPEG
-            fotoBitmap.compress(Bitmap.CompressFormat.JPEG, 85, baos);
-
-            // Creamos una cadena de bytes en donde almacenamos la imagen
+            fotoReducida.compress(Bitmap.CompressFormat.JPEG, 85, baos);
             byte[] fotoBytes = baos.toByteArray();
-            // Y guardamos en la variable antes creado la codificación en base64
             fotoPerfilBase64 = Base64.encodeToString(fotoBytes, Base64.DEFAULT);
         }
 
@@ -473,7 +470,7 @@ public class CreacionPerfil extends AppCompatActivity {
           fechaNaciCifrada,
           cp.isEmpty() ? 0 : Integer.parseInt(cp),
           new ArrayList<>(),
-          fotoBitmap,
+          fotoReducida,
           descripcion,
           anosPermiso.isEmpty() ? 0 : Integer.parseInt(anosPermiso),
           new ArrayList<>(),
@@ -547,6 +544,17 @@ public class CreacionPerfil extends AppCompatActivity {
                     showToast("Error al verificar username: " + e.getMessage());
                 });
 
+    }
+
+    private Bitmap resizeBitmap(Bitmap original, int maxWidth, int maxHeight) {
+        int width = original.getWidth();
+        int height = original.getHeight();
+
+        float scale = Math.min(((float) maxWidth / width), ((float) maxHeight / height));
+        int newWidth = Math.round(width * scale);
+        int newHeight = Math.round(height * scale);
+
+        return Bitmap.createScaledBitmap(original, newWidth, newHeight, true);
     }
 
     /**
