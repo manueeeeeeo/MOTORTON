@@ -1,5 +1,6 @@
 package com.clase.motorton.ui.perfil;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -191,14 +192,30 @@ public class EditarPerfilActivity extends AppCompatActivity {
         imagenPerfil.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (ContextCompat.checkSelfPermission(EditarPerfilActivity.this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
-                        ContextCompat.checkSelfPermission(EditarPerfilActivity.this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                boolean cameraPermission = ContextCompat.checkSelfPermission(EditarPerfilActivity.this, Manifest.permission.CAMERA)
+                        == PackageManager.PERMISSION_GRANTED;
 
-                    ActivityCompat.requestPermissions(EditarPerfilActivity.this,
-                            new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.READ_EXTERNAL_STORAGE},
-                            PERMISSION_REQUEST_CODE);
-                } else { // En caso de tener los permisos concedidos
-                    // Llamamos al método para mostrar el dialogo de elegir de donde sacar la foto
+                boolean storagePermission;
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    storagePermission = ContextCompat.checkSelfPermission(EditarPerfilActivity.this, Manifest.permission.READ_MEDIA_IMAGES)
+                            == PackageManager.PERMISSION_GRANTED;
+                } else {
+                    storagePermission = ContextCompat.checkSelfPermission(EditarPerfilActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                            == PackageManager.PERMISSION_GRANTED;
+                }
+
+                if (!cameraPermission || !storagePermission) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        ActivityCompat.requestPermissions(EditarPerfilActivity.this,
+                                new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_MEDIA_IMAGES},
+                                PERMISSION_REQUEST_CODE);
+                    } else {
+                        ActivityCompat.requestPermissions(EditarPerfilActivity.this,
+                                new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE},
+                                PERMISSION_REQUEST_CODE);
+                    }
+                } else {
                     showImagePickerDialog();
                 }
             }
@@ -277,6 +294,18 @@ public class EditarPerfilActivity extends AppCompatActivity {
                         String fotoBase64 = documentSnapshot.getString("fotoPerfil");
                         fotoPerfilAnterior = fotoBase64;
 
+                        String nombreCompletoDescifrado = "";
+                        String emailDescifrado = "";
+
+                        try {
+                            if (nombreCompleto != null)
+                                nombreCompletoDescifrado = CifradoDeDatos.descifrar(nombreCompleto);
+                            if (emailCifrado != null)
+                                emailDescifrado = CifradoDeDatos.descifrar(emailCifrado);
+                        } catch (Exception e) {
+                            showToast("Error al descifrar datos personales.");
+                        }
+
                         editUsername.setText(username1 != null ? username1 : "");
                         editCP.setText(String.valueOf(cp));
                         editDescrip.setText(descripcion1 != null ? descripcion1 : "");
@@ -306,8 +335,8 @@ public class EditarPerfilActivity extends AppCompatActivity {
                         perfilActual = new Perfil(
                                 uid,
                                 username1,
-                                emailCifrado,
-                                nombreCompleto,
+                                emailDescifrado,
+                                nombreCompletoDescifrado,
                                 ubicacion,
                                 0,
                                 fechaNaci,
@@ -377,9 +406,6 @@ public class EditarPerfilActivity extends AppCompatActivity {
         if (!nuevoUsername.equals(perfilActual.getUsername())) {
             cambios.put("username", nuevoUsername);
         }
-        if (!nuevoNombreCompleto.equals(perfilActual.getNombre_completo())) {
-            cambios.put("nombre_completo", nuevoNombreCompleto);
-        }
         if (nuevoCP != perfilActual.getCp()) {
             cambios.put("cp", nuevoCP);
         }
@@ -394,6 +420,15 @@ public class EditarPerfilActivity extends AppCompatActivity {
         }
         if (!ubicacionesSonIguales(perfilActual.getUbicacion(), ubicacionSeleccionada)) {
             cambios.put("ubicacion", ubicacionSeleccionada);
+        }
+        if (!nuevoNombreCompleto.equals(perfilActual.getNombre_completo())) {
+            try {
+                String nombreCifrado = CifradoDeDatos.cifrar(nuevoNombreCompleto);
+                cambios.put("nombre_completo", nombreCifrado);
+            } catch (Exception e) {
+                showToast("Error al cifrar el nombre.");
+                return;
+            }
         }
 
         if (cambios.isEmpty()) {
@@ -471,9 +506,18 @@ public class EditarPerfilActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
         if (requestCode == PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
-                    grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+            boolean allGranted = true;
+
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    allGranted = false;
+                    break;
+                }
+            }
+
+            if (allGranted) {
                 showImagePickerDialog();
             } else {
                 showToast("Permisos necesarios no otorgados");

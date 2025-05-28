@@ -1,5 +1,6 @@
 package com.clase.motorton.ui.perfil;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Intent;
@@ -226,14 +227,30 @@ public class CreacionPerfil extends AppCompatActivity {
         imagenPerfil.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (ContextCompat.checkSelfPermission(CreacionPerfil.this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
-                        ContextCompat.checkSelfPermission(CreacionPerfil.this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                boolean cameraPermission = ContextCompat.checkSelfPermission(CreacionPerfil.this, Manifest.permission.CAMERA)
+                        == PackageManager.PERMISSION_GRANTED;
 
-                    ActivityCompat.requestPermissions(CreacionPerfil.this,
-                            new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.READ_EXTERNAL_STORAGE},
-                            PERMISSION_REQUEST_CODE);
-                } else { // En caso de tener los permisos concedidos
-                    // Llamamos al método para mostrar el dialogo de elegir de donde sacar la foto
+                boolean storagePermission;
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    storagePermission = ContextCompat.checkSelfPermission(CreacionPerfil.this, Manifest.permission.READ_MEDIA_IMAGES)
+                            == PackageManager.PERMISSION_GRANTED;
+                } else {
+                    storagePermission = ContextCompat.checkSelfPermission(CreacionPerfil.this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                            == PackageManager.PERMISSION_GRANTED;
+                }
+
+                if (!cameraPermission || !storagePermission) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        ActivityCompat.requestPermissions(CreacionPerfil.this,
+                                new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_MEDIA_IMAGES},
+                                PERMISSION_REQUEST_CODE);
+                    } else {
+                        ActivityCompat.requestPermissions(CreacionPerfil.this,
+                                new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE},
+                                PERMISSION_REQUEST_CODE);
+                    }
+                } else {
                     showImagePickerDialog();
                 }
             }
@@ -341,9 +358,18 @@ public class CreacionPerfil extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
         if (requestCode == PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
-                    grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+            boolean allGranted = true;
+
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    allGranted = false;
+                    break;
+                }
+            }
+
+            if (allGranted) {
                 showImagePickerDialog();
             } else {
                 showToast("Permisos necesarios no otorgados");
@@ -422,17 +448,14 @@ public class CreacionPerfil extends AppCompatActivity {
 
         // Creo una variable de tipo texto donde almacenar la foto en base64
         String fotoPerfilBase64 = null;
-        // Procedemos a comprobar si el bitmap es nulo
-        if (fotoBitmap != null) { // En caso de no ser nulo
-            // Creamos un array de bytes para comprimir la imagen
+        Bitmap fotoReducida = null;
+
+        if (fotoBitmap != null) {
+            fotoReducida = resizeBitmap(fotoBitmap, 800, 800);
+
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-            // Procedemos a comprimmir la imagen a un 85% y además, le establecemos como un JPEG
-            fotoBitmap.compress(Bitmap.CompressFormat.JPEG, 85, baos);
-
-            // Creamos una cadena de bytes en donde almacenamos la imagen
+            fotoReducida.compress(Bitmap.CompressFormat.JPEG, 85, baos);
             byte[] fotoBytes = baos.toByteArray();
-            // Y guardamos en la variable antes creado la codificación en base64
             fotoPerfilBase64 = Base64.encodeToString(fotoBytes, Base64.DEFAULT);
         }
 
@@ -447,7 +470,7 @@ public class CreacionPerfil extends AppCompatActivity {
           fechaNaciCifrada,
           cp.isEmpty() ? 0 : Integer.parseInt(cp),
           new ArrayList<>(),
-          fotoBitmap,
+          fotoReducida,
           descripcion,
           anosPermiso.isEmpty() ? 0 : Integer.parseInt(anosPermiso),
           new ArrayList<>(),
@@ -521,6 +544,17 @@ public class CreacionPerfil extends AppCompatActivity {
                     showToast("Error al verificar username: " + e.getMessage());
                 });
 
+    }
+
+    private Bitmap resizeBitmap(Bitmap original, int maxWidth, int maxHeight) {
+        int width = original.getWidth();
+        int height = original.getHeight();
+
+        float scale = Math.min(((float) maxWidth / width), ((float) maxHeight / height));
+        int newWidth = Math.round(width * scale);
+        int newHeight = Math.round(height * scale);
+
+        return Bitmap.createScaledBitmap(original, newWidth, newHeight, true);
     }
 
     /**
