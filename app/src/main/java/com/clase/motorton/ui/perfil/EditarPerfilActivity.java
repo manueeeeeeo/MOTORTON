@@ -432,8 +432,12 @@ public class EditarPerfilActivity extends AppCompatActivity {
             }
         }
 
-        if(editNombreComple.getText().isEmpty() || editUsername.getText().isEmpty() || editCP.getText().isEmpty()
-        || editAnoCon.getText().isEmpty() || editDescrip.getText().isEmpty()){
+        if (editNombreComple.getText().toString().isEmpty() ||
+                editUsername.getText().toString().isEmpty() ||
+                editCP.getText().toString().isEmpty() ||
+                editAnoCon.getText().toString().isEmpty() ||
+                editDescrip.getText().toString().isEmpty()) {
+
             showToast("Todos los campos han de estar rellenos!!");
             return;
         }

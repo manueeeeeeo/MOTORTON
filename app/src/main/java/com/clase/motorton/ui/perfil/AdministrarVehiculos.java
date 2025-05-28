@@ -29,7 +29,6 @@ import com.clase.motorton.R;
 import com.clase.motorton.adaptadores.SpinnerAdaptarNormal;
 import com.clase.motorton.adaptadores.SpinnerAdapter;
 import com.clase.motorton.api.ApiVehiculos;
-import com.clase.motorton.bd.BDMongo;
 import com.clase.motorton.modelos.FotoVehiculoTemporal;
 import com.clase.motorton.modelos.Vehiculo;
 import com.google.firebase.auth.FirebaseAuth;
