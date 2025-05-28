@@ -306,6 +306,7 @@ public class EditarPerfilActivity extends AppCompatActivity {
                             showToast("Error al descifrar datos personales.");
                         }
 
+                        editNombreComple.setText(nombreCompletoDescifrado);
                         editUsername.setText(username1 != null ? username1 : "");
                         editCP.setText(String.valueOf(cp));
                         editDescrip.setText(descripcion1 != null ? descripcion1 : "");
@@ -429,6 +430,12 @@ public class EditarPerfilActivity extends AppCompatActivity {
                 showToast("Error al cifrar el nombre.");
                 return;
             }
+        }
+
+        if(editNombreComple.getText().isEmpty() || editUsername.getText().isEmpty() || editCP.getText().isEmpty()
+        || editAnoCon.getText().isEmpty() || editDescrip.getText().isEmpty()){
+            showToast("Todos los campos han de estar rellenos!!");
+            return;
         }
 
         if (cambios.isEmpty()) {
