@@ -453,6 +453,19 @@ public class InicioSesion extends AppCompatActivity {
 
                                 if (user != null && !user.isEmailVerified()) {
                                     showToast("Debes verificar tu correo electrónico antes de continuar. Ve a tu correo.");
+                                    if (!user.isEmailVerified()){
+                                        user.sendEmailVerification()
+                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if (task.isSuccessful()) {
+                                                            showToast("Correo de verificación enviado correctamente");
+                                                        } else {
+                                                            showToast("Error al enviar el corrreo de verificación!!");
+                                                        }
+                                                    }
+                                                });
+                                    }
                                     return;
                                 }
 
