@@ -33,6 +33,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.clase.motorton.R;
 import com.clase.motorton.cifrado.CifradoDeDatos;
 import com.clase.motorton.modelos.Perfil;
+import com.clase.motorton.servicios.InternetController;
 import com.clase.motorton.ui.mapas.ElegirUbicacion;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -143,6 +144,8 @@ public class CreacionPerfil extends AppCompatActivity {
     // Variable para manejar la autentificación del usuario
     private FirebaseAuth auth = null;
 
+    private InternetController internetController = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -175,6 +178,7 @@ public class CreacionPerfil extends AppCompatActivity {
         // Inicializamos tanto la autentificación como la base de datos de firebase
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        internetController = new InternetController(CreacionPerfil.this);
 
         // Obtengo en las variables todos los elementos visuales interactivos de la interfaz
         editFechaNacimiento = findViewById(R.id.dob_input);
@@ -280,6 +284,11 @@ public class CreacionPerfil extends AppCompatActivity {
         btnCrear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(!internetController.tieneConexion()){
+                    showToast("No puedes crear una cuenta sin tener acceso a internet!!");
+                    return;
+                }
+
                 // Obtengo en las variable todos los valores de los editText
                 username = editUsername.getText().toString();
                 nombre = editNombre.getText().toString();
@@ -414,6 +423,11 @@ public class CreacionPerfil extends AppCompatActivity {
      * y una vez hecho todo eso y comprobado, insertamos el perfil en la bd
      */
     public void insertarPerfil() {
+        if (!internetController.tieneConexion()) {
+            showToast("No hay conexión a Internet");
+            return;
+        }
+
         // Obtenemos la instancia e la base de datos de firestore
         db = FirebaseFirestore.getInstance();
         // Obtenemos el usuario que está autenticado en ese momento

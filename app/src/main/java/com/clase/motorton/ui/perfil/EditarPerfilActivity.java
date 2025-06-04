@@ -34,6 +34,7 @@ import com.clase.motorton.MainActivity;
 import com.clase.motorton.R;
 import com.clase.motorton.cifrado.CifradoDeDatos;
 import com.clase.motorton.modelos.Perfil;
+import com.clase.motorton.servicios.InternetController;
 import com.clase.motorton.ui.mapas.ElegirUbicacion;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -135,6 +136,8 @@ public class EditarPerfilActivity extends AppCompatActivity {
     // Variable en donde guardamos los datos actuales del perfil del usuario
     private Perfil perfilActual = null;
 
+    private InternetController internetController = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -167,6 +170,7 @@ public class EditarPerfilActivity extends AppCompatActivity {
         // Inicializamos tanto la autentificación como la base de datos de firebase
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        internetController = new InternetController(EditarPerfilActivity.this);
 
         // Obtengo en las variables todos los elementos visuales interactivos de la interfaz
         btnCrear = (Button) findViewById(R.id.create_profile_button);
@@ -245,6 +249,11 @@ public class EditarPerfilActivity extends AppCompatActivity {
         btnCrear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(!internetController.tieneConexion()){
+                    showToast("No puedes crear una cuenta sin tener acceso a internet!!");
+                    return;
+                }
+
                 // Obtengo en las variable todos los valores de los editText
                 username = editUsername.getText().toString();
                 anosPermiso = editAnoCon.getText().toString();
@@ -263,10 +272,19 @@ public class EditarPerfilActivity extends AppCompatActivity {
             }
         });
 
-        cargarDatos();
+        if(internetController.tieneConexion()){
+            cargarDatos();
+        }else{
+            showToast("No se pueden cargar tus datos porque no tienes internet!!");
+        }
     }
 
     public void cargarDatos() {
+        if(!internetController.tieneConexion()){
+            showToast("No puedes crear una cuenta sin tener acceso a internet!!");
+            return;
+        }
+
         user = auth.getCurrentUser();
 
         if (user == null) {
@@ -358,6 +376,11 @@ public class EditarPerfilActivity extends AppCompatActivity {
     }
 
     public void actualizarPerfil() {
+        if(!internetController.tieneConexion()){
+            showToast("No puedes crear una cuenta sin tener acceso a internet!!");
+            return;
+        }
+
         FirebaseUser user = auth.getCurrentUser();
 
         if (user == null) {
@@ -481,6 +504,11 @@ public class EditarPerfilActivity extends AppCompatActivity {
     }
 
     private void actualizarEnFirestore(String uid, Map<String, Object> cambios) {
+        if(!internetController.tieneConexion()){
+            showToast("No puedes crear una cuenta sin tener acceso a internet!!");
+            return;
+        }
+
         db.collection("perfiles")
                 .document(uid)
                 .update(cambios)

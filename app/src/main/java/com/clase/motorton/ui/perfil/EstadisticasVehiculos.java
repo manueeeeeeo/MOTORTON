@@ -25,6 +25,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.clase.motorton.R;
+import com.clase.motorton.servicios.InternetController;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.BarData;
@@ -57,6 +58,7 @@ public class EstadisticasVehiculos extends AppCompatActivity {
     private static final int REQUEST_CODE_PERMISOS = 101;
     private FirebaseFirestore db = null;
     private Toast mensajeToast = null;
+    private InternetController internetController = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +86,12 @@ public class EstadisticasVehiculos extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         btnGenerarPdf = (Button) findViewById(R.id.btnGenerarPDF);
+        internetController = new InternetController(EstadisticasVehiculos.this);
+
+        if (!internetController.tieneConexion()) {
+            showToast("No hay conexión a Internet");
+            return;
+        }
 
         db.collection("vehiculos")
                 .get()
@@ -220,6 +228,11 @@ public class EstadisticasVehiculos extends AppCompatActivity {
     }
 
     private void obtenerMarcas(String tipoVehiculo) {
+        if (!internetController.tieneConexion()) {
+            showToast("No hay conexión a Internet");
+            return;
+        }
+
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Map<String, Integer> conteoMarcas = new HashMap<>();
 

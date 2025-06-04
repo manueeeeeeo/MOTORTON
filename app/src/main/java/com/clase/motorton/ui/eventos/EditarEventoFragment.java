@@ -111,7 +111,11 @@ public class EditarEventoFragment extends Fragment {
             String eventId = getArguments().getString("eventoId");
             if (eventId != null) {
                 documentoEventoID = eventId;
-                cargarEvento(eventId);
+                if (internetController.tieneConexion()) {
+                    cargarEvento(eventId);
+                } else {
+                    showToast("No tienes conexión a internet. No se puede cargar el evento.");
+                }
             } else {
                 showToast("Error: No se recibió el ID del evento");
             }

@@ -83,6 +83,7 @@ public class ElegirUbicacion extends AppCompatActivity {
 
         if(!internetController.tieneConexion()){
             showToast("No tienes acceso a internet, conectese a una red!!");
+            return;
         }
 
         mapView.setTileSource(TileSourceFactory.MAPNIK);
@@ -120,6 +121,11 @@ public class ElegirUbicacion extends AppCompatActivity {
      * mostraremos tanto por la consola como por un Toast
      */
     private void buscarUbicacion(String nombreLugar){
+        if(!internetController.tieneConexion()){
+            showToast("No tienes acceso a internet, conectese a una red!!");
+            return;
+        }
+
         // Generamos un nuevo hilo para no bloquear la interfaz ni el mapa
         new Thread(() -> {
             // Procedemos a utilizar un try catch para poder captar y tratar todas las posibles excepciones
@@ -188,6 +194,11 @@ public class ElegirUbicacion extends AppCompatActivity {
      * obtenidas en la busqueda de la ubicación
      */
     private void mostrarResultado(double lat, double lon, String direccion) {
+        if(!internetController.tieneConexion()){
+            showToast("No tienes acceso a internet, conectese a una red!!");
+            return;
+        }
+
         // Creo un nuevo GeoPunto para poder obtener una ubicación y marcarla
         GeoPoint punto = new GeoPoint(lat, lon);
         // Esteblecemos que realizamos una animación hacia el punto definido

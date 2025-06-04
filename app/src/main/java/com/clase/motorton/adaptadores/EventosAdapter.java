@@ -3,6 +3,7 @@ package com.clase.motorton.adaptadores;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +19,16 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 import com.clase.motorton.R;
 import com.clase.motorton.modelos.Evento;
+import com.clase.motorton.servicios.InternetController;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,6 +43,7 @@ public class EventosAdapter extends RecyclerView.Adapter<EventosAdapter.ViewHold
     private Context context = null;
     // Variable para manejar el uid del usuario
     private String currentUserId = null;
+    private InternetController internetController = null;
 
     /**
      * @param context
@@ -47,6 +56,7 @@ public class EventosAdapter extends RecyclerView.Adapter<EventosAdapter.ViewHold
         this.context = context;
         this.eventoList = eventos;
         this.currentUserId = currentUserId;
+        internetController = new InternetController(context);
     }
 
     @NonNull
@@ -76,8 +86,14 @@ public class EventosAdapter extends RecyclerView.Adapter<EventosAdapter.ViewHold
 
         // Inicializamos la instancia de la base de datos
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (currentUser == null) {
+            Toast.makeText(context, "Debes iniciar sesión", Toast.LENGTH_SHORT).show();
+            return;
+        }
         // Obtenemos el uid del usuario
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String uid = currentUser.getUid();
 
         // Procedemos a comprobar si el uid del organizador y el del usuario autenticado son el mismo o no
         if (evento.getOrganizador() != null && evento.getOrganizador().equals(currentUserId)) {
@@ -90,32 +106,19 @@ public class EventosAdapter extends RecyclerView.Adapter<EventosAdapter.ViewHold
             holder.botonBorrar.setVisibility(View.GONE);
         }
 
-        // Accedemos a la colección de eventos
-        db.collection("eventos").whereEqualTo("id", evento.getId())
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> { // En caso de que vaya bien
-                    // Comprobamos que lo que nos devuelve la query no sea nulo
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get(0);
-
-                        // Guardamos en una lista los participantes desde la base de datos
-                        List<String> participantes = (List<String>) documentSnapshot.get("participantes");
-                        if (participantes != null && participantes.contains(uid)) { // En caso de que ya estes en la lista de participantes
-                            // Establecemos el texto como quitarme
-                            holder.botonApuntarse.setText("Quitarme");
-                        } else { // En caso de que no estes en la lista de participantes
-                            // Establecemos el texto como apuntarse
-                            holder.botonApuntarse.setText("Apuntarse");
-                        }
-                    }
-                })
-                .addOnFailureListener(e -> { // En caso de que algo falle
-                    // Lanzamos un toast indicando que ocurrió un error al obtener el evento
-                    Toast.makeText(context, "Error al obtener el evento", Toast.LENGTH_SHORT).show();
-                });
+        if (evento.getParticipantes() != null && evento.getParticipantes().contains(uid)) {
+            holder.botonApuntarse.setText("Quitarme");
+        } else {
+            holder.botonApuntarse.setText("Apuntarse");
+        }
 
         // Acción para cuando toquemos el botón de apuntarnos
         holder.botonApuntarse.setOnClickListener(v -> {
+            if(!internetController.tieneConexion()){
+                Toast.makeText(context, "No tienes acceso a internet!", Toast.LENGTH_SHORT);
+                return;
+            }
+
             // Ponemos visible el progressbar
             holder.progressBar.setVisibility(View.VISIBLE);
 
@@ -196,6 +199,7 @@ public class EventosAdapter extends RecyclerView.Adapter<EventosAdapter.ViewHold
         holder.botonEditar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 Bundle bundle = new Bundle();
                 bundle.putString("eventoId", evento.getId());
 
@@ -207,12 +211,21 @@ public class EventosAdapter extends RecyclerView.Adapter<EventosAdapter.ViewHold
         holder.botonBorrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(!internetController.tieneConexion()){
+                    Toast.makeText(context, "No tienes acceso a internet!", Toast.LENGTH_SHORT);
+                    return;
+                }
                 eliminarEvento(evento, position);
             }
         });
     }
 
     private void eliminarEvento(Evento evento, int position){
+        if(!internetController.tieneConexion()){
+            Toast.makeText(context, "No tienes acceso a internet!", Toast.LENGTH_SHORT);
+            return;
+        }
+
         new androidx.appcompat.app.AlertDialog.Builder(context)
                 .setTitle("Confirmar eliminación")
                 .setMessage("¿Estás seguro de que quieres eliminar este evento?")

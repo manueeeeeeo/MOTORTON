@@ -31,6 +31,7 @@ import com.clase.motorton.adaptadores.SpinnerAdapter;
 import com.clase.motorton.api.ApiVehiculos;
 import com.clase.motorton.modelos.FotoVehiculoTemporal;
 import com.clase.motorton.modelos.Vehiculo;
+import com.clase.motorton.servicios.InternetController;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -120,6 +121,8 @@ public class AdministrarVehiculos extends AppCompatActivity {
 
     private ActivityResultLauncher<Intent> modificarVehiculoLauncher = null;
 
+    private InternetController internetController = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,6 +132,7 @@ public class AdministrarVehiculos extends AppCompatActivity {
         // Inicialización de Firebase
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        internetController = new InternetController(AdministrarVehiculos.this);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -168,7 +172,6 @@ public class AdministrarVehiculos extends AppCompatActivity {
                             maxVe = data.getDoubleExtra("maxVe", 0.0);
                             luces = data.getBooleanExtra("luces", false);
                             bodykit = data.getBooleanExtra("bodykit", false);
-                            foto = data.getStringExtra("foto");
                             foto = FotoVehiculoTemporal.getTempFotoBase64();
                         }
                     }
@@ -215,17 +218,21 @@ public class AdministrarVehiculos extends AppCompatActivity {
         }
 
         if (vehiculo != null) {
-            btnCrear.setText("Guardar cambios");
+            btnCrear.setText("Guardar");
         } else {
-            btnCrear.setText("Agregar vehículo");
+            btnCrear.setText("Agregar");
         }
 
 
         // Obtengo el contexto
         context = AdministrarVehiculos.this;
 
-        // Llamo al método para llamar a las marcas desde la API indicando primeramente el tipo de motos
-        cargarMarcasDesdeAPI("motos");
+        if(internetController.tieneConexion()){
+            // Llamo al método para llamar a las marcas desde la API indicando primeramente el tipo de motos
+            cargarMarcasDesdeAPI("motos");
+        }else{
+            showToast("No hay conexión ha internet");
+        }
 
         // Establecemos la configuración de acciones del spinner de tipo de vehículo
         spinnerTipo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -236,8 +243,12 @@ public class AdministrarVehiculos extends AppCompatActivity {
                 // Convertimos el tipo seleccionado para pasarselo a los métodos
                 String tipoApi = tipoSeleccionado.equalsIgnoreCase("Motos") ? "motos" : "coches";
 
-                // Llamo al método para cargar las marcas de ese tipo de vehículo
-                cargarMarcasDesdeAPI(tipoApi);
+                if(internetController.tieneConexion()){
+                    // Llamo al método para cargar las marcas de ese tipo de vehículo
+                    cargarMarcasDesdeAPI(tipoApi);
+                }else{
+                    showToast("No hay conexión ha internet");
+                }
             }
 
             @Override
@@ -252,8 +263,13 @@ public class AdministrarVehiculos extends AppCompatActivity {
                 String marcaSeleccionada = parent.getItemAtPosition(position).toString();
                 // Obtenemos el tipo también
                 String tipo = spinnerTipo.getSelectedItem().toString().equalsIgnoreCase("Motos") ? "motos" : "coches";
-                // Llamamos al método para cargar los modelos de esa marca
-                cargarModelosDesdeAPI(tipo, marcaSeleccionada);
+
+                if(internetController.tieneConexion()){
+                    // Llamamos al método para cargar los modelos de esa marca
+                    cargarModelosDesdeAPI(tipo, marcaSeleccionada);
+                }else{
+                    showToast("No hay conexión ha internet");
+                }
             }
 
             @Override
@@ -266,6 +282,11 @@ public class AdministrarVehiculos extends AppCompatActivity {
         btnCrear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (!internetController.tieneConexion()) {
+                    showToast("No hay conexión a Internet");
+                    return;
+                }
+
                 // Obtengo en las variables los valores de los editText y elementos otros
                 matricula = editMatricula.getText().toString().trim();
                 marca = spinnerMarca.getSelectedItem().toString();
@@ -332,6 +353,11 @@ public class AdministrarVehiculos extends AppCompatActivity {
      * en la base de datos de Firestore
      */
     private void insertarVehiculo() {
+        if (!internetController.tieneConexion()) {
+            showToast("No hay conexión a Internet");
+            return;
+        }
+
         String uid = auth.getCurrentUser().getUid();
 
         if(matricula == null || marca == null || modeloVehi == null || descrip == null ||
@@ -402,6 +428,11 @@ public class AdministrarVehiculos extends AppCompatActivity {
      * y agregamos la nueva matricula y actualizamos el documento
      */
     private void actualizarListaVehiculosEnPerfil(String uid, String matricula) {
+        if (!internetController.tieneConexion()) {
+            showToast("No hay conexión a Internet");
+            return;
+        }
+
         // Procedemos a obtener la lista de vehículos del usuario con ese uid
         db.collection("perfiles").document(uid)
                 .get()
@@ -436,6 +467,11 @@ public class AdministrarVehiculos extends AppCompatActivity {
     }
 
     private void actualizarListaVehiculosEnPerfilTrasCambio(String uid, String matriculaAntigua, String matriculaNueva) {
+        if (!internetController.tieneConexion()) {
+            showToast("No hay conexión a Internet");
+            return;
+        }
+
         db.collection("perfiles").document(uid)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
@@ -469,6 +505,11 @@ public class AdministrarVehiculos extends AppCompatActivity {
      * vehículos y lo establecemos en el spinner de modelos
      */
     private void cargarModelosDesdeAPI(String tipo, String marca) {
+        if (!internetController.tieneConexion()) {
+            showToast("No hay conexión a Internet");
+            return;
+        }
+
         // Codificar espacios y caracteres especiales en la marca por si acaso
         String marcaParam = marca.replace(" ", "%20");
         // Establecemos la url de la llamada a la API indicando el tipo en minusculas
@@ -516,6 +557,11 @@ public class AdministrarVehiculos extends AppCompatActivity {
      * de las marcas todas las marcas existentes en la API
      */
     private void cargarMarcasDesdeAPI(String tipo) {
+        if (!internetController.tieneConexion()) {
+            showToast("No hay conexión a Internet");
+            return;
+        }
+
         // Establecemos la url de la llamada a la API indicando el tipo en minusculas
         String url = "https://vehiculos-api.onrender.com/api/marcas/" + tipo.toLowerCase();
 
@@ -602,6 +648,11 @@ public class AdministrarVehiculos extends AppCompatActivity {
     }
 
     private void validarMatriculaUnica(String matriculaNueva, String matriculaAntigua, boolean esEdicion) {
+        if (!internetController.tieneConexion()) {
+            showToast("No hay conexión a Internet");
+            return;
+        }
+
         db.collection("vehiculos").document(matriculaNueva)
                 .get()
                 .addOnCompleteListener(task -> {
@@ -638,6 +689,11 @@ public class AdministrarVehiculos extends AppCompatActivity {
      * en su perfil y enc aso de no superar el límite de los
      * 5 vehículos le agregamos*/
     private void verificarCantidadVehiculosYAgregar() {
+        if (!internetController.tieneConexion()) {
+            showToast("No hay conexión a Internet");
+            return;
+        }
+
         // Obtenemos en una variable el uid actual del usuario
         String uid = auth.getCurrentUser().getUid();
 
