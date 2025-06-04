@@ -82,6 +82,12 @@ public class SearchFragment extends Fragment {
                 String query = s.toString().trim();
                 if (!query.equals(lastQuery)) {
                     lastQuery = query;
+
+                    if (!internetController.tieneConexion()) {
+                        showToast("Sin conexión. No se puede buscar.");
+                        return;
+                    }
+
                     buscar(query);
                 }
             }
@@ -98,6 +104,12 @@ public class SearchFragment extends Fragment {
     }
 
     private void buscar(String texto) {
+        if (!internetController.tieneConexion()) {
+            showToast("No hay conexión. No se puede realizar la búsqueda.");
+            progressBar.setVisibility(View.GONE);
+            return;
+        }
+
         if (texto.isEmpty()) {
             resultadosList.clear();
             resultadosMap.clear();

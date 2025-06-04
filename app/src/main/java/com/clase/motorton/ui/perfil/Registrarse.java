@@ -25,6 +25,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.clase.motorton.R;
 import com.clase.motorton.controllers.ControladorEmail;
 import com.clase.motorton.controllers.ControladorPassword;
+import com.clase.motorton.servicios.InternetController;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -79,6 +80,8 @@ public class Registrarse extends AppCompatActivity {
     // Variable para manejar la base de datos por Firebase
     private FirebaseFirestore db = null;
 
+    private InternetController internetController = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,6 +115,7 @@ public class Registrarse extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         // Obtengo la isntancia de Firebase Firestore
         db = FirebaseFirestore.getInstance();
+        internetController = new InternetController(Registrarse.this);
 
         // Obtengo todos los elementos de la interfaz gráfica
         btnRegis = (Button) findViewById(R.id.btnRegis);
@@ -200,46 +204,50 @@ public class Registrarse extends AppCompatActivity {
                 correo = (String) editCorreo.getText().toString(); // Obtenemos en una variable el correo
                 clave = (String) editClave.getText().toString(); // Obtenemos en una variable la clave
                 clave2 = (String) editConfirmarClave.getText().toString(); // Obtenemos en una variable la confirmación de la clave
-                if(correo.isEmpty()){ // En caso de que el correo esté vacío
-                    // Lanzamos un Toast indicandolo
-                    showToast("El campo del correo está vacio!!");
-                }else{ // En caso de que esté relleno
-                    if(clave.isEmpty()){ // En caso de que la clave esté vacía
-                        // Lanzamos in Toast indicandolo
-                        showToast("El campo de la clave está vacio!!");
-                    }else{ // En caso de que esté rellena
-                        if(clave2.isEmpty()){ // En caso de que la confirmación de clave esté vacía
-                            // Lanzamos un Toast indicandolo
-                            showToast("El campo de confirmar la clave está vacio!!");
+                if(internetController.tieneConexion()){
+                    if(correo.isEmpty()){ // En caso de que el correo esté vacío
+                        // Lanzamos un Toast indicandolo
+                        showToast("El campo del correo está vacio!!");
+                    }else{ // En caso de que esté relleno
+                        if(clave.isEmpty()){ // En caso de que la clave esté vacía
+                            // Lanzamos in Toast indicandolo
+                            showToast("El campo de la clave está vacio!!");
                         }else{ // En caso de que esté rellena
-                            // Procedemos a comprobar que la clave y la confirmación sean la misma
-                            if(clave.equals(clave2)){ // En caso de que sean la misma
-                                // Comprobamos con el controlador que sea un correo valido
-                                if(controEmail.esCorreoValido(correo)){ // En caso de ser valido
-                                    // Comprobamos con el controlador que la clave sea valida
-                                    if(controPass.validarPassword(clave).equals("OK")){ // En caso de ser valida
-                                        // Comprobamos con el controlador que la confirmación sea valida
-                                        if(controPass.validarPassword(clave2).equals("OK")){ // En caso de ser valida
-                                            // Llamamos al método para registrarnos con el correo y la clave
-                                            registrarseConClaveYEmail(correo, clave);
-                                        }else{ // En caso de que la confirmación no sea valida
-                                            // Lanzamos un Toast indicandolo
-                                            showToast("Error: " + controPass.validarPassword(clave2));
-                                        }
-                                    }else{ // En caso de que la clave no sea valida
-                                        // Lanzamos un Toast indicandolo
-                                        showToast("Error: " + controPass.validarPassword(clave));
-                                    }
-                                }else{ // En caso de que el correo no sea valido
-                                    // Lanzamos un Toast indicandolo
-                                    showToast("El correo no tiene el formato adecuado!!");
-                                }
-                            }else{ // En caso de que sean diferentes
+                            if(clave2.isEmpty()){ // En caso de que la confirmación de clave esté vacía
                                 // Lanzamos un Toast indicandolo
-                                showToast("La clave y la confirmación tienen que ser la misma");
+                                showToast("El campo de confirmar la clave está vacio!!");
+                            }else{ // En caso de que esté rellena
+                                // Procedemos a comprobar que la clave y la confirmación sean la misma
+                                if(clave.equals(clave2)){ // En caso de que sean la misma
+                                    // Comprobamos con el controlador que sea un correo valido
+                                    if(controEmail.esCorreoValido(correo)){ // En caso de ser valido
+                                        // Comprobamos con el controlador que la clave sea valida
+                                        if(controPass.validarPassword(clave).equals("OK")){ // En caso de ser valida
+                                            // Comprobamos con el controlador que la confirmación sea valida
+                                            if(controPass.validarPassword(clave2).equals("OK")){ // En caso de ser valida
+                                                // Llamamos al método para registrarnos con el correo y la clave
+                                                registrarseConClaveYEmail(correo, clave);
+                                            }else{ // En caso de que la confirmación no sea valida
+                                                // Lanzamos un Toast indicandolo
+                                                showToast("Error: " + controPass.validarPassword(clave2));
+                                            }
+                                        }else{ // En caso de que la clave no sea valida
+                                            // Lanzamos un Toast indicandolo
+                                            showToast("Error: " + controPass.validarPassword(clave));
+                                        }
+                                    }else{ // En caso de que el correo no sea valido
+                                        // Lanzamos un Toast indicandolo
+                                        showToast("El correo no tiene el formato adecuado!!");
+                                    }
+                                }else{ // En caso de que sean diferentes
+                                    // Lanzamos un Toast indicandolo
+                                    showToast("La clave y la confirmación tienen que ser la misma");
+                                }
                             }
                         }
                     }
+                }else{
+                    showToast("No puede registrarse sin conexión!!");
                 }
             }
         });
@@ -253,6 +261,11 @@ public class Registrarse extends AppCompatActivity {
      * en la base de datos de la misma para realizar un procedeimiento u otro
      * */
     public void registrarseConClaveYEmail(String email, String clave){
+        if(!internetController.tieneConexion()){
+            showToast("No tienes acceso a internet, conectese a una red!!");
+            return;
+        }
+
         auth.createUserWithEmailAndPassword(email, clave)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
