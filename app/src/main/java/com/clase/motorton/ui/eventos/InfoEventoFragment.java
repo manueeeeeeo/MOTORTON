@@ -97,11 +97,9 @@ public class InfoEventoFragment extends Fragment {
         // Inicializo el controlador de internet
         internetController = new InternetController(getContext());
 
-        if(!internetController.tieneConexion()){
-            showToast("No tienes acceso a internet, conectese a una red!!");
-        }
-
-        if (getArguments() != null && getArguments().containsKey("eventoId")) {
+        if (!internetController.tieneConexion()) {
+            showToast("No tienes acceso a internet, conéctese a una red!");
+        } else if (getArguments() != null && getArguments().containsKey("eventoId")) {
             String eventoId = getArguments().getString("eventoId");
             cargarEvento(eventoId);
         }

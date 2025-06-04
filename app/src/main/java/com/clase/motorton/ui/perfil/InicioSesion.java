@@ -29,6 +29,7 @@ import com.clase.motorton.MainActivity;
 import com.clase.motorton.R;
 import com.clase.motorton.controllers.ControladorEmail;
 import com.clase.motorton.controllers.ControladorPassword;
+import com.clase.motorton.servicios.InternetController;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -88,6 +89,8 @@ public class InicioSesion extends AppCompatActivity {
     // Variable booleana para comprobar si la clave es visibles o no
     boolean claveVisible = false;
 
+    private InternetController internetController = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,6 +124,7 @@ public class InicioSesion extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         // Inicializo la variable de la base de datos
         db = FirebaseFirestore.getInstance();
+        internetController = new InternetController(InicioSesion.this);
 
         // Obtengo de la interfaz todos los componentes necesarios para el buen funcionamiento del programa
         btnIniciar = (Button) findViewById(R.id.btnIniciar);
@@ -155,34 +159,38 @@ public class InicioSesion extends AppCompatActivity {
         olvidoClave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Obtengo en una variable el correo del que se tiene que recuperar la clave
-                String correoEnviar = editCorreo.getText().toString().trim();
-                // Compruebo que el email no sea nulo
-                if (correoEnviar.isEmpty()) { // En caso de que sea nulo o esté vacio
-                    // Lanzo un toast indicando al usuario que tiene que ingresar su correo en el editText
-                    showToast("Por favor, ingresa tu correo electrónico.");
-                } else { // En caso de que no sea nulo
-                    // Comprobamos que el controlador del email sea valido o no lo sea
-                    if(controEmail.esCorreoValido(correoEnviar)){ // En caso de que si que lo sea
-                        auth.sendPasswordResetEmail(correoEnviar)
-                                // En caso de que todo se complete correctamente
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        // Procedemos a comprobar si la tarea fue correcta
-                                        if (task.isSuccessful()) { // En caso afirmativo
-                                            // Lanzamos un toast indicandoselo al usuario
-                                            showToast("Correo de restablecimiento enviado.");
-                                        } else { // En caso negativo
-                                            // Le lanzamos otro toast al usuario indicandoselo
-                                            showToast("Error: " + task.getException().getMessage());
+                if(internetController.tieneConexion()){
+                    // Obtengo en una variable el correo del que se tiene que recuperar la clave
+                    String correoEnviar = editCorreo.getText().toString().trim();
+                    // Compruebo que el email no sea nulo
+                    if (correoEnviar.isEmpty()) { // En caso de que sea nulo o esté vacio
+                        // Lanzo un toast indicando al usuario que tiene que ingresar su correo en el editText
+                        showToast("Por favor, ingresa tu correo electrónico.");
+                    } else { // En caso de que no sea nulo
+                        // Comprobamos que el controlador del email sea valido o no lo sea
+                        if(controEmail.esCorreoValido(correoEnviar)){ // En caso de que si que lo sea
+                            auth.sendPasswordResetEmail(correoEnviar)
+                                    // En caso de que todo se complete correctamente
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            // Procedemos a comprobar si la tarea fue correcta
+                                            if (task.isSuccessful()) { // En caso afirmativo
+                                                // Lanzamos un toast indicandoselo al usuario
+                                                showToast("Correo de restablecimiento enviado.");
+                                            } else { // En caso negativo
+                                                // Le lanzamos otro toast al usuario indicandoselo
+                                                showToast("Error: " + task.getException().getMessage());
+                                            }
                                         }
-                                    }
-                                });
-                    }else{ // En caso de que no lo sea
-                        // Lanzamos un toast indicando al usuario que tiene que ingresar un correo valido
-                        showToast("Por favor, ingrese un correo electrónico válido.");
+                                    });
+                        }else{ // En caso de que no lo sea
+                            // Lanzamos un toast indicando al usuario que tiene que ingresar un correo valido
+                            showToast("Por favor, ingrese un correo electrónico válido.");
+                        }
                     }
+                }else{
+                    showToast("Conectese a una red para poder recuperar la clave!!");
                 }
             }
         });
@@ -191,29 +199,33 @@ public class InicioSesion extends AppCompatActivity {
         btnIniciar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Guardo en la variable el correo que ha introducido el usuario
-                correo = (String) editCorreo.getText().toString();
-                // Guardo en la variable la clave que ha introducido el usuario
-                clave = (String) editClave.getText().toString();
-                // Procedemos a comprobar si alguno de los dos está nulo
-                if(correo.isEmpty() || clave.isEmpty()){ // En caso de alguno estar nulo
-                    // Mostramos un toast diciendo que hay algo nulo
-                    showToast("Existe algún campo vacio");
-                }else{ // En caso de que todo este correcto
-                    // Procedemos a comprobar si el correo es valido
-                    if(controEmail.esCorreoValido(correo)){ // En caso de ser valido
-                        // Procedemos a comprobar si la clave cumple con los requisitos
-                        if(controPass.validarPassword(clave).equals("OK")){ // En caso de si cumplir
-                            // Llamamos al método parra iniciar la sesión con el correo y la clave
-                            entrarConCorreoYClave(correo, clave);
-                        }else{ // En caso de que no cumpla
-                            // Lanzamos un toast indicando que lo cumple la clave
-                            showToast("Error: " + controPass.validarPassword(clave));
+                if(internetController.tieneConexion()){
+                    // Guardo en la variable el correo que ha introducido el usuario
+                    correo = (String) editCorreo.getText().toString();
+                    // Guardo en la variable la clave que ha introducido el usuario
+                    clave = (String) editClave.getText().toString();
+                    // Procedemos a comprobar si alguno de los dos está nulo
+                    if(correo.isEmpty() || clave.isEmpty()){ // En caso de alguno estar nulo
+                        // Mostramos un toast diciendo que hay algo nulo
+                        showToast("Existe algún campo vacio");
+                    }else{ // En caso de que todo este correcto
+                        // Procedemos a comprobar si el correo es valido
+                        if(controEmail.esCorreoValido(correo)){ // En caso de ser valido
+                            // Procedemos a comprobar si la clave cumple con los requisitos
+                            if(controPass.validarPassword(clave).equals("OK")){ // En caso de si cumplir
+                                // Llamamos al método parra iniciar la sesión con el correo y la clave
+                                entrarConCorreoYClave(correo, clave);
+                            }else{ // En caso de que no cumpla
+                                // Lanzamos un toast indicando que lo cumple la clave
+                                showToast("Error: " + controPass.validarPassword(clave));
+                            }
+                        }else{ // En caso de no ser valido
+                            // Lanzamos un toast indicando al usuario que ponga un correo de formato adecuado
+                            showToast("El correo no tiene el formato adecuado!!");
                         }
-                    }else{ // En caso de no ser valido
-                        // Lanzamos un toast indicando al usuario que ponga un correo de formato adecuado
-                        showToast("El correo no tiene el formato adecuado!!");
                     }
+                }else{
+                    showToast("No puede iniciar sesión sin acceso a internet!!");
                 }
             }
         });
@@ -244,8 +256,12 @@ public class InicioSesion extends AppCompatActivity {
         iniciarGoogle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Llamaremos al método para iniciar sesión con Google
-                signInWithGoogle();
+                if(internetController.tieneConexion()){
+                    // Llamaremos al método para iniciar sesión con Google
+                    signInWithGoogle();
+                }else{
+                    showToast("No puede iniciar sesión si no tiene acceso a internet");
+                }
             }
         });
 
@@ -289,6 +305,11 @@ public class InicioSesion extends AppCompatActivity {
      * para abrir la pestaña de las cuentas de Google del usuario
      * */
     private void signInWithGoogle() {
+        if(!internetController.tieneConexion()){
+            showToast("No tienes acceso a internet, conectese a una red!!");
+            return;
+        }
+
         Intent signInIntent = googleSignInClient.getSignInIntent();
         signInLauncher.launch(signInIntent);
     }
@@ -301,6 +322,11 @@ public class InicioSesion extends AppCompatActivity {
      * así redirigirle a una pantalla u otra
      * */
     private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
+        if(!internetController.tieneConexion()){
+            showToast("No tienes acceso a internet, conectese a una red!!");
+            return;
+        }
+
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
         auth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -438,6 +464,11 @@ public class InicioSesion extends AppCompatActivity {
      * así redirigirle a una pantalla u otra
      * */
     public void entrarConCorreoYClave(String email, String pass){
+        if(!internetController.tieneConexion()){
+            showToast("No tienes acceso a internet, conectese a una red!!");
+            return;
+        }
+
         auth.signInWithEmailAndPassword(email, pass)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override

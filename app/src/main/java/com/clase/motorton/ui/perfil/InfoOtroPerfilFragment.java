@@ -23,6 +23,7 @@ import com.clase.motorton.R;
 import com.clase.motorton.adaptadores.VehiculosAdapter;
 import com.clase.motorton.cifrado.CifradoDeDatos;
 import com.clase.motorton.modelos.Vehiculo;
+import com.clase.motorton.servicios.InternetController;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -61,6 +62,8 @@ public class InfoOtroPerfilFragment extends Fragment {
     private FirebaseFirestore db = null;
     private String uidUser = null;
 
+    private InternetController internetController = null;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -69,6 +72,7 @@ public class InfoOtroPerfilFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
+        internetController = new InternetController(getContext());
 
         textUsername = (TextView) root.findViewById(R.id.textViewUsernameOtroUsuario);
         textUbicacion = (TextView) root.findViewById(R.id.textViewUbicacionOtroUsuario);
@@ -89,17 +93,29 @@ public class InfoOtroPerfilFragment extends Fragment {
         String uidPasado = null;
         if (getArguments() != null && getArguments().containsKey("perfilId")) {
             uidPasado = getArguments().getString("perfilId");
-            cargarDatosPerfil(uidPasado);
+            if(internetController.tieneConexion()){
+                cargarDatosPerfil(uidPasado);
+            }else{
+                showToast("No se puede cargar el perfil sin acceso a internet!!");
+            }
         }
 
         String finalUidPasado = uidPasado;
 
-        comprobarLike(finalUidPasado, uidUser);
+        if(internetController.tieneConexion()){
+            comprobarLike(finalUidPasado, uidUser);
+        }else{
+            showToast("No podemos comprobar el like sin acceso a internet!!");
+        }
 
         btnLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                darLike(finalUidPasado, uidUser);
+                if(internetController.tieneConexion()) {
+                    darLike(finalUidPasado, uidUser);
+                }else{
+                    showToast("No puedes dar un like sin acceso a internet!!");
+                }
             }
         });
 
@@ -107,6 +123,11 @@ public class InfoOtroPerfilFragment extends Fragment {
     }
 
     private void comprobarLike(String uidPerfil, String miUid) {
+        if (!internetController.tieneConexion()) {
+            showToast("No hay conexión a Internet");
+            return;
+        }
+
         db.collection("perfiles").document(uidPerfil)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
@@ -131,6 +152,11 @@ public class InfoOtroPerfilFragment extends Fragment {
 
 
     private void darLike(String uidPerfil, String miUid) {
+        if (!internetController.tieneConexion()) {
+            showToast("No hay conexión a Internet");
+            return;
+        }
+
         db.collection("perfiles").document(uidPerfil)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
@@ -189,6 +215,10 @@ public class InfoOtroPerfilFragment extends Fragment {
     }
 
     public void cargarDatosPerfil(String uidPasado){
+        if (!internetController.tieneConexion()) {
+            showToast("No hay conexión a Internet");
+            return;
+        }
         // Establezco visible el progressbar
         mostrarLoader();
 
@@ -281,6 +311,11 @@ public class InfoOtroPerfilFragment extends Fragment {
     }
 
     public void cargarVehiculosOtroPerfil(String uidPasado){
+        if (!internetController.tieneConexion()) {
+            showToast("No hay conexión a Internet");
+            return;
+        }
+
         // Muesto loader y ocultar RecyclerView
         mostrarLoader();
         recycleVehiculos.setVisibility(View.GONE);

@@ -78,6 +78,7 @@ public class MapaEventFragment extends Fragment {
 
         if(!internetController.tieneConexion()){
             showToast("No tienes acceso a internet, conectese a una red!!");
+            return view;
         }
 
         String tipoSeleccion = getArguments().getString("tipoSeleccion", "ubicacion");
@@ -241,6 +242,11 @@ public class MapaEventFragment extends Fragment {
      * lo que hemos buscado
      */
     private void buscarLocalizacion(String query) {
+        if(!internetController.tieneConexion()){
+            showToast("No tienes acceso a internet, conectese a una red!!");
+            return;
+        }
+
         // Utilizamos el geocoder para poder buscar
         Geocoder geocoder = new Geocoder(getContext());
         // Utilizamos un try catch para poder captar y tratar todas las posibles excepciones
@@ -281,6 +287,11 @@ public class MapaEventFragment extends Fragment {
     }
 
     private void obtenerRutaConCallOSRM(GeoPoint start, GeoPoint end) {
+        if(!internetController.tieneConexion()){
+            showToast("No tienes acceso a internet, conectese a una red!!");
+            return;
+        }
+
         new Thread(() -> {
             try {
                 String urlString = "https://router.project-osrm.org/route/v1/driving/" +
@@ -350,7 +361,11 @@ public class MapaEventFragment extends Fragment {
 
     private void dibujarLineaRuta() {
         if (startMarker != null && endMarker != null) {
-            obtenerRutaConCallOSRM(startMarker.getPosition(), endMarker.getPosition());
+            if (internetController != null && internetController.tieneConexion()) {
+                obtenerRutaConCallOSRM(startMarker.getPosition(), endMarker.getPosition());
+            } else {
+                showToast("No se puede calcular la ruta. Verifica tu conexión a Internet.");
+            }
         }
     }
 
