@@ -17,8 +17,9 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginTop="8dp"
+            android:background="#5F5F5F"
             android:padding="8dp"
-            android:textColor="#FFFFFF"
+            android:textColor="#000000"
             android:popupBackground="#5c5c7c"
             android:backgroundTint="#5c5c7c"
             app:layout_constraintTop_toTopOf="parent"
@@ -40,7 +41,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="8dp"
-                android:paddingBottom="80dp"
+                android:paddingBottom="120dp"
                 android:clipToPadding="false"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

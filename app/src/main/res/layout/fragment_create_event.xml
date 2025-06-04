@@ -101,9 +101,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:backgroundTint="#000000"
-                    android:popupBackground="#929292"
-                    android:textColor="#000000"/>
+                    android:background="#5F5F5F"
+                    android:padding="8dp"
+                    android:textColor="#000000"
+                    android:popupBackground="#5c5c7c"
+                    android:backgroundTint="#5c5c7c"/>
 
                 <TextView
                     android:id="@+id/textViewTipoEvento"
@@ -121,9 +123,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
+                    android:background="#5F5F5F"
+                    android:padding="8dp"
                     android:textColor="#000000"
-                    android:popupBackground="#929292"
-                    android:backgroundTint="#000000"/>
+                    android:popupBackground="#5c5c7c"
+                    android:backgroundTint="#5c5c7c"/>
 
                 <TextView
                     android:id="@+id/textViewMapa"
