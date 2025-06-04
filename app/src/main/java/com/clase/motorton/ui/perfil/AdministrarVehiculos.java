@@ -296,6 +296,11 @@ public class AdministrarVehiculos extends AppCompatActivity {
                 anos = Integer.parseInt(editAnos.getText().toString().trim());
                 export = esExportado.isChecked();
 
+                if(!verificarMatriculaReges(matricula)){
+                    showToast("El formato de la matricula es (0000 AAA) o (0000AAA)");
+                    return;
+                }
+
                 // Procedemos a comprobar si todos los campos están rellenos
                 if (validarCampos()) { // En caso afirmativo
                     // Llamamos al método para validar si la matricula es única y no está repetida
@@ -345,6 +350,12 @@ public class AdministrarVehiculos extends AppCompatActivity {
         editMatricula.setText("");
         editAnos.setText("");
         editDescrip.setText("");
+    }
+
+    public boolean verificarMatriculaReges(String matricula){
+        String regex = "^\\d{4}\\s?[A-Z]{3}$";
+
+        return matricula.matches(regex);
     }
 
     /**
