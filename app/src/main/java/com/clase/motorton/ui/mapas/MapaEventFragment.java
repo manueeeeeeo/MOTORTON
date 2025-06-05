@@ -22,6 +22,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapEventsReceiver;
+import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
@@ -150,6 +151,8 @@ public class MapaEventFragment extends Fragment {
 
         MapEventsOverlay eventsOverlay = new MapEventsOverlay(mReceive);
         map.getOverlays().add(eventsOverlay);
+        BoundingBox spainBounds = new BoundingBox(43.79, 4.33, 27.63, -9.30);
+        map.setScrollableAreaLimitDouble(spainBounds);
 
         // Establecemos la acción que sucede al pulsar el botón de confirmar la ruta
         btnConfirmarRuta.setOnClickListener(v -> {
@@ -257,6 +260,13 @@ public class MapaEventFragment extends Fragment {
             if (addresses != null && !addresses.isEmpty()) { // En caso de que no sea nulo
                 // Obtenemos la primera parte de la dirección
                 android.location.Address address = addresses.get(0);
+
+                String countryCode = address.getCountryCode();
+                if (countryCode == null || !countryCode.equalsIgnoreCase("ES")) {
+                    showToast("Por favor, busca una ubicación dentro de España");
+                    return;
+                }
+
                 // Creamos un geopunto obteniendo la latitud y longitu de la ubicación
                 GeoPoint geoPoint = new GeoPoint(address.getLatitude(), address.getLongitude());
                 // Establecemos que se centre en el geopunto
