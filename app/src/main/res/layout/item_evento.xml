@@ -2,6 +2,7 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="12dp"
@@ -59,6 +60,17 @@
             app:layout_constraintStart_toStartOf="@id/tituloEvento"
             app:layout_constraintTop_toBottomOf="@id/tipoEvento"
             app:layout_constraintEnd_toEndOf="parent" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/botonApuntarse"
+            app:layout_constraintTop_toTopOf="@id/botonApuntarse"
+            app:layout_constraintEnd_toEndOf="@id/botonApuntarse"
+            app:layout_constraintStart_toStartOf="@id/botonApuntarse"
+            tools:ignore="NotSibling" />
 
         <LinearLayout
             android:id="@+id/layoutBotones"

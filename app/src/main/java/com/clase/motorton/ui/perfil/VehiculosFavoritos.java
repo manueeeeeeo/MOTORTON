@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.clase.motorton.R;
 import com.clase.motorton.adaptadores.VehiculosAdapter;
 import com.clase.motorton.modelos.Vehiculo;
+import com.clase.motorton.servicios.InternetController;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -42,6 +43,8 @@ public class VehiculosFavoritos extends AppCompatActivity {
     private FirebaseAuth mAuth = null;
     // Variable para manejar la base de datos de firebase
     private FirebaseFirestore db = null;
+
+    private InternetController internetController = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +70,7 @@ public class VehiculosFavoritos extends AppCompatActivity {
             decorView.setSystemUiVisibility(uiOptions);
         }
 
+        internetController = new InternetController(VehiculosFavoritos.this);
         progressBar = findViewById(R.id.progressLoadingFavoritos);
         recyclerViewVehiculosFavs = findViewById(R.id.recyclerVehiculosFavoritos);
         recyclerViewVehiculosFavs.setLayoutManager(new GridLayoutManager(this, 2));
@@ -77,10 +81,19 @@ public class VehiculosFavoritos extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        cargarFavoritos();
+        if(internetController.tieneConexion()) {
+            cargarFavoritos();
+        }else{
+            Toast.makeText(this, "Sin conexión a internet. No se pueden cargar favoritos.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void cargarFavoritos() {
+        if (!internetController.tieneConexion()) {
+            Toast.makeText(this, "No hay conexión. Intenta más tarde.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         progressBar.setVisibility(View.VISIBLE);
         String userId = mAuth.getCurrentUser().getUid();
 

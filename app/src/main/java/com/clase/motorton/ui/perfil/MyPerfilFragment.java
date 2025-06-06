@@ -25,6 +25,7 @@ import com.clase.motorton.adaptadores.EventosAdapter;
 import com.clase.motorton.adaptadores.VehiculosAdapter;
 import com.clase.motorton.cifrado.CifradoDeDatos;
 import com.clase.motorton.modelos.Evento;
+import com.clase.motorton.servicios.InternetController;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -79,6 +80,8 @@ public class MyPerfilFragment extends Fragment {
     // Variable para manejar la base de datos de firebase
     private FirebaseFirestore db = null;
 
+    private InternetController internetController = null;
+
     public MyPerfilFragment() {
     }
 
@@ -90,6 +93,7 @@ public class MyPerfilFragment extends Fragment {
         // Inicializamos Firebase
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        internetController = new InternetController(getContext());
 
         // Obtenemos referencias a los elementos de la interfaz
         progressBar = root.findViewById(R.id.progressBar);
@@ -161,7 +165,12 @@ public class MyPerfilFragment extends Fragment {
                 textMisVeh.setVisibility(View.VISIBLE);
 
                 recyclerViewVehiculos.setLayoutManager(new GridLayoutManager(getContext(), 2));
-                cargarVehiculos(mAuth.getCurrentUser().getUid());
+
+                if(internetController.tieneConexion()){
+                    cargarVehiculos(mAuth.getCurrentUser().getUid());
+                }else{
+                    showToast("No se pueden cargar los vehículos sin internet!!");
+                }
             }
         });
 
@@ -175,7 +184,11 @@ public class MyPerfilFragment extends Fragment {
 
                 textEventosParticipo.setVisibility(View.VISIBLE);
 
-                cargarEventosParticipas(mAuth.getCurrentUser().getUid());
+                if(internetController.tieneConexion()){
+                    cargarEventosParticipas(mAuth.getCurrentUser().getUid());
+                }else{
+                    showToast("No se pueden cargar los eventos sin internet!!");
+                }
             }
         });
 
@@ -190,20 +203,34 @@ public class MyPerfilFragment extends Fragment {
                 textEventoCreados.setVisibility(View.VISIBLE);
 
                 recyclerViewVehiculos.setLayoutManager(new LinearLayoutManager(getContext()));
-                cargarEventosCreados(mAuth.getCurrentUser().getUid());
+
+                if(internetController.tieneConexion()){
+                    cargarEventosCreados(mAuth.getCurrentUser().getUid());
+                }else{
+                    showToast("No se pueden cargar los eventos sin internet!!");
+                }
             }
         });
 
         recyclerViewVehiculos.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
-        // Llamo al método para cargar los datos del perfil
-        cargarPerfil();
+        if(internetController.tieneConexion()){
+            // Llamo al método para cargar los datos del perfil
+            cargarPerfil();
+        }else{
+            showToast("No podemos cargar tu perfil porque no tienes internet!!");
+        }
 
         // Retornamos la vista
         return root;
     }
 
     private void cargarEventosParticipas(String uid) {
+        if (!internetController.tieneConexion()) {
+            showToast("No hay conexión a Internet");
+            return;
+        }
+
         // Muesto loader y ocultar RecyclerView
         progressBar.setVisibility(View.VISIBLE);
         recyclerViewVehiculos.setVisibility(View.GONE);
@@ -251,6 +278,11 @@ public class MyPerfilFragment extends Fragment {
 
 
     private void cargarEventosCreados(String uid ){
+        if (!internetController.tieneConexion()) {
+            showToast("No hay conexión a Internet");
+            return;
+        }
+
         // Muesto loader y ocultar RecyclerView
         progressBar.setVisibility(View.VISIBLE);
         recyclerViewVehiculos.setVisibility(View.GONE);
@@ -303,6 +335,11 @@ public class MyPerfilFragment extends Fragment {
      * para que el usuario pueda verlos
      */
     private void cargarPerfil(){
+        if (!internetController.tieneConexion()) {
+            showToast("No hay conexión a Internet");
+            return;
+        }
+
         // Establezco visible el progressbar
         progressBar.setVisibility(View.VISIBLE);
 
@@ -429,6 +466,11 @@ public class MyPerfilFragment extends Fragment {
      * que tiene el uid que le pasamos como parametro
      */
     private void cargarVehiculos(String uid) {
+        if (!internetController.tieneConexion()) {
+            showToast("No hay conexión a Internet");
+            return;
+        }
+
         // Muesto loader y ocultar RecyclerView
         progressBar.setVisibility(View.VISIBLE);
         recyclerViewVehiculos.setVisibility(View.GONE);

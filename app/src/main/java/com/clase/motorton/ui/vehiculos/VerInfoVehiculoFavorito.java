@@ -92,13 +92,21 @@ public class VerInfoVehiculoFavorito extends AppCompatActivity {
         if (intent != null && intent.hasExtra("matriculaVeh")) {
             String matri = intent.getStringExtra("matriculaVeh");
             matriculaVeh = matri;
-            cargarDatosVehiculo(matri);
+            if (internetController.tieneConexion()) {
+                cargarDatosVehiculo(matri);
+            } else {
+                showToast("No hay conexión, no se pueden cargar los datos del vehículo.");
+            }
         }
 
         vehFav.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AgregarVehiculoFav(uidUser, matriculaVeh);
+                if (internetController.tieneConexion()) {
+                    AgregarVehiculoFav(uidUser, matriculaVeh);
+                } else {
+                    showToast("Sin conexión. No se puede actualizar favoritos.");
+                }
             }
         });
     }
@@ -149,6 +157,11 @@ public class VerInfoVehiculoFavorito extends AppCompatActivity {
     }
 
     public void cargarDatosVehiculo(String matriculaVe){
+        if (!internetController.tieneConexion()) {
+            showToast("Sin conexión. No se pueden cargar los datos del vehículo.");
+            return;
+        }
+
         db.collection("vehiculos")
                 .whereEqualTo("matricula", matriculaVe)
                 .get()

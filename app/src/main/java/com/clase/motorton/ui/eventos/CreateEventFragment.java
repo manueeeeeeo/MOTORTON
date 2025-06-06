@@ -432,6 +432,11 @@ public class CreateEventFragment extends Fragment {
      * base de datos en firebase
      */
     private void crearEvento() {
+        if (!internetController.tieneConexion()) {
+            showToast("No hay conexión a Internet");
+            return;
+        }
+
         // Obtenemos todos los datos de los spinners y de los editText
         String nombre = editTextNombreEvento.getText().toString().trim();
         String descripcion = editTextDescripcion.getText().toString().trim();
@@ -483,7 +488,7 @@ public class CreateEventFragment extends Fragment {
         String eventoId = uidOrganizador + "_" + System.currentTimeMillis();
         evento.setId(eventoId);
         evento.setActivo(true);
-        evento.setParticipantes(new ArrayList<>());
+        evento.setParticipantes(new ArrayList<String>());
         evento.setDistanciaRuta(distancia);
         evento.setTiempoRuta(tiempo);
 

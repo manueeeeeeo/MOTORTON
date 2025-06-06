@@ -34,6 +34,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.clase.motorton.R;
 import com.clase.motorton.modelos.FotoVehiculoTemporal;
 import com.clase.motorton.modelos.Vehiculo;
+import com.clase.motorton.servicios.InternetController;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -70,6 +71,8 @@ public class ModificacionesVehiculo extends AppCompatActivity {
     private Context context = null;
     // Variable manejar todos los Toast de está actividad
     private Toast mensajeToast = null;
+
+    private InternetController internetController = null;
 
     // Variable para manejar el código de solicitud de permisos
     private static final int PERMISSION_REQUEST_CODE = 100;
@@ -136,6 +139,7 @@ public class ModificacionesVehiculo extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        internetController = new InternetController(ModificacionesVehiculo.this);
 
         btnVolver = (Button) findViewById(R.id.btnVolverNada);
         btnGuardarCambios = (Button) findViewById(R.id.btnConfirmarModi);
@@ -180,7 +184,11 @@ public class ModificacionesVehiculo extends AppCompatActivity {
         btnGuardarCambios.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                guardarDatosModificaciones();
+                if(internetController.tieneConexion()){
+                    guardarDatosModificaciones();
+                }else{
+                    showToast("No tienes acceso a internet!!");
+                }
             }
         });
 
@@ -224,6 +232,11 @@ public class ModificacionesVehiculo extends AppCompatActivity {
     }
 
     private void guardarDatosModificaciones(){
+        if (!internetController.tieneConexion()) {
+            showToast("No hay conexión a Internet");
+            return;
+        }
+
         try {
             tubo = editTuboEscape.getText().toString();
             aleron = editAleron.getText().toString();

@@ -17,6 +17,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.clase.motorton.modelos.Vehiculo;
+import com.clase.motorton.servicios.InternetController;
 import com.clase.motorton.ui.perfil.AdministrarVehiculos;
 import com.clase.motorton.ui.vehiculos.VerInfoVehiculoFavorito;
 import com.google.firebase.auth.FirebaseAuth;
@@ -35,6 +36,7 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
     private final Context context;
     private Toast mensajeToast = null;
     private List<String> listaFavoritos = new ArrayList<>();
+    private InternetController internetController = null;
 
     /**
      * @param context
@@ -46,6 +48,7 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
     public VehiculosAdapter(ArrayList<Vehiculo> vehiculosList, Context context) {
         this.vehiculosList = vehiculosList;
         this.context = context;
+        internetController = new InternetController(context);
     }
 
     @NonNull
@@ -149,6 +152,11 @@ public class VehiculosAdapter extends RecyclerView.Adapter<VehiculosAdapter.Vehi
         holder.imageViewFavorito.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(!internetController.tieneConexion()){
+                    Toast.makeText(context, "No tienes acceso a internet!", Toast.LENGTH_SHORT);
+                    return;
+                }
+
                 agregarListFavVeh(vehiculo.getMatricula(), uidUser, holder.imageViewFavorito);
             }
         });

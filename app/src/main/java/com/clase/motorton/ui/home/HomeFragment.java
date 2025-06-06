@@ -205,6 +205,10 @@ public class HomeFragment extends Fragment {
     }
 
     private void cargarMasEventos(String provincia) {
+        if (!internetController.tieneConexion()) {
+            showToast("Sin conexión. No se pueden cargar eventos.");
+            return;
+        }
         if (lastVisible == null) return;
         ProgressBar progress = binding.progressLoading;
         progress.setVisibility(View.VISIBLE);
@@ -246,6 +250,12 @@ public class HomeFragment extends Fragment {
     }
 
     private void cargarConRefresh(String provincia) {
+        if (!internetController.tieneConexion()) {
+            showToast("Sin conexión. No se pueden actualizar los eventos.");
+            binding.swipeRefresh.setRefreshing(false);
+            return;
+        }
+
         binding.swipeRefresh.setRefreshing(true);
         isLoading = true;
         eventoList.clear();
@@ -309,5 +319,18 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (eventoList != null) {
+            eventoList.clear();
+            eventoAdapter.notifyDataSetChanged();
+        }
+
+        lastVisible = null;
+        cargarConRefresh(currentProvinciaFilter);
     }
 }
