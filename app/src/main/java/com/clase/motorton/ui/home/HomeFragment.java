@@ -46,6 +46,10 @@ public class HomeFragment extends Fragment {
     // Variable para manejar la lista de las provincias
     private List<String> provincias = new ArrayList<>();
 
+    private boolean spinnerInitialized = false;
+    private String lastProvinciaFilter = null;
+    private boolean yaCargoInicial = false;
+
     private String currentProvinciaFilter = null;
 
     private InternetController internetController = null;
@@ -134,12 +138,13 @@ public class HomeFragment extends Fragment {
         eventoAdapter = new EventosAdapter(getContext(), eventoList, uidUsuario);
         recyclerView.setAdapter(eventoAdapter);
 
+        spinnerPronvincia.setSelection(0, false);
+        spinnerInitialized = false;
+
         // Inicializamos Firestore
         db = FirebaseFirestore.getInstance();
 
         binding.swipeRefresh.setOnRefreshListener(() -> cargarConRefresh(currentProvinciaFilter));
-
-        //cargarInicial();
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -154,20 +159,36 @@ public class HomeFragment extends Fragment {
         spinnerPronvincia.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (!spinnerInitialized) {
+                    spinnerInitialized = true;
+                    return;
+                }
+
                 String selectedProvincia = provincias.get(position);
                 if (selectedProvincia.equals("-- Elija una Opción --")) {
-                    currentProvinciaFilter = null;
-                    cargarConRefresh(null);
-                } else {
-                    currentProvinciaFilter = selectedProvincia;
-                    cargarConRefresh(selectedProvincia);
+                    selectedProvincia = null;
                 }
+
+                if ((lastProvinciaFilter == null && selectedProvincia == null) ||
+                        (lastProvinciaFilter != null && lastProvinciaFilter.equals(selectedProvincia))) {
+                    return;
+                }
+
+                currentProvinciaFilter = selectedProvincia;
+                lastProvinciaFilter = selectedProvincia;
+                cargarConRefresh(currentProvinciaFilter);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
+        if (eventoList.isEmpty()) {
+            currentProvinciaFilter = null;
+            lastProvinciaFilter = null;
+            cargarConRefresh(null);
+            yaCargoInicial = true;
+        }
         return root;
     }
 
@@ -319,18 +340,5 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        if (eventoList != null) {
-            eventoList.clear();
-            eventoAdapter.notifyDataSetChanged();
-        }
-
-        lastVisible = null;
-        cargarConRefresh(currentProvinciaFilter);
     }
 }
