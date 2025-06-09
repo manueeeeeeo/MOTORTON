@@ -145,9 +145,8 @@ public class InfoEventoFragment extends Fragment {
                             if (participantes != null) {
                                 int cantidadParticipantes = participantes.size();
                                 textParticipantes1.setText("Participantes: " + cantidadParticipantes);
-                                participantesList.clear();
-                                participantesList.addAll(participantes);
-                                participanteAdapter.notifyDataSetChanged();
+                                participanteAdapter = new ParticipanteAdapter(participantes);
+                                recyclerViewParticipantes.setAdapter(participanteAdapter);
                                 recyclerViewParticipantes.setVisibility(View.VISIBLE);
                             } else {
                                 textParticipantes1.setText("Participantes: 0");
