@@ -20,6 +20,7 @@ import androidx.work.WorkManager;
 
 import com.clase.motorton.R;
 import com.clase.motorton.notifications.NotificationUtils;
+import com.clase.motorton.pasajero.VersionBeta;
 import com.clase.motorton.servicios.InternetController;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -237,7 +238,7 @@ public class Ajustes extends AppCompatActivity {
                 GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut();
                 FirebaseAuth.getInstance().signOut();
 
-                Intent intent = new Intent(this, InicioSesion.class);
+                Intent intent = new Intent(this, VersionBeta.class);
                 startActivity(intent);
                 finish();
             }).addOnFailureListener(e -> {
@@ -248,7 +249,7 @@ public class Ajustes extends AppCompatActivity {
             GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut();
             FirebaseAuth.getInstance().signOut();
 
-            Intent intent = new Intent(this, InicioSesion.class);
+            Intent intent = new Intent(this, VersionBeta.class);
             startActivity(intent);
             finish();
         }
@@ -404,7 +405,7 @@ public class Ajustes extends AppCompatActivity {
                     // Cierro la sesión del usuario en la autentificación
                     mAuth.signOut();
                     // Creamos el nuevo intent para ir al inicio de sesión
-                    Intent intent = new Intent(this, InicioSesion.class);
+                    Intent intent = new Intent(this, VersionBeta.class);
                     // Limpiamos la pila de actividades
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     // Iniciamos la nueva actividad
